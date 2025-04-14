@@ -30,16 +30,9 @@ jobs:
           npm install -g npm@9.8.0
           npm install -g firebase-tools@12.4.6
           
-          # Clean install with package sync
-          echo "Cleaning previous builds..."
-          rm -rf node_modules
-          rm -f package-lock.json
-          
+          # Install dependencies using clean install
           echo "Installing dependencies..."
-          npm install --legacy-peer-deps
-          
-          echo "Verifying installation..."
-          npm ls || true
+          npm ci
 
       - name: Create Environment Files
         run: |
