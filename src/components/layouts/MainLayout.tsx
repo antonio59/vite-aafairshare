@@ -18,7 +18,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button"; // Import Button for trigger
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useSession } from "@/hooks/useSession";
+import { useTheme } from "@/hooks/useTheme";
+import { cn } from "@/lib/utils";
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -36,32 +44,40 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentUser, loading } = useAuth();
-  // Safely access userProfile with optional chaining
-  const userProfile = (currentUser as any)?.userProfile;
   const { toast } = useToast();
+  const [isMobile] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
-  // --- Redirect and Loading Logic ---
-  // Show loading state first
-  if (loading) {
-     return ( <div className="flex min-h-screen items-center justify-center"><p>Loading...</p></div> );
-  }
-  
-  // Direct navigation when not authenticated
   useEffect(() => {
-    // Log route changes
-    console.log("Current route:", location.pathname);
-    
-    if (!currentUser && location.pathname !== '/login' && location.pathname !== '/register') {
-      console.warn("MainLayout: Not authenticated. Redirecting to login.");
-      navigate("/login", { replace: true });
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+
+    if (isMobile) {
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      return () => {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      };
     }
-  }, [currentUser, location.pathname, navigate]);
-  
-  // If we're still checking authentication and not on login page, don't render yet
-  if (!currentUser && location.pathname !== '/login' && location.pathname !== '/register') {
+  }, [isMobile]);
+
+  useEffect(() => {
+    if (loading) return;
+    if (!currentUser) {
+      navigate('/login');
+    }
+  }, [currentUser, loading, navigate]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!currentUser) {
     return null;
   }
-  // --- End Redirect/Loading ---
+
+  const userProfile = (currentUser as any)?.userProfile;
 
   const handleLogout = async () => {
     try {

@@ -10,14 +10,18 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "baseUrl": ".", // Add baseUrl
+    "composite": true,
+    "declaration": true,
     "paths": {      // Add paths mapping
-      "shared": ["../shared"] // Point to source relative to baseUrl
-    },
-    "rootDir": "src"
+      "shared": ["../shared"],
+      "shared/*": ["../shared/*"]
+    }
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src/**/*"
+  ],
+  "references": [
+    { "path": "../shared" }
   ]
 }

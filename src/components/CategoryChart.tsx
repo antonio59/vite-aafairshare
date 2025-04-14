@@ -156,7 +156,7 @@ export default function CategoryChart({ summary, isLoading = false }: CategoryCh
                       >
                         {categoryTotal.category.name}
                       </span>
-                    </div> {/* End of left-side div */}
+                    </div>
                     {/* Right side: amount + percentage */}
                     <div className="text-right">
                       <span className="text-sm font-medium text-gray-800 dark:text-gray-200 financial-value">
@@ -166,9 +166,9 @@ export default function CategoryChart({ summary, isLoading = false }: CategoryCh
                         {categoryTotal.percentage.toFixed(0)}%
                       </span>
                     </div>
-                  </div> // End of parent div for this iteration
-                ); // End of return statement
-              })} // End of map function
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

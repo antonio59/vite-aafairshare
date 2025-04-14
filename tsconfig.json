@@ -23,7 +23,23 @@
       "@shared/*": ["shared/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx", "vite.config.js"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "shared/**/*.ts",
+    "shared/**/*.tsx",
+    "shared/**/*.js",
+    "shared/**/*.jsx",
+    "functions/**/*.ts",
+    "functions/**/*.tsx",
+    "functions/**/*.js",
+    "functions/**/*.jsx",
+    "vite.config.ts",
+    "eslint.config.mjs",
+    "vitest.config.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }],
   "exclude": ["node_modules", "dist", "backup"]
 }

@@ -418,8 +418,7 @@ return (
                 </div>
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-amber-800">Unsettled Month</h3>
-                  {/* eslint-disable-next-line react/no-unescaped-entities */}
-                  <p className="text-sm text-amber-600 mt-1">The previous month hasn't been settled yet.</p>
+                  <p className="text-sm text-amber-600 mt-1">The previous month has not been settled yet.</p>
                 </div>
               </div>
             </div>

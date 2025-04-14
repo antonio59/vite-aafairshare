@@ -13,9 +13,8 @@ import type {
 // Import shared types from the installed 'shared' package
 import type {
   Settlement, Expense, User, Category, Location, RecurringExpense, RecurringFrequency,
-  // Import shared formatting utilities
-  formatCurrency, formatDate
 } from "shared"; // Import from package name
+import { formatCurrency, formatDate } from "shared"; // Import functions normally
 import type {EmailTemplate} from "./types.ts"; // Assuming types are in ./types
 
 // Initialize Firebase Admin SDK
@@ -241,7 +240,6 @@ export const onSettlementCreated = functions
         for (const tryPath of possiblePaths) {
           try {
             functions.logger.log(`Trying font path: ${tryPath}`);
-            // eslint-disable-next-line @typescript-eslint/no-var-requires
             pdfFonts = require(tryPath);
             fontPath = tryPath;
             functions.logger.log(`Successfully loaded fonts from: ${fontPath}`);
@@ -630,7 +628,7 @@ export const generateRecurringExpenses = functions.pubsub
           const newExpense: Omit<Expense, "id"> = {
             description: recurringExpense.description || recurringExpense.title,
             amount: recurringExpense.amount,
-            date: admin.firestore.Timestamp.fromDate(today),
+            date: admin.firestore.Timestamp.fromDate(today).toDate(),
             paidByUserId: recurringExpense.paidByUserId,
             splitType: recurringExpense.splitType,
             categoryId: recurringExpense.categoryId,

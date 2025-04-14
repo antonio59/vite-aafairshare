@@ -7,10 +7,7 @@ import { queryClient } from '@/lib/queryClient';
 // Define the structure for the item being edited (must have an id)
 interface EditableItem {
   id: string;
-  // Using 'any' here for flexibility as the hook is generic.
-  // Consider creating more specific hooks if stricter typing is needed.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Define the options for the hook

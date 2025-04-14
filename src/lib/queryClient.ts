@@ -13,44 +13,28 @@ export async function apiRequest<T = unknown>(
   method: string = 'GET',
   data?: unknown | undefined,
 ): Promise<T> {
-
   // Enhanced fetch options for better session handling
   const fetchOptions: RequestInit = {
     method,
     headers: {
       ...(data ? { "Content-Type": "application/json" } : {}),
       "X-Requested-With": "XMLHttpRequest",
-      // Add Cache-Control to prevent caching issues
       "Cache-Control": "no-cache, no-store, must-revalidate",
       "Pragma": "no-cache",
-      // Accept header to ensure proper content negotiation
       "Accept": "application/json"
     },
     body: data ? JSON.stringify(data) : undefined,
-    credentials: "include", // Critical - include cookies
+    credentials: "include",
     mode: 'cors',
     cache: 'no-cache',
     redirect: 'follow'
   };
 
-
-  // Add cookie debug information
-
   const res = await fetch(url, fetchOptions);
-
-  // Log response headers for debugging purposes
-  // Removed leftover console.log arguments
-
   await throwIfResNotOk(res);
 
-  // For 204 No Content responses (commonly used in DELETE operations),
-  // don't try to parse the response as JSON as there's no body
   if (res.status === 204) {
-    // Returning {} as any here because the function promises T, but there's no content.
-    // This assumes callers handle cases where T might be expected but an empty object is returned.
-    // A more robust solution might involve changing the return type to Promise<T | null> or similar.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return ({} as any);
+    return {} as T;
   }
 
   const responseData = await res.json();
@@ -58,10 +42,9 @@ export async function apiRequest<T = unknown>(
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
+export const getQueryFn = <T>({ on401: unauthorizedBehavior }: {
   on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
-  ({ on401: unauthorizedBehavior }) =>
+}): QueryFunction<T> =>
   async ({ queryKey }) => {
     // Handle array query keys properly
     let url = queryKey[0] as string;
@@ -109,11 +92,7 @@ export const getQueryFn: <T>(options: {
 
     // For 204 No Content responses, don't try to parse the response as JSON
     if (res.status === 204) {
-      // Returning {} as any here because the function promises T, but there's no content.
-      // This assumes callers handle cases where T might be expected but an empty object is returned.
-      // A more robust solution might involve changing the return type to Promise<T | null> or similar.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return ({} as any);
+      return {} as T;
     }
 
     return await res.json();

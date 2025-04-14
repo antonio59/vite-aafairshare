@@ -33,14 +33,11 @@ const CardTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  // eslint-disable-next-line jsx-a11y/heading-has-content
   <h3
-    ref={ref}
-    className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
-      className
-    )}
-    {...props} // Children are passed via props
+    ref={ref as React.Ref<HTMLHeadingElement>}
+    className={cn("text-lg font-semibold leading-none tracking-tight", className)}
+    aria-label={props['aria-label'] || 'Card title'}
+    {...props}
   />
 ))
 CardTitle.displayName = "CardTitle"

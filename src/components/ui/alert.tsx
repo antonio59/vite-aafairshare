@@ -36,11 +36,11 @@ const AlertTitle = React.forwardRef<
   HTMLHeadingElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  // eslint-disable-next-line jsx-a11y/heading-has-content
   <h5
-    ref={ref}
+    ref={ref as React.Ref<HTMLHeadingElement>}
     className={cn("mb-1 font-medium leading-none tracking-tight", className)}
-    {...props} // Children are passed via props
+    aria-label={props['aria-label'] || 'Alert title'}
+    {...props}
   />
 ))
 AlertTitle.displayName = "AlertTitle"
