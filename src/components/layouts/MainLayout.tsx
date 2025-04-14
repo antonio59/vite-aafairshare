@@ -1,0 +1,225 @@
+import { ReactNode } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Home, Users, BarChart2, Settings, LogOut, RefreshCw } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { auth } from "@/lib/firebase";
+import { useToast } from "@/hooks/use-toast";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { SkipLink } from "@/components/SkipLink";
+import { SwipeContainer } from "@/components/SwipeContainer";
+// Import DropdownMenu for mobile profile
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button"; // Import Button for trigger
+import { useEffect } from "react";
+
+interface MainLayoutProps {
+  children: ReactNode;
+}
+
+const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: Home },
+  { href: "/settlement", label: "Settlement", icon: Users },
+  { href: "/analytics", label: "Analytics", icon: BarChart2 },
+  { href: "/recurring", label: "Recurring", icon: RefreshCw },
+  { href: "/settings", label: "Settings", icon: Settings },
+];
+
+export default function MainLayout({ children }: MainLayoutProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { currentUser, loading } = useAuth();
+  // Safely access userProfile with optional chaining
+  const userProfile = (currentUser as any)?.userProfile;
+  const { toast } = useToast();
+
+  // --- Redirect and Loading Logic ---
+  // Show loading state first
+  if (loading) {
+     return ( <div className="flex min-h-screen items-center justify-center"><p>Loading...</p></div> );
+  }
+  
+  // Direct navigation when not authenticated
+  useEffect(() => {
+    // Log route changes
+    console.log("Current route:", location.pathname);
+    
+    if (!currentUser && location.pathname !== '/login' && location.pathname !== '/register') {
+      console.warn("MainLayout: Not authenticated. Redirecting to login.");
+      navigate("/login", { replace: true });
+    }
+  }, [currentUser, location.pathname, navigate]);
+  
+  // If we're still checking authentication and not on login page, don't render yet
+  if (!currentUser && location.pathname !== '/login' && location.pathname !== '/register') {
+    return null;
+  }
+  // --- End Redirect/Loading ---
+
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      toast({ title: "Logged Out", description: "You have been successfully logged out." });
+      // Navigate to login after logout
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout Error:", error);
+      toast({ title: "Logout Failed", description: "Could not log out.", variant: "destructive" });
+    }
+  };
+
+  const getInitials = (name?: string | null, email?: string | null): string => {
+    // ... (Keep existing getInitials function) ...
+    if (name) {
+      const names = name.split(' ');
+      if (names.length > 1) return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+      return name.substring(0, 2).toUpperCase();
+    }
+    if (email) return email.substring(0, 2).toUpperCase();
+    return '??';
+  };
+
+  return (
+    // Use h-screen and overflow-hidden on the outer container for mobile layout control
+    <div className="flex h-screen overflow-hidden bg-background">
+      <SkipLink />
+      {/* Sidebar (Desktop) - Added md:h-screen md:sticky md:top-0 */}
+      <aside className="hidden md:flex md:flex-col w-64 bg-card border-r border-border md:h-screen md:sticky md:top-0" aria-label="Main navigation">
+        {/* Sidebar Title Link */}
+        <div className="flex items-center justify-center h-16 border-b border-border flex-shrink-0">
+          {/* Apply styles directly to Link, which renders an <a> */}
+          <Link to="/" className="text-xl font-semibold text-primary hover:text-primary/80 transition-colors">AAFairShare</Link>
+        </div>
+        {/* Sidebar Navigation */}
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto" data-testid="desktop-navigation">
+          {navItems.map((item) => (
+            // Apply styles directly to Link
+            <Link
+              key={item.href}
+              to={item.href}
+              className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${ 
+                location.pathname === item.href 
+                  ? "bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary" 
+                  : "text-foreground/60 hover:bg-secondary hover:text-foreground" 
+              }`}
+            >
+              <item.icon className="mr-3 h-5 w-5" aria-hidden="true" />{item.label}
+            </Link>
+          ))}
+        </nav>
+        {/* Theme Toggle */}
+        <div className="px-4 py-2 border-t border-border flex-shrink-0">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-foreground">Theme</span>
+            <ThemeToggle />
+          </div>
+        </div>
+
+        {/* Sidebar Profile Section */}
+        <div className="p-4 border-t border-gray-200 flex-shrink-0">
+          {currentUser ? (
+            <div className="flex items-center space-x-3">
+              {/* Increased Avatar size */}
+              <Avatar className="h-12 w-12"><AvatarImage src={userProfile?.photoURL || currentUser.photoURL || undefined} alt={userProfile?.username || currentUser.displayName || "User"} /><AvatarFallback>{getInitials(userProfile?.username || currentUser.displayName, currentUser.email)}</AvatarFallback></Avatar>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{userProfile?.username || currentUser.displayName || "User"}</p>
+                <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-red-600 transition-colors flex items-center"><LogOut className="mr-1 h-3 w-3" />Logout</button>
+              </div>
+            </div>
+          ) : ( <p className="text-sm text-gray-500">Not logged in</p> )}
+        </div>
+      </aside>
+
+      {/* Main Content Area - Changed to h-screen and overflow-y-auto for all sizes */}
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+        <SwipeContainer
+          key={location.pathname}
+          onSwipeLeft={() => {
+            // Find the next navigation item
+            const currentIndex = navItems.findIndex(item => item.href === location.pathname);
+            if (currentIndex !== -1 && currentIndex < navItems.length - 1) {
+              navigate(navItems[currentIndex + 1].href);
+            }
+          }}
+          onSwipeRight={() => {
+            // Find the previous navigation item
+            const currentIndex = navItems.findIndex(item => item.href === location.pathname);
+            if (currentIndex > 0) {
+              navigate(navItems[currentIndex - 1].href);
+            }
+          }}
+        >
+        {/* Mobile Header - Enhanced with better position & shadow */}
+        <header className="md:hidden sticky top-0 z-30 flex items-center justify-between h-14 px-4 bg-card border-b border-border flex-shrink-0 shadow-sm">
+          {/* Mobile App Title/Logo Link */}
+          <Link to="/" className="text-lg font-semibold text-primary">
+            AAFairShare
+          </Link>
+
+          {/* Mobile Actions */}
+          <div className="flex items-center space-x-3">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Mobile User Profile Dropdown */}
+            {currentUser ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  {/* Increased touch target size */}
+                  <Button variant="ghost" className="relative h-11 w-11 rounded-full">
+                    <Avatar className="h-11 w-11">
+                      <AvatarImage src={userProfile?.photoURL || currentUser.photoURL || undefined} alt={userProfile?.username || currentUser.displayName || "User"} />
+                      <AvatarFallback>{getInitials(userProfile?.username || currentUser.displayName, currentUser.email)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 mt-2">
+                  <DropdownMenuLabel>{userProfile?.username || currentUser.displayName || "My Account"}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+               <Link to="/login"><Button variant="outline" size="sm">Login</Button></Link> // Show login button if not logged in
+            )}
+          </div>
+        </header>
+
+        {/* Page Content - Added overflow-y-auto to ensure scrolling works correctly */}
+        <main id="main-content" className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 overflow-y-auto" tabIndex={-1}>
+          {children}
+        </main>
+        </SwipeContainer>
+      </div>
+
+      {/* Bottom Navigation (Mobile) - Enhanced with drop shadow and larger touch targets */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border flex justify-around h-16 items-center z-30 px-1 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]" aria-label="Mobile navigation" data-testid="mobile-navigation">
+        {navItems.map((item) => (
+          <Link
+            key={item.href}
+            to={item.href}
+            className={`flex flex-col items-center justify-center h-full text-xs font-medium transition-colors p-1 w-full min-w-[3rem] ${ 
+              location.pathname === item.href
+                ? "text-primary dark:text-primary-foreground bg-primary/10 dark:bg-primary/20"
+                : "text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary-foreground hover:bg-gray-100 dark:hover:bg-gray-800"
+            }`}
+            aria-current={location.pathname === item.href ? "page" : undefined}
+          >
+            <item.icon className="h-6 w-6 mb-1" aria-hidden="true" />
+            <span className="truncate">{item.label}</span>
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+}

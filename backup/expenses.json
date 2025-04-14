@@ -1,0 +1,943 @@
+[
+  {
+    "id": "0Hb2uzEpugqZV6RC38Cu",
+    "data": {
+      "description": "",
+      "amount": "10.00",
+      "date": {
+        "_seconds": 1742860800,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "MuNOe1kix69fRrxLM2v7",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "1CoO1jjlYjfqEHq6Iw1O",
+    "data": {
+      "description": "",
+      "amount": "632.26",
+      "date": {
+        "_seconds": 1739750400,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "mDaWeyEv4ThLtChrFRhn",
+      "locationId": "dYY3n0sQzLeNqcAsNNyQ",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "3JpL7Xhwup89IVkilV5s",
+    "data": {
+      "description": "",
+      "amount": "25.00",
+      "date": {
+        "_seconds": 1740787200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "51yXf3oJrGMxCsOdHC1s",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "3Yoiswy7xk1uxqCfjPyg",
+    "data": {
+      "amount": 179.57,
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4z0fBvsgpMEkiv1YAFU1",
+      "splitType": "50/50",
+      "date": {
+        "_seconds": 1743462000,
+        "_nanoseconds": 0
+      },
+      "description": "",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "month": "2025-04",
+      "createdAt": {
+        "_seconds": 1743759628,
+        "_nanoseconds": 801000000
+      }
+    }
+  },
+  {
+    "id": "3yYo4WP2eXvKLsPgvxk1",
+    "data": {
+      "description": "",
+      "amount": "40.00",
+      "date": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "LGoXvByFA6oCOyYdzsDm",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "5THswA0QUrnt1KkXZ0Ws",
+    "data": {
+      "description": "",
+      "amount": "30.00",
+      "date": {
+        "_seconds": 1739664000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "oc69io7C8Zbv58d1VzOh",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "6iGx25liaEpnvho1PWpV",
+    "data": {
+      "description": "",
+      "amount": "40.00",
+      "date": {
+        "_seconds": 1739059200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "MuNOe1kix69fRrxLM2v7",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "7ItP6g8Y7sjReXTBiNxE",
+    "data": {
+      "description": "",
+      "amount": "236.84",
+      "date": {
+        "_seconds": 1739750400,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "mDaWeyEv4ThLtChrFRhn",
+      "locationId": "HEbzkdLnTvBUClLRDhjv",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "86vjVIMz5jUzhAAeBvTa",
+    "data": {
+      "description": "",
+      "amount": "40.00",
+      "date": {
+        "_seconds": 1740787200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "LGoXvByFA6oCOyYdzsDm",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "8NcYFvLhBN1vb5UNmPed",
+    "data": {
+      "description": "",
+      "amount": "29.80",
+      "date": {
+        "_seconds": 1737763200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "0DDvSWWkvEeP1m2DLhpy",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "ADZUTf0xphQTboDRddlb",
+    "data": {
+      "description": "",
+      "amount": "15.00",
+      "date": {
+        "_seconds": 1743033600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "WtSyyXiI80lPhT4qZFzk",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "AMHPS10aZdM6VaGcA6If",
+    "data": {
+      "description": "cleaning products",
+      "amount": "20.45",
+      "date": {
+        "_seconds": 1735776000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "HSZGsyhXGnyAFJxgIJHA",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "AeZWyYETmPfnjpRRwCe4",
+    "data": {
+      "description": "",
+      "amount": "12.00",
+      "date": {
+        "_seconds": 1737417600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "MuNOe1kix69fRrxLM2v7",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "BNpBduKY2k772JJNalWL",
+    "data": {
+      "description": "presents and shipping",
+      "amount": "20.00",
+      "date": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "mEsuXO7iuGFntx4y6wOa",
+      "locationId": "crThNOvfEZtJdYQmc9fl",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "BPS09Ee4dhutV1WOXfrS",
+    "data": {
+      "amount": 44.97,
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "oc69io7C8Zbv58d1VzOh",
+      "splitType": "50/50",
+      "date": {
+        "_seconds": 1743634800,
+        "_nanoseconds": 0
+      },
+      "description": "",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "month": "2025-04",
+      "createdAt": {
+        "_seconds": 1743759721,
+        "_nanoseconds": 9000000
+      }
+    }
+  },
+  {
+    "id": "BRkpzD5fBnUCnZl1J2KF",
+    "data": {
+      "description": "",
+      "amount": "20.20",
+      "date": {
+        "_seconds": 1741996800,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "ZVaPQCDJDfYlqDEqeSc4",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "C84S7beQtBPiazPtcBZM",
+    "data": {
+      "description": "",
+      "amount": "132.27",
+      "date": {
+        "_seconds": 1733011200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2024-12",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4BaV8IuBnC7IbWbYCKFH",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "Fkk4a0UAVWi6stqudX09",
+    "data": {
+      "description": "",
+      "amount": "168.00",
+      "date": {
+        "_seconds": 1733097600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2024-12",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4z0fBvsgpMEkiv1YAFU1",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "HDwp3oXvSSLHZSnF0r1y",
+    "data": {
+      "description": "yoghurt milk",
+      "date": {
+        "_seconds": 1736035200,
+        "_nanoseconds": 0
+      },
+      "split_type": "100%",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "EbUxrW1NhwPcmNoZK6aV",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "amount": 7.1,
+      "splitType": "100%",
+      "updatedAt": {
+        "_seconds": 1743760014,
+        "_nanoseconds": 4000000
+      }
+    }
+  },
+  {
+    "id": "HS052XBuGJk6m9ZhGPHd",
+    "data": {
+      "description": "",
+      "amount": "30.29",
+      "date": {
+        "_seconds": 1739923200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "qSbM8lWUTu41FIjook5M",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "HdOi8XqMpnkaI9r8s3T9",
+    "data": {
+      "amount": 40,
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "LGoXvByFA6oCOyYdzsDm",
+      "splitType": "50/50",
+      "date": {
+        "_seconds": 1743462000,
+        "_nanoseconds": 0
+      },
+      "description": "",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "month": "2025-04",
+      "createdAt": {
+        "_seconds": 1743759595,
+        "_nanoseconds": 104000000
+      }
+    }
+  },
+  {
+    "id": "HjQQcKLydKidYdAAjuUf",
+    "data": {
+      "description": "",
+      "amount": "56.00",
+      "date": {
+        "_seconds": 1739404800,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "qqCMzDY5pwZlLfmlFKQP",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "J81qIBaqrBqr6jvhPpE0",
+    "data": {
+      "description": "",
+      "amount": "28.11",
+      "date": {
+        "_seconds": 1737676800,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "oc69io7C8Zbv58d1VzOh",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "MwTVmm12KGTjXZj0q13B",
+    "data": {
+      "description": "",
+      "amount": "20.00",
+      "date": {
+        "_seconds": 1742515200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "EbUxrW1NhwPcmNoZK6aV",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "N4kKmjeaHZyvTYdt6BGu",
+    "data": {
+      "description": "",
+      "amount": "26.77",
+      "date": {
+        "_seconds": 1735776000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "G5n35JrgcUrLpm0d4oM4",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "NdAwub5ItVkWxs7jtgRG",
+    "data": {
+      "description": "",
+      "amount": "30.00",
+      "date": {
+        "_seconds": 1736640000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "EbUxrW1NhwPcmNoZK6aV",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "O94jXeIk8noLIxqi2LnB",
+    "data": {
+      "description": "",
+      "amount": "111.17",
+      "date": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4BaV8IuBnC7IbWbYCKFH",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "OKS10b7lKoNJ9kgvTbnP",
+    "data": {
+      "description": "",
+      "amount": "10.00",
+      "date": {
+        "_seconds": 1736294400,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "MuNOe1kix69fRrxLM2v7",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "OrDCHwM2ofU7D0x4dFPI",
+    "data": {
+      "description": "",
+      "amount": "86.44",
+      "date": {
+        "_seconds": 1738368000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4BaV8IuBnC7IbWbYCKFH",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "PnGMyQ7xz6zXKqPn1Jrc",
+    "data": {
+      "description": "yoghurt",
+      "date": {
+        "_seconds": 1739664000,
+        "_nanoseconds": 0
+      },
+      "split_type": "100%",
+      "month": "2025-02",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "oc69io7C8Zbv58d1VzOh",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "amount": 1.5,
+      "splitType": "100%"
+    }
+  },
+  {
+    "id": "PwGoYGeSUbobh3j2bk6T",
+    "data": {
+      "description": "",
+      "amount": "9.00",
+      "date": {
+        "_seconds": 1738368000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "WtSyyXiI80lPhT4qZFzk",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "SwznAXqQJy9ju1LJlpG4",
+    "data": {
+      "amount": 28.45,
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "8tABzcgkQP3lY3dy3VSm",
+      "splitType": "50/50",
+      "date": {
+        "_seconds": 1743292800,
+        "_nanoseconds": 0
+      },
+      "description": "",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2",
+      "month": "2025-03",
+      "createdAt": {
+        "_seconds": 1743860694,
+        "_nanoseconds": 879000000
+      }
+    }
+  },
+  {
+    "id": "TQs5EVRZGF0grW6uVL2P",
+    "data": {
+      "description": "",
+      "amount": "40.00",
+      "date": {
+        "_seconds": 1733097600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2024-12",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "LGoXvByFA6oCOyYdzsDm",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "VTm5iAVwBng6EiVJyeA1",
+    "data": {
+      "description": "",
+      "amount": "25.00",
+      "date": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "51yXf3oJrGMxCsOdHC1s",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "VjJaKDHCbtRJgmzcV9PV",
+    "data": {
+      "description": "",
+      "amount": "12.00",
+      "date": {
+        "_seconds": 1741651200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "MuNOe1kix69fRrxLM2v7",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "WR8R7fUM11uaJVXooxn0",
+    "data": {
+      "description": "yoghurt",
+      "split_type": "100%",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "oc69io7C8Zbv58d1VzOh",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "amount": 5,
+      "splitType": "100%",
+      "date": {
+        "_seconds": 1738108800,
+        "_nanoseconds": 0
+      },
+      "updatedAt": {
+        "_seconds": 1743760251,
+        "_nanoseconds": 246000000
+      }
+    }
+  },
+  {
+    "id": "XoMft1QCMG4Y1dtpF1XD",
+    "data": {
+      "description": "",
+      "amount": "25.00",
+      "date": {
+        "_seconds": 1738368000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "51yXf3oJrGMxCsOdHC1s",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "Z8g0LY32r8yfjgO6cwxb",
+    "data": {
+      "description": "",
+      "amount": "8.00",
+      "date": {
+        "_seconds": 1739923200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "MuNOe1kix69fRrxLM2v7",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "csrqoHsWq9XNsDySW7Cb",
+    "data": {
+      "description": "",
+      "amount": "15.70",
+      "date": {
+        "_seconds": 1741996800,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "n35JZNWIVC97Ygslr7fP",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "eicGDZorWveJI5w50CFN",
+    "data": {
+      "description": "",
+      "amount": "15.58",
+      "date": {
+        "_seconds": 1736035200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "EbUxrW1NhwPcmNoZK6aV",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "fI9sXAuRv55LAiDYChrm",
+    "data": {
+      "description": "",
+      "amount": "43.70",
+      "date": {
+        "_seconds": 1738281600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "Ury4h0cb6xDF9mfd1Cw4",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "g23nHPrwXCa2NpsHaUKf",
+    "data": {
+      "description": "",
+      "amount": "115.64",
+      "date": {
+        "_seconds": 1740787200,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4BaV8IuBnC7IbWbYCKFH",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "hqjUBi8Pp9YmOr56XMl0",
+    "data": {
+      "description": "",
+      "amount": "169.00",
+      "date": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4z0fBvsgpMEkiv1YAFU1",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "jGWVaoofW3ZE20ioFy8Y",
+    "data": {
+      "description": "",
+      "amount": "40.39",
+      "date": {
+        "_seconds": 1743206400,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "SkIsdngEsNGLX21X53B4",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "kDJ9q7bhguFNkddYZ1B3",
+    "data": {
+      "description": "",
+      "amount": "50.50",
+      "date": {
+        "_seconds": 1736121600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "WtSyyXiI80lPhT4qZFzk",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "kPShGMkkMVUjA4IEQ8xM",
+    "data": {
+      "description": "",
+      "amount": "30.29",
+      "date": {
+        "_seconds": 1738972800,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "qSbM8lWUTu41FIjook5M",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2"
+    }
+  },
+  {
+    "id": "l8cj3CFeLvzV7q7WQBaS",
+    "data": {
+      "description": "",
+      "date": {
+        "_seconds": 1743159932,
+        "_nanoseconds": 598000000
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "oc69io7C8Zbv58d1VzOh",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "amount": 41.15,
+      "splitType": "50/50",
+      "updatedAt": {
+        "_seconds": 1743759779,
+        "_nanoseconds": 252000000
+      }
+    }
+  },
+  {
+    "id": "m3kPK1wftab5im70iJxR",
+    "data": {
+      "amount": 25,
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "51yXf3oJrGMxCsOdHC1s",
+      "splitType": "50/50",
+      "date": {
+        "_seconds": 1743462000,
+        "_nanoseconds": 0
+      },
+      "description": "",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "month": "2025-04",
+      "createdAt": {
+        "_seconds": 1743759567,
+        "_nanoseconds": 338000000
+      }
+    }
+  },
+  {
+    "id": "mJN6VZxyujx4mXqNVh0W",
+    "data": {
+      "description": "",
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "oc69io7C8Zbv58d1VzOh",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "date": {
+        "_seconds": 1738108800,
+        "_nanoseconds": 0
+      },
+      "amount": 31.76,
+      "splitType": "50/50",
+      "updatedAt": {
+        "_seconds": 1743760269,
+        "_nanoseconds": 383000000
+      }
+    }
+  },
+  {
+    "id": "pHqZBqaxtaCNBkNH1Jy7",
+    "data": {
+      "description": "",
+      "amount": "101.41",
+      "date": {
+        "_seconds": 1743462000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-04",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "4BaV8IuBnC7IbWbYCKFH",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "pecEbvjcEP0QXhvMs8TN",
+    "data": {
+      "description": "tuna",
+      "amount": "18.89",
+      "date": {
+        "_seconds": 1736640000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "HSZGsyhXGnyAFJxgIJHA",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "qLTlPYatU2Un4PCcuadE",
+    "data": {
+      "description": "",
+      "amount": "32.26",
+      "date": {
+        "_seconds": 1733097600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2024-12",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "51yXf3oJrGMxCsOdHC1s",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "r8ut626QU7N3ZEbsgmju",
+    "data": {
+      "description": "",
+      "amount": "40.00",
+      "date": {
+        "_seconds": 1738368000,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-02",
+      "categoryId": "s2Sib3yjwjMce2mA3Sra",
+      "locationId": "LGoXvByFA6oCOyYdzsDm",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "tqvzZJeKNI3UcVVzgIBb",
+    "data": {
+      "description": "",
+      "amount": "17.06",
+      "date": {
+        "_seconds": 1741305600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-03",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "77OKFHTjZEiAZJPFppXN",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  },
+  {
+    "id": "vLQtOLvI4p6ZCpJlAsan",
+    "data": {
+      "amount": 56.1,
+      "categoryId": "7FIe4Kk3v7velUgiLcrE",
+      "locationId": "PGGWEJ8auTmQmSEEJJnl",
+      "splitType": "50/50",
+      "date": {
+        "_seconds": 1742515200,
+        "_nanoseconds": 0
+      },
+      "description": "",
+      "paidByUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2",
+      "month": "2025-03",
+      "createdAt": {
+        "_seconds": 1743860768,
+        "_nanoseconds": 501000000
+      }
+    }
+  },
+  {
+    "id": "wxE3PoWF6AWEWIV066Gl",
+    "data": {
+      "description": "",
+      "amount": "18.35",
+      "date": {
+        "_seconds": 1735689600,
+        "_nanoseconds": 0
+      },
+      "split_type": "50/50",
+      "month": "2025-01",
+      "categoryId": "fG69FIQZ28Oh6GK05B5r",
+      "locationId": "77OKFHTjZEiAZJPFppXN",
+      "paidByUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23"
+    }
+  }
+]

@@ -1,0 +1,248 @@
+.settlements-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.settlements-container h1 {
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  background-color: var(--card-bg-color);
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.month-selector h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.month-selector button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.month-selector button:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.month-selector button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.settlement-summary {
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.summary-card h3 {
+  margin-top: 0;
+  color: var(--text-color);
+}
+
+.summary-card .amount {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary-color);
+  margin: 1rem 0;
+}
+
+.create-settlement-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+  width: 100%;
+  max-width: 300px;
+}
+
+.create-settlement-button:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.create-settlement-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.settlement-history {
+  margin-top: 2rem;
+}
+
+.settlement-history h2 {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.settlements-list {
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.settlement-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.settlement-item:last-child {
+  border-bottom: none;
+}
+
+.settlement-details {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.settlement-date {
+  min-width: 100px;
+  color: var(--text-color-light);
+}
+
+.settlement-amount {
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.settlement-status {
+  background-color: #e6f7e6;
+  color: #2e7d32;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.settlement-actions .delete-button {
+  background-color: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.settlement-actions .delete-button:hover {
+  background-color: rgba(255, 68, 68, 0.2);
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  color: var(--text-color-light);
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color-light);
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--text-color);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.modal-actions button.confirm-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.modal-actions button:not(.confirm-button) {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .settlement-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .settlement-date {
+    min-width: auto;
+  }
+  
+  .settlement-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .settlement-actions {
+    margin-top: 1rem;
+    align-self: flex-end;
+  }
+}

@@ -1,0 +1,60 @@
+name: Staging Deployment
+
+on:
+  push:
+    branches:
+      - develop
+      - 'feature/**'
+      - 'bugfix/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm install -g npm@9.8.0
+          npm install -g firebase-tools@12.4.6
+          npm ci
+
+      - name: Create env file
+        run: |
+          cat << EOF > .env
+          VITE_FIREBASE_API_KEY=${{ secrets.STAGING_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN=${{ secrets.STAGING_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID=${{ secrets.STAGING_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET=${{ secrets.STAGING_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.STAGING_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID=${{ secrets.STAGING_APP_ID }}
+          VITE_FIREBASE_MEASUREMENT_ID=${{ secrets.STAGING_MEASUREMENT_ID }}
+          EOF
+
+      - name: Build
+        run: npm run build:staging
+
+      - name: Deploy to Firebase
+        run: |
+          echo '${{ secrets.STAGING_FIREBASE_RC }}' > .firebaserc
+          firebase deploy --only hosting --token '${{ secrets.STAGING_DEPLOY_TOKEN }}'
+
+      - name: Notify Slack
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow,job,took,pullRequest
+          text: 'Staging Deployment ${{ job.status }}'
+          webhook-url: ${{ secrets.STAGING_SLACK_URL }} 

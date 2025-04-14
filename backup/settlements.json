@@ -1,0 +1,78 @@
+[
+  {
+    "id": "Q5v8ViAlGBmBV5rc5cBG",
+    "data": {
+      "month": "2025-01",
+      "amount": 260.34000000000003,
+      "date": {
+        "_seconds": 1744018335,
+        "_nanoseconds": 708000000
+      },
+      "fromUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2",
+      "toUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "notes": "Settlement for 2025-01",
+      "recordedBy": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "createdAt": {
+        "_seconds": 1744018335,
+        "_nanoseconds": 820000000
+      }
+    }
+  },
+  {
+    "id": "fmLz6MWdafR2A1VxAmZe",
+    "data": {
+      "month": "2025-02",
+      "amount": 373.86999999999995,
+      "date": {
+        "_seconds": 1743755734,
+        "_nanoseconds": 306000000
+      },
+      "fromUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "toUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2",
+      "notes": "Settlement for 2025-02",
+      "recordedBy": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "createdAt": {
+        "_seconds": 1743755734,
+        "_nanoseconds": 363000000
+      }
+    }
+  },
+  {
+    "id": "vOGiiowqmZ003dB5H8F4",
+    "data": {
+      "month": "2025-03",
+      "amount": 30.705000000000013,
+      "date": {
+        "_seconds": 1743860892,
+        "_nanoseconds": 442000000
+      },
+      "fromUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2",
+      "toUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "notes": "Settlement for 2025-03",
+      "recordedBy": "7dCjpZWVqyROVvhGig4gwhCwnEa2",
+      "createdAt": {
+        "_seconds": 1743860892,
+        "_nanoseconds": 828000000
+      }
+    }
+  },
+  {
+    "id": "wVxXgKnCTcJwUfl4mtIr",
+    "data": {
+      "month": "2024-12",
+      "amount": 186.265,
+      "date": {
+        "_seconds": 1744018340,
+        "_nanoseconds": 644000000
+      },
+      "fromUserId": "7dCjpZWVqyROVvhGig4gwhCwnEa2",
+      "toUserId": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "notes": "Settlement for 2024-12",
+      "recordedBy": "AOm7vJnYaQRKZ6bPoTvikz0ZnQ23",
+      "createdAt": {
+        "_seconds": 1744018340,
+        "_nanoseconds": 718000000
+      }
+    }
+  }
+]

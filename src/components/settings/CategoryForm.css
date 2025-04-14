@@ -1,0 +1,111 @@
+.category-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.category-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.category-form label {
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.category-form input {
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg-color);
+  color: var(--text-color);
+}
+
+.icon-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.icon-option {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background-color: var(--card-bg-color);
+  border: 1px solid var(--border-color);
+  transition: all 0.2s;
+}
+
+.icon-option:hover {
+  background-color: var(--hover-color);
+}
+
+.icon-option.selected {
+  background-color: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+.icon-placeholder {
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.form-actions button {
+  padding: 0.75rem 1.25rem;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.submit-button:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.submit-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.cancel-button {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+}
+
+.cancel-button:hover {
+  background-color: var(--hover-color);
+}
+
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background-color: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}

@@ -1,0 +1,107 @@
+# FairShare Expense Sharing App
+
+A modern expense sharing application designed for two users to track and split expenses, built with React, TypeScript, and Firebase.
+
+## Features
+
+- 🔐 Google Authentication
+- 💰 Track and categorize expenses
+- 📊 Visualize spending patterns with charts
+- 🔄 Split expenses equally (50/50) or assign to one user (100%)
+- 📱 Responsive design for mobile and desktop
+- 📆 Monthly expense tracking and settlement
+
+## Architecture Overview
+
+### Tech Stack
+
+- **Frontend**: React 18 with TypeScript, built using Vite
+- **State Management**: React Context + React Query for server state
+- **UI Components**: Tailwind CSS with shadcn/ui components
+- **Forms**: React Hook Form with Zod validation
+- **Backend**: Firebase (Firestore, Authentication)
+- **Routing**: React Router v7
+
+### Core Architecture Concepts
+
+#### Two-User System
+The application is designed specifically for two users to share expenses:
+- Simplified user management
+- Split types limited to 50/50 or 100%
+- Straightforward settlement calculations
+
+#### Component Architecture
+- **Container/Presentation Pattern**: Separates data fetching from UI rendering
+- **Lazy Loading**: Improves initial load time with component code splitting
+- **Memo & Optimization**: Performance optimized for larger datasets
+
+#### Data Flow
+- **Context Providers**: Domain-specific contexts (User, Resources)
+- **Custom Hooks**: Abstracted data fetching and state management
+- **Service Layer**: Firebase operations abstracted through service modules
+
+#### Type System
+- Centralized type definitions in shared directory
+- Consistent use of TypeScript interfaces
+- Strong typing throughout the application
+
+## Getting Started
+
+### Prerequisites
+- Node.js 16+
+- Firebase account
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/fairshare.git
+cd fairshare
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Create a `.env` file in the root directory with your Firebase configuration:
+```
+VITE_FIREBASE_API_KEY=your-api-key
+VITE_FIREBASE_AUTH_DOMAIN=your-auth-domain
+VITE_FIREBASE_PROJECT_ID=your-project-id
+VITE_FIREBASE_STORAGE_BUCKET=your-storage-bucket
+VITE_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
+VITE_FIREBASE_APP_ID=your-app-id
+```
+
+4. Start the development server
+```bash
+npm run dev
+```
+
+## Project Structure
+
+```
+src/
+├── components/      # UI components
+├── contexts/        # React Context providers
+├── hooks/           # Custom React hooks
+├── lib/             # Utilities and configuration
+├── pages/           # Page components
+├── services/        # API and Firebase services
+└── shared/          # Shared types and utilities
+```
+
+## Code Style & Documentation
+
+This project follows a comprehensive code style guide available in the `docs/code-style-guide.md` file, which includes:
+
+- File organization standards
+- Component structure guidelines
+- Documentation requirements
+- TypeScript best practices
+- Performance considerations
+
+## License
+
+MIT

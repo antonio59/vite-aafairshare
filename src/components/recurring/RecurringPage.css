@@ -1,0 +1,242 @@
+.recurring-container {
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.recurring-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.recurring-container h1 {
+  margin: 0;
+  color: var(--text-color);
+}
+
+.add-recurring-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.add-recurring-button:hover {
+  background-color: var(--primary-color-dark);
+}
+
+.recurring-list {
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.recurring-item {
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.recurring-item:last-child {
+  border-bottom: none;
+}
+
+.recurring-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.recurring-category-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary-color-light);
+  color: var(--primary-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.recurring-info {
+  flex: 1;
+}
+
+.recurring-info h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-color);
+}
+
+.recurring-meta {
+  display: flex;
+  gap: 1rem;
+  color: var(--text-color-light);
+  font-size: 0.9rem;
+}
+
+.recurring-amount {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: var(--primary-color);
+}
+
+.recurring-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.recurring-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.recurring-actions .edit-button {
+  background-color: rgba(0, 123, 255, 0.1);
+  color: #007bff;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+}
+
+.recurring-actions .edit-button:hover {
+  background-color: rgba(0, 123, 255, 0.2);
+}
+
+.recurring-actions .delete-button {
+  background-color: rgba(255, 68, 68, 0.1);
+  color: #ff4444;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.recurring-actions .delete-button:hover {
+  background-color: rgba(255, 68, 68, 0.2);
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  color: var(--text-color-light);
+}
+
+.loading-indicator {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-color-light);
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--card-bg-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: var(--text-color);
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-bg-color);
+  color: var(--text-color);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.modal-actions button.confirm-button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+}
+
+.modal-actions button:not(.confirm-button) {
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .recurring-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .add-recurring-button {
+    width: 100%;
+  }
+  
+  .recurring-details {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .recurring-category-icon {
+    margin-bottom: 0.5rem;
+  }
+  
+  .recurring-meta {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .recurring-amount {
+    margin-top: 0.5rem;
+  }
+}

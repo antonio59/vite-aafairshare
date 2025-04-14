@@ -1,0 +1,10 @@
+[
+  {
+    "id": "settlementNotification",
+    "data": {
+      "subject": "AAFairShare Settlement Report - {{month}}",
+      "htmlBody": "<div style=\"font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;\">   <h1 style=\"color: #0F172A; margin-bottom: 20px;\">AAFairShare</h1>   <h2 style=\"border-bottom: 1px solid #eee; padding-bottom: 10px;\">Settlement Report - {{month}}</h2>   <p>Hi {{fromUserName}} and {{toUserName}},</p>   <p>Here's the settlement summary for <strong>{{month}}</strong>:</p>   <div style=\"background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;\">     <p style=\"margin: 5px 0;\">{{fromUserName}} Paid: <strong>{{fromUserTotalFormatted}}</strong></p>     <p style=\"margin: 5px 0;\">{{toUserName}} Paid: <strong>{{toUserTotalFormatted}}</strong></p>     <p style=\"margin: 5px 0;\">Total Expenses: <strong>{{totalExpensesFormatted}}</strong></p>     <hr style=\"border: none; border-top: 1px solid #eee; margin: 10px 0;\">     <p style=\"margin: 5px 0;\">Settlement: <strong>{{fromUserName}} paid {{toUserName}} {{settlementAmountFormatted}}</strong></p>   </div>   <p>Please find the detailed CSV and PDF reports attached.</p>   <br/>   <p>Thanks,</p>   <p><strong>The AAFairShare Team</strong></p> </div>",
+      "textBody": "Settlement report for {{month}} attached. Total: {{totalExpensesFormatted}}. {{fromUserName}} paid {{toUserName}} {{settlementAmountFormatted}}."
+    }
+  }
+]

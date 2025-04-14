@@ -1,0 +1,186 @@
+[
+  {
+    "id": "6Qx0MfzW7bEwn3QTrxZc",
+    "data": {
+      "to": [
+        "antoniojosephsmith18@gmail.com",
+        "andypamo@gmail.com"
+      ],
+      "message": {
+        "subject": "AAFairShare Settlement Report - 2025-02",
+        "text": "Settlement report for 2025-02 attached. Total: $NaN. Antonio paid Andres $373.87.",
+        "html": "<div style=\"font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;\">   <h1 style=\"color: #0F172A; margin-bottom: 20px;\">AAFairShare</h1>   <h2 style=\"border-bottom: 1px solid #eee; padding-bottom: 10px;\">Settlement Report - 2025-02</h2>   <p>Hi Antonio and Andres,</p>   <p>Here's the settlement summary for <strong>2025-02</strong>:</p>   <div style=\"background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;\">     <p style=\"margin: 5px 0;\">Antonio Paid: <strong>$NaN</strong></p>     <p style=\"margin: 5px 0;\">Andres Paid: <strong>$NaN</strong></p>     <p style=\"margin: 5px 0;\">Total Expenses: <strong>$NaN</strong></p>     <hr style=\"border: none; border-top: 1px solid #eee; margin: 10px 0;\">     <p style=\"margin: 5px 0;\">Settlement: <strong>Antonio paid Andres $373.87</strong></p>   </div>   <p>Please find the detailed CSV and PDF reports attached.</p>   <br/>   <p>Thanks,</p>   <p><strong>The AAFairShare Team</strong></p> </div>",
+        "attachments": [
+          {
+            "filename": "Settlement-Report-2025-02.csv",
+            "content": "IkRhdGUiLCJEZXNjcmlwdGlvbiIsIkNhdGVnb3J5IiwiTG9jYXRpb24iLCJBbW91bnQiLCJQYWlkIEJ5IgoiMDEvMDIvMjAyNSIsIiIsIlV0aWxpdGllcyIsIk92byBFbmVyZ3kiLCIkODYuNDQiLCJBbnRvbmlvIgoiMDEvMDIvMjAyNSIsIiIsIkdyb2NlcmllcyIsIk0mUyIsIiQ5LjAwIiwiQW5kcmVzIgoiMDEvMDIvMjAyNSIsIiIsIlV0aWxpdGllcyIsIkh5cGVyb3B0aWMiLCIkMjUuMDAiLCJBbnRvbmlvIgoiMDEvMDIvMjAyNSIsIiIsIlV0aWxpdGllcyIsIlRoYW1lcyBXYXRlciIsIiQ0MC4wMCIsIkFudG9uaW8iCiIwOC8wMi8yMDI1IiwiIiwiRGluaW5nIiwiRGVsaXZlcm9vIiwiJDMwLjI5IiwiQW5kcmVzIgoiMDkvMDIvMjAyNSIsIiIsIkdyb2NlcmllcyIsIlRlc2NvIiwiJDQwLjAwIiwiQW5kcmVzIgoiMTMvMDIvMjAyNSIsIiIsIkRpbmluZyIsIlViZXJFYXRzIiwiJDU2LjAwIiwiQW50b25pbyIKIjE2LzAyLzIwMjUiLCIiLCJHcm9jZXJpZXMiLCJPY2FkbyIsIiQzMC4wMCIsIkFudG9uaW8iCiIxNi8wMi8yMDI1IiwieW9naHVydCIsIkdyb2NlcmllcyIsIk9jYWRvIiwiJDEuNTAiLCJBbnRvbmlvIgoiMTcvMDIvMjAyNSIsIiIsIkhvbGlkYXlzIiwiUnlhbmFpciIsIiQ2MzIuMjYiLCJBbmRyZXMiCiIxNy8wMi8yMDI1IiwiIiwiSG9saWRheXMiLCJBdmlzIiwiJDIzNi44NCIsIkFuZHJlcyIKIjE5LzAyLzIwMjUiLCIiLCJEaW5pbmciLCJEZWxpdmVyb28iLCIkMzAuMjkiLCJBbmRyZXMiCiIxOS8wMi8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiVGVzY28iLCIkOC4wMCIsIkFuZHJlcyI=",
+            "encoding": "base64",
+            "contentType": "text/csv"
+          }
+        ]
+      },
+      "delivery": {
+        "startTime": {
+          "_seconds": 1743755743,
+          "_nanoseconds": 567000000
+        },
+        "error": null,
+        "leaseExpireTime": null,
+        "state": "SUCCESS",
+        "endTime": {
+          "_seconds": 1743755746,
+          "_nanoseconds": 662000000
+        },
+        "info": {
+          "rejected": [],
+          "pending": [],
+          "messageId": "<4cdf9c10-2c89-9833-0354-593153032d10@gmail.com>",
+          "accepted": [
+            "antoniojosephsmith18@gmail.com",
+            "andypamo@gmail.com"
+          ],
+          "response": "250 2.0.0 OK  1743755746 ffacd0b85a97d-39c301a6ae5sm3830416f8f.32 - gsmtp"
+        },
+        "attempts": 1
+      }
+    }
+  },
+  {
+    "id": "YaC7EzfXwiEwysJcLFs7",
+    "data": {
+      "to": [
+        "andypamo@gmail.com",
+        "antoniojosephsmith18@gmail.com"
+      ],
+      "message": {
+        "subject": "AAFairShare Settlement Report - 2025-01",
+        "text": "Settlement report for 2025-01 attached. Total: £713.18. Andres paid Antonio £260.34.",
+        "html": "<div style=\"font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;\">   <h1 style=\"color: #0F172A; margin-bottom: 20px;\">AAFairShare</h1>   <h2 style=\"border-bottom: 1px solid #eee; padding-bottom: 10px;\">Settlement Report - 2025-01</h2>   <p>Hi Andres and Antonio,</p>   <p>Here's the settlement summary for <strong>2025-01</strong>:</p>   <div style=\"background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;\">     <p style=\"margin: 5px 0;\">Andres Paid: <strong>£102.30</strong></p>     <p style=\"margin: 5px 0;\">Antonio Paid: <strong>£610.88</strong></p>     <p style=\"margin: 5px 0;\">Total Expenses: <strong>£713.18</strong></p>     <hr style=\"border: none; border-top: 1px solid #eee; margin: 10px 0;\">     <p style=\"margin: 5px 0;\">Settlement: <strong>Andres paid Antonio £260.34</strong></p>   </div>   <p>Please find the detailed CSV and PDF reports attached.</p>   <br/>   <p>Thanks,</p>   <p><strong>The AAFairShare Team</strong></p> </div>",
+        "attachments": [
+          {
+            "filename": "Settlement-Report-2025-01.csv",
+            "content": "IkRhdGUiLCJEZXNjcmlwdGlvbiIsIkNhdGVnb3J5IiwiTG9jYXRpb24iLCJBbW91bnQiLCJQYWlkIEJ5IgoiMDEvMDEvMjAyNSIsIiIsIlV0aWxpdGllcyIsIlRoYW1lcyBXYXRlciIsIsKjNDAuMDAiLCJBbnRvbmlvIgoiMDEvMDEvMjAyNSIsInByZXNlbnRzIGFuZCBzaGlwcGluZyIsIkdpZnRzIiwiVGVtdSIsIsKjMjAuMDAiLCJBbnRvbmlvIgoiMDEvMDEvMjAyNSIsIiIsIlV0aWxpdGllcyIsIk92byBFbmVyZ3kiLCLCozExMS4xNyIsIkFudG9uaW8iCiIwMS8wMS8yMDI1IiwiIiwiVXRpbGl0aWVzIiwiSHlwZXJvcHRpYyIsIsKjMjUuMDAiLCJBbnRvbmlvIgoiMDEvMDEvMjAyNSIsIiIsIlV0aWxpdGllcyIsIlRvd2VyIEhhbWxldHMgQ291bmNpbCBUYXgiLCLCozE2OS4wMCIsIkFudG9uaW8iCiIwMS8wMS8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiTWFjcm8gRm9vZCBDZW50ZXIiLCLCozE4LjM1IiwiQW50b25pbyIKIjAyLzAxLzIwMjUiLCJjbGVhbmluZyBwcm9kdWN0cyIsIkdyb2NlcmllcyIsIkFtYXpvbiIsIsKjMjAuNDUiLCJBbnRvbmlvIgoiMDIvMDEvMjAyNSIsIiIsIkdyb2NlcmllcyIsIkxpZGwiLCLCozI2Ljc3IiwiQW50b25pbyIKIjA1LzAxLzIwMjUiLCJ5b2dodXJ0IG1pbGsiLCJHcm9jZXJpZXMiLCJXYWl0cm9zZSIsIsKjNy4xMCIsIkFudG9uaW8iCiIwNS8wMS8yMDI1IiwiIiwiRGluaW5nIiwiV2FpdHJvc2UiLCLCozE1LjU4IiwiQW50b25pbyIKIjA2LzAxLzIwMjUiLCIiLCJHcm9jZXJpZXMiLCJNJlMiLCLCozUwLjUwIiwiQW5kcmVzIgoiMDgvMDEvMjAyNSIsIiIsIkdyb2NlcmllcyIsIlRlc2NvIiwiwqMxMC4wMCIsIkFuZHJlcyIKIjEyLzAxLzIwMjUiLCIiLCJHcm9jZXJpZXMiLCJXYWl0cm9zZSIsIsKjMzAuMDAiLCJBbnRvbmlvIgoiMTIvMDEvMjAyNSIsInR1bmEiLCJHcm9jZXJpZXMiLCJBbWF6b24iLCLCozE4Ljg5IiwiQW50b25pbyIKIjIxLzAxLzIwMjUiLCIiLCJHcm9jZXJpZXMiLCJUZXNjbyIsIsKjMTIuMDAiLCJBbmRyZXMiCiIyNC8wMS8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiT2NhZG8iLCLCozI4LjExIiwiQW50b25pbyIKIjI1LzAxLzIwMjUiLCIiLCJEaW5pbmciLCJOb29kbGUgU3RyZWV0IiwiwqMyOS44MCIsIkFuZHJlcyIKIjI5LzAxLzIwMjUiLCJ5b2dodXJ0IiwiR3JvY2VyaWVzIiwiT2NhZG8iLCLCozUuMDAiLCJBbnRvbmlvIgoiMjkvMDEvMjAyNSIsIiIsIkdyb2NlcmllcyIsIk9jYWRvIiwiwqMzMS43NiIsIkFudG9uaW8iCiIzMS8wMS8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiVmlsZ2FpbiIsIsKjNDMuNzAiLCJBbnRvbmlvIgoiU3VtbWFyeSIsIiIsLCwsCiJBbmRyZXMgUGFpZDoiLCLCozEwMi4zMCIsLCwsCiJBbnRvbmlvIFBhaWQ6IiwiwqM2MTAuODgiLCwsLAoiVG90YWwgRXhwZW5zZXM6IiwiwqM3MTMuMTgiLCwsLAoiU2V0dGxlbWVudCBBbW91bnQ6IiwiQW5kcmVzIHBhaWQgQW50b25pbyDCozI2MC4zNCIsLCws",
+            "encoding": "base64",
+            "contentType": "text/csv"
+          }
+        ]
+      },
+      "delivery": {
+        "startTime": {
+          "_seconds": 1744018342,
+          "_nanoseconds": 348000000
+        },
+        "error": null,
+        "leaseExpireTime": null,
+        "state": "SUCCESS",
+        "endTime": {
+          "_seconds": 1744018345,
+          "_nanoseconds": 122000000
+        },
+        "info": {
+          "rejected": [],
+          "pending": [],
+          "messageId": "<5e5c4b1d-96c5-004d-e079-b888105d3a54@gmail.com>",
+          "accepted": [
+            "andypamo@gmail.com",
+            "antoniojosephsmith18@gmail.com"
+          ],
+          "response": "250 2.0.0 OK  1744018345 ffacd0b85a97d-39c301b42besm11336265f8f.41 - gsmtp"
+        },
+        "attempts": 1
+      }
+    }
+  },
+  {
+    "id": "ee82wK8LOrKuGvRZiU5U",
+    "data": {
+      "to": [
+        "andypamo@gmail.com",
+        "antoniojosephsmith18@gmail.com"
+      ],
+      "message": {
+        "subject": "AAFairShare Settlement Report - 2024-12",
+        "text": "Settlement report for 2024-12 attached. Total: £372.53. Andres paid Antonio £186.27.",
+        "html": "<div style=\"font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;\">   <h1 style=\"color: #0F172A; margin-bottom: 20px;\">AAFairShare</h1>   <h2 style=\"border-bottom: 1px solid #eee; padding-bottom: 10px;\">Settlement Report - 2024-12</h2>   <p>Hi Andres and Antonio,</p>   <p>Here's the settlement summary for <strong>2024-12</strong>:</p>   <div style=\"background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;\">     <p style=\"margin: 5px 0;\">Andres Paid: <strong>£0.00</strong></p>     <p style=\"margin: 5px 0;\">Antonio Paid: <strong>£372.53</strong></p>     <p style=\"margin: 5px 0;\">Total Expenses: <strong>£372.53</strong></p>     <hr style=\"border: none; border-top: 1px solid #eee; margin: 10px 0;\">     <p style=\"margin: 5px 0;\">Settlement: <strong>Andres paid Antonio £186.27</strong></p>   </div>   <p>Please find the detailed CSV and PDF reports attached.</p>   <br/>   <p>Thanks,</p>   <p><strong>The AAFairShare Team</strong></p> </div>",
+        "attachments": [
+          {
+            "filename": "Settlement-Report-2024-12.csv",
+            "content": "IkRhdGUiLCJEZXNjcmlwdGlvbiIsIkNhdGVnb3J5IiwiTG9jYXRpb24iLCJBbW91bnQiLCJQYWlkIEJ5IgoiMDEvMTIvMjAyNCIsIiIsIlV0aWxpdGllcyIsIk92byBFbmVyZ3kiLCLCozEzMi4yNyIsIkFudG9uaW8iCiIwMi8xMi8yMDI0IiwiIiwiVXRpbGl0aWVzIiwiVG93ZXIgSGFtbGV0cyBDb3VuY2lsIFRheCIsIsKjMTY4LjAwIiwiQW50b25pbyIKIjAyLzEyLzIwMjQiLCIiLCJVdGlsaXRpZXMiLCJUaGFtZXMgV2F0ZXIiLCLCozQwLjAwIiwiQW50b25pbyIKIjAyLzEyLzIwMjQiLCIiLCJVdGlsaXRpZXMiLCJIeXBlcm9wdGljIiwiwqMzMi4yNiIsIkFudG9uaW8iCiJTdW1tYXJ5IiwiIiwsLCwKIkFuZHJlcyBQYWlkOiIsIsKjMC4wMCIsLCwsCiJBbnRvbmlvIFBhaWQ6IiwiwqMzNzIuNTMiLCwsLAoiVG90YWwgRXhwZW5zZXM6IiwiwqMzNzIuNTMiLCwsLAoiU2V0dGxlbWVudCBBbW91bnQ6IiwiQW5kcmVzIHBhaWQgQW50b25pbyDCozE4Ni4yNyIsLCws",
+            "encoding": "base64",
+            "contentType": "text/csv"
+          }
+        ]
+      },
+      "delivery": {
+        "startTime": {
+          "_seconds": 1744018342,
+          "_nanoseconds": 508000000
+        },
+        "error": null,
+        "leaseExpireTime": null,
+        "state": "SUCCESS",
+        "endTime": {
+          "_seconds": 1744018348,
+          "_nanoseconds": 457000000
+        },
+        "info": {
+          "rejected": [],
+          "pending": [],
+          "messageId": "<9abe132e-95cf-0d73-6646-9e36d50673bb@gmail.com>",
+          "accepted": [
+            "andypamo@gmail.com",
+            "antoniojosephsmith18@gmail.com"
+          ],
+          "response": "250 2.0.0 OK  1744018348 ffacd0b85a97d-39c30226bbfsm11809224f8f.90 - gsmtp"
+        },
+        "attempts": 1
+      }
+    }
+  },
+  {
+    "id": "ou39G8NWbin76tMRxNLJ",
+    "data": {
+      "to": [
+        "andypamo@gmail.com",
+        "antoniojosephsmith18@gmail.com"
+      ],
+      "message": {
+        "subject": "AAFairShare Settlement Report - 2025-03",
+        "text": "Settlement report for 2025-03 attached. Total: £NaN. Andres paid Antonio £30.71.",
+        "html": "<div style=\"font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px;\">   <h1 style=\"color: #0F172A; margin-bottom: 20px;\">AAFairShare</h1>   <h2 style=\"border-bottom: 1px solid #eee; padding-bottom: 10px;\">Settlement Report - 2025-03</h2>   <p>Hi Andres and Antonio,</p>   <p>Here's the settlement summary for <strong>2025-03</strong>:</p>   <div style=\"background-color: #f9f9f9; padding: 10px; border-radius: 5px; margin-bottom: 15px;\">     <p style=\"margin: 5px 0;\">Andres Paid: <strong>£NaN</strong></p>     <p style=\"margin: 5px 0;\">Antonio Paid: <strong>£NaN</strong></p>     <p style=\"margin: 5px 0;\">Total Expenses: <strong>£NaN</strong></p>     <hr style=\"border: none; border-top: 1px solid #eee; margin: 10px 0;\">     <p style=\"margin: 5px 0;\">Settlement: <strong>Andres paid Antonio £30.71</strong></p>   </div>   <p>Please find the detailed CSV and PDF reports attached.</p>   <br/>   <p>Thanks,</p>   <p><strong>The AAFairShare Team</strong></p> </div>",
+        "attachments": [
+          {
+            "filename": "Settlement-Report-2025-03.csv",
+            "content": "IkRhdGUiLCJEZXNjcmlwdGlvbiIsIkNhdGVnb3J5IiwiTG9jYXRpb24iLCJBbW91bnQiLCJQYWlkIEJ5IgoiMDEvMDMvMjAyNSIsIiIsIlV0aWxpdGllcyIsIkh5cGVyb3B0aWMiLCLCozI1LjAwIiwiQW50b25pbyIKIjAxLzAzLzIwMjUiLCIiLCJVdGlsaXRpZXMiLCJUaGFtZXMgV2F0ZXIiLCLCozQwLjAwIiwiQW50b25pbyIKIjAxLzAzLzIwMjUiLCIiLCJVdGlsaXRpZXMiLCJPdm8gRW5lcmd5IiwiwqMxMTUuNjQiLCJBbnRvbmlvIgoiMDcvMDMvMjAyNSIsIiIsIkdyb2NlcmllcyIsIk1hY3JvIEZvb2QgQ2VudGVyIiwiwqMxNy4wNiIsIkFudG9uaW8iCiIxMS8wMy8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiVGVzY28iLCLCozEyLjAwIiwiQW5kcmVzIgoiMTUvMDMvMjAyNSIsIiIsIkdyb2NlcmllcyIsIkFsZGkiLCLCozIwLjIwIiwiQW50b25pbyIKIjE1LzAzLzIwMjUiLCIiLCJEaW5pbmciLCJIYW4gQ2hpbmVzZSIsIsKjMTUuNzAiLCJBbmRyZXMiCiIyMS8wMy8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiV2FpdHJvc2UiLCLCozIwLjAwIiwiQW5kcmVzIgoiMjEvMDMvMjAyNSIsIiIsIkRpbmluZyIsIklwcHVkbyIsIsKjNTYuMTAiLCJBbmRyZXMiCiIyNS8wMy8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiVGVzY28iLCLCozEwLjAwIiwiQW5kcmVzIgoiMjcvMDMvMjAyNSIsIiIsIkdyb2NlcmllcyIsIk0mUyIsIsKjMTUuMDAiLCJBbmRyZXMiCiIyOC8wMy8yMDI1IiwiIiwiR3JvY2VyaWVzIiwiT2NhZG8iLCLCozQxLjE1IiwiQW50b25pbyIKIjI5LzAzLzIwMjUiLCIiLCJEaW5pbmciLCJOb3RlcyIsIsKjNDAuMzkiLCJBbmRyZXMiCiIzMC8wMy8yMDI1IiwiIiwiRGluaW5nIiwiWmFtYnJlcm8iLCLCozI4LjQ1IiwiQW5kcmVzIgoiU3VtbWFyeSIsIiIsLCwsCiJBbmRyZXMgUGFpZDoiLCLCo05hTiIsLCwsCiJBbnRvbmlvIFBhaWQ6IiwiwqNOYU4iLCwsLAoiVG90YWwgRXhwZW5zZXM6IiwiwqNOYU4iLCwsLAoiU2V0dGxlbWVudCBBbW91bnQ6IiwiQW5kcmVzIHBhaWQgQW50b25pbyDCozMwLjcxIiwsLCw=",
+            "encoding": "base64",
+            "contentType": "text/csv"
+          }
+        ]
+      },
+      "delivery": {
+        "startTime": {
+          "_seconds": 1743860899,
+          "_nanoseconds": 190000000
+        },
+        "error": null,
+        "leaseExpireTime": null,
+        "state": "SUCCESS",
+        "endTime": {
+          "_seconds": 1743860901,
+          "_nanoseconds": 642000000
+        },
+        "info": {
+          "rejected": [],
+          "pending": [],
+          "messageId": "<2ac33dda-4dc5-304f-4f75-203aca2aa272@gmail.com>",
+          "accepted": [
+            "andypamo@gmail.com",
+            "antoniojosephsmith18@gmail.com"
+          ],
+          "response": "250 2.0.0 OK  1743860901 5b1f17b1804b1-43ec1660eb3sm77546145e9.11 - gsmtp"
+        },
+        "attempts": 1
+      }
+    }
+  }
+]
