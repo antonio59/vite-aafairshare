@@ -28,18 +28,27 @@ firestore-debug.log*
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+*.swp
+*~
 
 # Testing
 coverage/
 __tests__/coverage/
 .nyc_output/
+test-results/
+playwright-report/
+cypress/videos/
+cypress/screenshots/
 
 # Production
 build/
@@ -47,12 +56,12 @@ build/
 .netlify
 
 # Firebase service account keys
-serviceAccountKey.json
-serviceAccountKey.staging.json
+serviceAccountKey*.json
 
 # TypeScript
 *.tsbuildinfo
 .tscache/
+tsconfig.tsbuildinfo
 
 # Cache and temporary files
 .cache/
@@ -65,3 +74,35 @@ serviceAccountKey.staging.json
 .env.development
 .env.staging
 .env.production
+
+# Screenshots and backups
+aafairshare_screenshots/
+backup/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Debug files
+debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# Vite
+.vite/

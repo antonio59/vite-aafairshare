@@ -1,119 +1,66 @@
-# Deployment Strategy
+# Deployment Guide
 
-This document outlines our git workflow, CI/CD pipelines, and deployment strategy for the FairShare application.
+## GitHub Branching Strategy
 
-## Git Branch Strategy
+We use a simplified Git Flow approach with the following branches:
 
-We follow a simplified GitFlow workflow with the following branches:
+- **main**: Production branch that always reflects the live environment
+- **develop**: Staging branch for testing before production
+- **feature/***:  Short-lived branches for new features
+- **bugfix/***:  Short-lived branches for bug fixes
+- **hotfix/***:  Emergency fixes applied directly to main
 
-- `main`: Production-ready code that is deployed to the live environment
-- `develop`: Integration branch for features to be tested in the staging environment
-- `feature/*`: Feature branches for development work
-- `hotfix/*`: Hotfix branches for critical production fixes
+### Branch Workflow:
 
-### Workflow:
+1. Create feature/bugfix branches from `develop`
+2. Open pull requests to merge back into `develop`
+3. Periodically merge `develop` into `main` for production releases
+4. Create hotfixes from `main` and merge back to both `main` and `develop`
 
-1. Create a feature branch from `develop` using the format `feature/feature-name`
-2. Develop and test your feature locally
-3. Create a pull request to merge your feature branch into `develop`
-4. After code review and approval, merge into `develop` (triggers staging deployment)
-5. Test features in the staging environment
-6. When ready for release, create a PR from `develop` to `main`
-7. After final review, merge into `main` (triggers production deployment)
+## CI/CD Strategy
 
-For urgent fixes:
-1. Create a hotfix branch from `main` using the format `hotfix/issue-description`
-2. Implement and test the fix
-3. Create a PR to merge into both `main` and `develop`
+We use GitHub Actions for continuous integration and deployment:
 
-## CI/CD Pipeline
+### Pull Request Validation
+- Triggered on any PR to any branch
+- Runs linting, tests, and build verification
+- Must pass before merging
 
-We use GitHub Actions to automate our testing and deployment workflows:
+### Deployment Workflow
+- Triggered on pushes to `main` and `develop` branches
+- Runs validation steps (lint, test, build)
+- Deploys to appropriate Firebase environment:
+  - `main` → Production
+  - `develop` → Staging
 
-### Workflows:
+## Environment Setup
 
-1. **Pull Request Checks** (runs on PR to `develop` or `main`):
-   - Run linting
-   - Run unit tests
-   - Build application
+### Environment Variables
+- Store sensitive environment variables in GitHub Repository Secrets
+- Required secrets:
+  - `FIREBASE_SERVICE_ACCOUNT`: Firebase service account JSON
+  - `FIREBASE_PROJECT_ID`: Firebase project ID
 
-2. **Staging Deployment** (runs on push to `develop`):
-   - Run linting and tests
-   - Build application with staging env variables
-   - Deploy to Firebase Hosting (staging environment)
-   - Deploy Firestore and Storage rules
-   - Run E2E tests against staging environment
-   - Notify team of successful deployment
-
-3. **Production Deployment** (runs on push to `main`):
-   - Run linting and tests
-   - Build application with production env variables
-   - Create a version tag based on package.json
-   - Deploy to Firebase Hosting (production environment)
-   - Deploy Firestore and Storage rules
-   - Create a GitHub release
-   - Run E2E tests against production environment
-   - Notify team of successful deployment
-
-## Environments
-
-### Staging Environment
-- URL: https://staging.fairshare.app
-- Firebase Project: fairshare-staging
-- Purpose: Testing new features before production release
-- Configuration: Uses staging environment variables
-
-### Production Environment
-- URL: https://fairshare.app
-- Firebase Project: fairshare-prod
-- Purpose: Live application for end users
-- Configuration: Uses production environment variables
+### Firebase Projects
+- **Production**: Linked to `main` branch
+- **Staging**: Linked to `develop` branch
 
 ## Version Management
 
-We follow Semantic Versioning (SemVer) for our application releases:
+We follow semantic versioning (MAJOR.MINOR.PATCH):
+- MAJOR: Breaking changes
+- MINOR: New features (backwards compatible)
+- PATCH: Bug fixes (backwards compatible)
 
-- **Major version** (X.0.0): Breaking changes or significant new features
-- **Minor version** (X.Y.0): New features with backward compatibility
-- **Patch version** (X.Y.Z): Bug fixes and minor improvements
+### Dependencies
+- Lock npm dependencies in package-lock.json
+- Regularly update dependencies with security patches
+- Schedule major dependency updates between feature releases
 
-The version is managed in the `package.json` file and used to create release tags.
+## Deployment Process
 
-## Firebase Configuration
-
-### Firebase Features Used:
-- Firebase Hosting for web application
-- Firestore for database
-- Firebase Storage for file storage
-- Firebase Authentication for user management
-
-### Deployment Setup:
-1. We use separate Firebase projects for staging and production
-2. Environment-specific configuration is stored in GitHub Secrets
-3. Firebase service accounts are configured as secrets in GitHub
-4. Firebase rules are versioned in the repository and deployed with the application
-
-## Required GitHub Secrets
-
-The following secrets need to be configured in the GitHub repository:
-
-### Staging Environment:
-- `FIREBASE_SERVICE_ACCOUNT_STAGING`: Firebase service account for staging
-- `STAGING_FIREBASE_API_KEY`, `STAGING_FIREBASE_AUTH_DOMAIN`, etc.
-
-### Production Environment:
-- `FIREBASE_SERVICE_ACCOUNT_PROD`: Firebase service account for production
-- `PROD_FIREBASE_API_KEY`, `PROD_FIREBASE_AUTH_DOMAIN`, etc.
-
-### Notifications:
-- `SLACK_WEBHOOK`: Webhook URL for Slack notifications
-
-## Manual Deployments
-
-In case of need, manual deployments can be triggered using the workflow_dispatch event in GitHub Actions:
-
-1. Go to the Actions tab in GitHub
-2. Select the workflow (Staging or Production)
-3. Click "Run workflow" and select the branch
-4. Fill in any required parameters
-5. Click "Run workflow" to start the deployment 
+1. Merge feature branches to `develop` after PR approval
+2. Test thoroughly on staging environment
+3. Create a release PR from `develop` to `main`
+4. After approval, merge to trigger production deployment
+5. Tag the release with appropriate version 

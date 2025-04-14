@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "site": "aafairshare-37271",
+      "site": "aafairshare---staging",
       "public": "dist",
       "ignore": [
         "firebase.json",
@@ -64,10 +64,6 @@
         {
           "source": "**",
           "headers": [
-            {
-              "key": "X-Robots-Tag",
-              "value": "noindex, nofollow"
-            },
             {
               "key": "Access-Control-Allow-Origin",
               "value": "*"

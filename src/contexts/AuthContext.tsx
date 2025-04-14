@@ -11,13 +11,19 @@ import {
   signOut,
   onAuthStateChanged,
   signInWithPopup,
-  User as FirebaseUser
+  User as FirebaseUser,
+  GoogleAuthProvider
 } from 'firebase/auth';
-import { auth, googleProvider } from '../config/firebase';
+import { auth } from '../lib/firebase';
 import { User, convertFirebaseAuthToUser } from '@shared/types';
 import { Category, Location } from '@shared/schema';
-import { db } from '../config/firebase';
+import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+
+// Create a Google provider instance
+const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
+googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
 
 interface AuthContextType {
   currentUser: User | null;
