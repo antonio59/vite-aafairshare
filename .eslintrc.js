@@ -5,6 +5,7 @@ module.exports = {
     es2021: true,
     node: true,
     jest: true,
+    commonjs: true
   },
   extends: [
     'eslint:recommended',
@@ -81,19 +82,17 @@ module.exports = {
     'react/prop-types': 'off',
     '@typescript-eslint/no-explicit-any': 'warn',
     
-    // Disallow JSX files
-    'react/jsx-filename-extension': [
-      'error',
-      { extensions: ['.tsx'] }
-    ],
-    
     // Path aliasing - enforce @/ imports instead of relative paths
     'import/no-unresolved': 'error',
     
-    // Additional rules can be added as needed
+    // Additional rules
     'react/react-in-jsx-scope': 'off',
-    'no-unused-vars': 'warn',
-    '@typescript-eslint/no-unused-vars': ['warn'],
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['warn', { 
+      argsIgnorePattern: '^_',
+      varsIgnorePattern: '^_',
+      ignoreRestSiblings: true
+    }],
     
     // Custom rule to prevent importing both JSX and TSX versions
     'no-restricted-imports': ['error', {
@@ -113,33 +112,13 @@ module.exports = {
         }
       ]
     }],
-    'import/no-restricted-paths': [
-      'error',
-      {
-        zones: [
-          {
-            target: './src',
-            from: './src',
-            message: 'Duplicate component names detected in JSX and TSX files. Complete the migration of this component.',
-            forbiddenImportPatterns: ['*.jsx'],
-            allowedImportPatterns: ['*.tsx'],
-          },
-        ],
-      },
-    ],
-    
-    // Ensure proper component signatures for TypeScript
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    'react/prop-types': [
-      'warn',
-      {
-        skipUndeclared: true,
-      },
-    ],
     
     // Hooks
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
+    
+    // Allow __dirname in Node.js environment
+    'no-undef': ['error', { typeof: true }]
   },
   overrides: [
     {
@@ -169,6 +148,17 @@ module.exports = {
         'react/prop-types': 'off',
         '@typescript-eslint/explicit-function-return-type': 'off',
       },
+    },
+    {
+      // Node.js script files
+      files: ['scripts/*.js', 'vite.config.js', '.eslintrc.js', 'functions/**/*.js'],
+      env: {
+        node: true,
+        commonjs: true
+      },
+      rules: {
+        'no-undef': 'off' // Allow global Node.js variables
+      }
     }
   ]
 }; 

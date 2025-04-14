@@ -148,12 +148,6 @@ function formatMonthYear(monthStr) {
 }
 
 /**
- * Formats a currency amount
- * @param {Number} amount - The amount to format
- * @param {String} currency - The currency code (default: GBP)
- * @returns {String} - Formatted currency amount
- */
-/**
  * Formats a date object to a human-readable string
  * @param {Date|string} date - The date to format
  * @returns {String} - Formatted date (e.g., "January 15, 2023")
@@ -168,21 +162,10 @@ function formatDate(date) {
 }
 
 /**
- * Formats a month string (YYYY-MM) to a human-readable format
- * @param {String} monthStr - The month in YYYY-MM format
- * @returns {String} - Formatted month and year (e.g., "January 2023")
- */
-function formatMonthYear(monthStr) {
-  const [year, month] = monthStr.split('-');
-  const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-}
-
-/**
  * Formats a currency amount
  * @param {Number} amount - The amount to format
  * @param {String} currency - The currency code (default: GBP)
- * @returns {String} - Formatted currency amount
+ * @returns {String} - Formatted currency amount (e.g., "£123.45")
  */
 function formatCurrency(amount, currency = 'GBP') {
   return new Intl.NumberFormat('en-GB', {
