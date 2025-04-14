@@ -35,8 +35,12 @@ jobs:
           npm install -g npm@9.8.0
           npm install -g firebase-tools@12.4.6
 
-      - name: Copy Environment File
-        run: cp .env.staging .env
+      - name: Create Environment Files
+        run: |
+          # Create .env.staging from secret
+          echo '${{ secrets.ENV_STAGING }}' > .env.staging
+          # Copy to .env for build
+          cp .env.staging .env
 
       - name: Create Service Account Key File
         run: |
