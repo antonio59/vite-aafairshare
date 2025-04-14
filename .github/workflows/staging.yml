@@ -57,7 +57,7 @@ jobs:
               "default": "aafairshare---staging"
             }
           }' > .firebaserc
-          firebase deploy --only hosting
+          firebase deploy --only hosting --project aafairshare---staging
 
       - name: Deployment Status
         run: |
