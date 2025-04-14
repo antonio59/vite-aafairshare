@@ -24,11 +24,15 @@ jobs:
           node-version: '18.18.0'
           cache: 'npm'
 
-      - name: Install Dependencies
+      - name: Clean Install
         run: |
+          # Remove platform-specific dependencies
+          rm -rf node_modules
+          rm -f package-lock.json
+          # Install dependencies with --force to ignore platform checks
+          npm install --force
           npm install -g npm@9.8.0
           npm install -g firebase-tools@12.4.6
-          npm ci
 
       - name: Copy Environment File
         run: cp .env.staging .env
