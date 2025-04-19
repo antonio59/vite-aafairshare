@@ -4,8 +4,8 @@ import { cleanup } from '@testing-library/react';
 import matchers from '@testing-library/jest-dom/matchers';
 import { setupServer } from 'msw/node';
 
-// Extend Vitest's expect with React Testing Library matchers
-expect.extend(matchers);
+// Vitest's expect.extend requires 'any' due to lack of type compatibility with jest-dom matchers
+expect.extend(matchers as any);
 
 // Automatically cleanup after each test
 afterEach(() => {

@@ -8,7 +8,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import importPlugin from 'eslint-plugin-import'
 
 export default [
-  { ignores: ['dist', 'node_modules', 'backup', 'functions/lib'] },
+  { ignores: ['dist', 'node_modules', 'backup', 'functions/lib', 'src_backup', 'shared_backup', 'test', 'tests'] },
 
   // Base config for all files
   {
@@ -62,7 +62,7 @@ export default [
       'react-refresh/only-export-components': 'off',
       'react/display-name': 'off',
       'react/no-unescaped-entities': 'off',
-      'no-unused-vars': 'off',
+      'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
       '@typescript-eslint/no-var-requires': 'off',
       'no-undef': 'off',
       'import/no-commonjs': 'off',
@@ -108,14 +108,14 @@ export default [
       ...typescriptEslint.configs.recommended.rules,
       ...reactRecommended.rules,
       ...reactHooks.configs.recommended.rules,
-      'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off',
+      'no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
+      '@typescript-eslint/no-unused-vars': ['error', { 'argsIgnorePattern': '^_' }],
       'react/jsx-filename-extension': ['error', { extensions: ['.tsx'] }],
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react/display-name': 'off',
       'react/no-unescaped-entities': 'off',
-      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/naming-convention': 'off',
       '@typescript-eslint/consistent-type-imports': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',

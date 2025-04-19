@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Users, BarChart2, Settings, LogOut, RefreshCw } from "lucide-react";
+import { Home, Users, BarChart2, Settings, LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/lib/firebase";
@@ -19,14 +19,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button"; // Import Button for trigger
 import { useEffect, useState } from "react";
-import { useSession } from "@/hooks/useSession";
-import { useTheme } from "@/hooks/useTheme";
-import { cn } from "@/lib/utils";
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -36,7 +28,6 @@ const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/settlement", label: "Settlement", icon: Users },
   { href: "/analytics", label: "Analytics", icon: BarChart2 },
-  { href: "/recurring", label: "Recurring", icon: RefreshCw },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -46,12 +37,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
   const { currentUser, loading } = useAuth();
   const { toast } = useToast();
   const [isMobile] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
     if (isMobile) {
@@ -77,7 +66,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return null;
   }
 
-  const userProfile = (currentUser as any)?.userProfile;
+  // Type guard for userProfile
+  type UserProfile = { photoURL?: string | null; username?: string | null };
+  const userProfile: UserProfile | null = (typeof currentUser === 'object' && currentUser && 'userProfile' in currentUser)
+    ? (currentUser as { userProfile?: UserProfile }).userProfile ?? null
+    : null;
 
   const handleLogout = async () => {
     try {
@@ -85,7 +78,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
       toast({ title: "Logged Out", description: "You have been successfully logged out." });
       // Navigate to login after logout
       navigate("/login");
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Logout Error:", error);
       toast({ title: "Logout Failed", description: "Could not log out.", variant: "destructive" });
     }
@@ -103,11 +96,11 @@ export default function MainLayout({ children }: MainLayoutProps) {
   };
 
   return (
-    // Use h-screen and overflow-hidden on the outer container for mobile layout control
-    <div className="flex h-screen overflow-hidden bg-background">
+    // Use h-screen on the outer container for mobile layout control, but remove overflow-hidden
+    <div className="flex h-screen bg-background">
       <SkipLink />
-      {/* Sidebar (Desktop) - Added md:h-screen md:sticky md:top-0 */}
-      <aside className="hidden md:flex md:flex-col w-64 bg-card border-r border-border md:h-screen md:sticky md:top-0" aria-label="Main navigation">
+      {/* Sidebar (Desktop) - Now fixed on desktop */}
+      <aside className="hidden md:flex md:fixed md:inset-y-0 md:left-0 md:w-64 md:flex-col bg-card border-r border-border z-40" aria-label="Main navigation">
         {/* Sidebar Title Link */}
         <div className="flex items-center justify-center h-16 border-b border-border flex-shrink-0">
           {/* Apply styles directly to Link, which renders an <a> */}
@@ -143,9 +136,17 @@ export default function MainLayout({ children }: MainLayoutProps) {
           {currentUser ? (
             <div className="flex items-center space-x-3">
               {/* Increased Avatar size */}
-              <Avatar className="h-12 w-12"><AvatarImage src={userProfile?.photoURL || currentUser.photoURL || undefined} alt={userProfile?.username || currentUser.displayName || "User"} /><AvatarFallback>{getInitials(userProfile?.username || currentUser.displayName, currentUser.email)}</AvatarFallback></Avatar>
+              <Avatar className="h-12 w-12">
+                <AvatarImage src={userProfile?.photoURL ?? currentUser.photoURL ?? undefined} alt={userProfile?.username ?? currentUser.username ?? "User"} />
+                <AvatarFallback>{getInitials(userProfile?.username ?? currentUser.username, currentUser.email)}</AvatarFallback>
+              </Avatar>
               <div className="flex-1 overflow-hidden">
-                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{userProfile?.username || currentUser.displayName || "User"}</p>
+                <div className="flex flex-col">
+                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                    {userProfile?.username ?? currentUser.username ?? "User"}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentUser.email}</p>
+                </div>
                 <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-red-600 transition-colors flex items-center"><LogOut className="mr-1 h-3 w-3" />Logout</button>
               </div>
             </div>
@@ -153,8 +154,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content Area - Changed to h-screen and overflow-y-auto for all sizes */}
-      <div className="flex-1 flex flex-col h-screen overflow-hidden">
+      {/* Main Content Area - Offset for fixed sidebar on desktop */}
+      <div className="flex-1 flex flex-col h-screen min-h-0 md:ml-64">
         <SwipeContainer
           key={location.pathname}
           onSwipeLeft={() => {
@@ -191,13 +192,13 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   {/* Increased touch target size */}
                   <Button variant="ghost" className="relative h-11 w-11 rounded-full">
                     <Avatar className="h-11 w-11">
-                      <AvatarImage src={userProfile?.photoURL || currentUser.photoURL || undefined} alt={userProfile?.username || currentUser.displayName || "User"} />
-                      <AvatarFallback>{getInitials(userProfile?.username || currentUser.displayName, currentUser.email)}</AvatarFallback>
+                      <AvatarImage src={userProfile?.photoURL ?? currentUser.photoURL ?? undefined} alt={userProfile?.username ?? currentUser.username ?? "User"} />
+                      <AvatarFallback>{getInitials(userProfile?.username ?? currentUser.username, currentUser.email)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 mt-2">
-                  <DropdownMenuLabel>{userProfile?.username || currentUser.displayName || "My Account"}</DropdownMenuLabel>
+                  <DropdownMenuLabel>{userProfile?.username ?? currentUser.username ?? "My Account"}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
                     <LogOut className="mr-2 h-4 w-4" />
@@ -211,8 +212,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </div>
         </header>
 
-        {/* Page Content - Added overflow-y-auto to ensure scrolling works correctly */}
-        <main id="main-content" className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 overflow-y-auto" tabIndex={-1}>
+        {/* Page Content - Added overflow-y-auto and min-h-0 to ensure scrolling works correctly */}
+        <main id="main-content" className="flex-1 p-4 sm:p-6 lg:p-8 pb-20 md:pb-8 overflow-y-auto min-h-0" tabIndex={-1}>
           {children}
         </main>
         </SwipeContainer>

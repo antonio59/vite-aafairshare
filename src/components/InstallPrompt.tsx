@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download, X } from 'lucide-react';
@@ -15,16 +15,16 @@ export function InstallPrompt() {
 
   useEffect(() => {
     // Check if it's iOS
-    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as Window & { MSStream?: unknown }).MSStream;
     setIsIOS(isIOSDevice);
 
     // For non-iOS devices, listen for the beforeinstallprompt event
     if (!isIOSDevice) {
-      const handleBeforeInstallPrompt = (e: Event) => {
+      const handleBeforeInstallPrompt = (event: Event) => {
         // Prevent Chrome 67 and earlier from automatically showing the prompt
-        e.preventDefault();
+        event.preventDefault();
         // Store the event for later use
-        setInstallPrompt(e as BeforeInstallPromptEvent);
+        setInstallPrompt(event as BeforeInstallPromptEvent);
         // Show our custom install prompt
         setShowPrompt(true);
       };
@@ -37,7 +37,7 @@ export function InstallPrompt() {
     } else {
       // For iOS, check if the app is already installed
       const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || 
-                                (window.navigator as any).standalone;
+                                (window.navigator as Navigator & { standalone?: boolean }).standalone;
       
       // Only show the iOS instructions if not already in standalone mode
       if (!isInStandaloneMode) {

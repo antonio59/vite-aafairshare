@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 // Lazy load the MonthSelector component
@@ -18,7 +18,7 @@ const MonthSelectorSkeleton = () => (
 // Define props interface
 interface LazyMonthSelectorProps {
   value: string;
-  onChange: (month: string) => void;
+  onChange: (value: string) => void;
 }
 
 export function LazyMonthSelector(props: LazyMonthSelectorProps) {

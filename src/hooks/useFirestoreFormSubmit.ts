@@ -1,26 +1,22 @@
 import { useState } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, updateDoc, doc, DocumentReference } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { queryClient } from '@/lib/queryClient';
 
 // Define the structure for the item being edited (must have an id)
-interface EditableItem {
-  id: string;
-  [key: string]: unknown;
-}
+export type EditableItem = Record<string, unknown>;
 
 // Define the options for the hook
-// Removed unused TFormData generic from options
 interface UseFirestoreFormSubmitOptions {
   collectionName: string;
   item?: EditableItem | null; // The item being edited (if any)
   // Optional: Add specific query keys to invalidate on success
   invalidateQueryKeys?: (string | number)[][];
   // Optional: Custom success/error messages or callbacks
-  onSuccess?: (docRef?: DocumentReference) => void;
+  onSuccess?: () => void;
   // Changed 'any' to 'unknown' for error type
-  onError?: (error: unknown) => void;
+  onError?: () => void;
   successAddTitle?: string;
   successUpdateTitle?: string;
   successAddDescription?: string;
@@ -30,9 +26,9 @@ interface UseFirestoreFormSubmitOptions {
 }
 
 // Define the return type of the hook
-// Removed unused TFormData generic from result
 interface UseFirestoreFormSubmitResult {
-  handleSubmit: (data: object) => Promise<void>; // Use object for data type
+  // eslint-disable-next-line no-unused-vars
+  handleSubmit: (_data: object) => Promise<void>;
   isSubmitting: boolean;
 }
 
@@ -65,20 +61,19 @@ export function useFirestoreFormSubmit(
   const handleSubmit = async (data: object) => {
     setIsSubmitting(true);
     try {
-      let docRef: DocumentReference | undefined = undefined;
+      // docRef removed as it was unused
       const dataToSave = { ...data }; // Copy data to avoid modifying original
 
       if (item?.id) {
         // Update existing item
-        const itemRef = doc(db, collectionName, item.id);
+        const itemRef = doc(collection(db, collectionName), String(item.id));
         await updateDoc(itemRef, dataToSave);
         toast({ title: successUpdateTitle, description: successUpdateDescription });
-        docRef = itemRef; // Store ref for callback
       } else {
         // Add new item
         // Note: We are not adding 'createdAt' here to keep the hook generic.
         // Add it in the component's onSubmit data preparation if needed.
-        docRef = await addDoc(collection(db, collectionName), dataToSave);
+        await addDoc(collection(db, collectionName), dataToSave);
         toast({ title: successAddTitle, description: successAddDescription });
       }
 
@@ -89,7 +84,7 @@ export function useFirestoreFormSubmit(
 
       // Call success callback if provided
       if (onSuccess) {
-        onSuccess(docRef);
+        onSuccess();
       }
 
     } catch (error: unknown) { // Changed 'any' to 'unknown'
@@ -103,7 +98,7 @@ export function useFirestoreFormSubmit(
       });
       // Call error callback if provided
       if (onError) {
-        onError(error); // Pass the original unknown error
+        onError();
       }
     } finally {
       setIsSubmitting(false);

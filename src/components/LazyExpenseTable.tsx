@@ -6,7 +6,7 @@
  */
 
 import React, { Suspense, lazy, memo } from 'react';
-import { ExpenseWithDetails } from '@shared/schema';
+import { ExpenseWithDetails } from '@shared/types';
 
 // Lazy load the ExpenseTable component to reduce initial bundle size
 const ExpenseTable = lazy(() => import("./ExpenseTable").then(module => ({ 

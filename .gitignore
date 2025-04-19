@@ -106,3 +106,7 @@ yarn-error.log*
 
 # Vite
 .vite/
+
+# Rules
+.cursorrules 
+.cursor/

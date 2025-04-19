@@ -78,7 +78,8 @@ const SheetContent = React.forwardRef<
         // Check if the child is SheetTitle
         if (children.type === SheetTitle ||
             (children.type && typeof children.type !== 'string' &&
-             (children.type as any).displayName === SheetPrimitive.Title.displayName)) {
+             'displayName' in children.type &&
+             (children.type as { displayName?: string }).displayName === SheetPrimitive.Title.displayName)) {
           return true;
         }
 

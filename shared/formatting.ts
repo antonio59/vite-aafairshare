@@ -24,19 +24,21 @@ export function formatCurrency(amount: number | undefined | null): string {
  * @param date - The date to format
  * @returns Formatted date string
  */
-export function formatDate(date: Date | string | any): string {
+export function formatDate(date: Date | string | unknown): string {
   // Handle Firestore Timestamp objects
-  if (date && typeof date === 'object' && 'toDate' in date && typeof date.toDate === 'function') {
-    date = date.toDate();
+  if (date && typeof date === 'object' && 'toDate' in date && typeof (date as { toDate?: () => Date }).toDate === 'function') {
+    date = (date as { toDate: () => Date }).toDate();
   }
   
   // Handle string dates
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   
   // Use locale date string for consistent formatting
-  return dateObj.toLocaleDateString("en-GB", {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric'
-  });
+  return dateObj instanceof Date && !isNaN(dateObj.getTime())
+    ? dateObj.toLocaleDateString("en-GB", {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      })
+    : '';
 } 

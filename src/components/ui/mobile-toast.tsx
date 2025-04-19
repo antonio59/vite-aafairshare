@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
@@ -57,6 +57,14 @@ export function MobileToast({
     variant === 'info' ? <Info className="h-5 w-5 text-blue-500" /> : null
   );
 
+  const handleClose = useCallback(() => {
+    setIsExiting(true);
+    setTimeout(() => {
+      setIsVisible(false);
+      onClose?.();
+    }, 300); // Match the transition duration
+  }, [onClose]);
+
   // Trigger haptic feedback based on variant
   useEffect(() => {
     if (variant === 'success') {
@@ -71,20 +79,10 @@ export function MobileToast({
   // Auto-dismiss after duration
   useEffect(() => {
     if (duration) {
-      const timer = setTimeout(() => {
-        handleClose();
-      }, duration);
+      const timer = setTimeout(handleClose, duration);
       return () => clearTimeout(timer);
     }
-  }, [duration]);
-
-  const handleClose = () => {
-    setIsExiting(true);
-    setTimeout(() => {
-      setIsVisible(false);
-      if (onClose) onClose();
-    }, 300); // Match the transition duration
-  };
+  }, [duration, handleClose]);
 
   if (!isVisible) return null;
 

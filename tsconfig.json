@@ -36,10 +36,14 @@
     "functions/**/*.tsx",
     "functions/**/*.js",
     "functions/**/*.jsx",
-    "vite.config.ts",
     "eslint.config.mjs",
     "vitest.config.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }],
-  "exclude": ["node_modules", "dist", "backup"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src_backup",
+    "shared_backup"
+  ]
 }

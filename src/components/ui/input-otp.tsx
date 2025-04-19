@@ -1,20 +1,16 @@
 import * as React from "react"
-import { OTPInput, OTPInputContext } from "input-otp"
-import { Dot } from "lucide-react"
+import { DashIcon } from "@radix-ui/react-icons"
+import { OTPInput, SlotProps } from "input-otp"
 
 import { cn } from "@/lib/utils"
 
 const InputOTP = React.forwardRef<
   React.ElementRef<typeof OTPInput>,
   React.ComponentPropsWithoutRef<typeof OTPInput>
->(({ className, containerClassName, ...props }, ref) => (
+>(({ className, ...props }, ref) => (
   <OTPInput
     ref={ref}
-    containerClassName={cn(
-      "flex items-center gap-2 has-[:disabled]:opacity-50",
-      containerClassName
-    )}
-    className={cn("disabled:cursor-not-allowed", className)}
+    containerClassName={cn("flex items-center gap-2", className)}
     {...props}
   />
 ))
@@ -30,24 +26,26 @@ InputOTPGroup.displayName = "InputOTPGroup"
 
 const InputOTPSlot = React.forwardRef<
   React.ElementRef<"div">,
-  React.ComponentPropsWithoutRef<"div"> & { index: number }
->(({ index, className, ...props }, ref) => {
-  const inputOTPContext = React.useContext(OTPInputContext)
-  const { char, hasFakeCaret, isActive } = inputOTPContext.slots[index]
-
+  SlotProps
+>(({ char, hasFakeCaret, isActive, ...props }, ref) => {
+  const { className = '', ...rest } = props as { className?: string };
   return (
     <div
       ref={ref}
       className={cn(
-        "relative flex h-10 w-10 items-center justify-center border-y border-r border-input text-sm transition-all first:rounded-l-md first:border-l last:rounded-r-md",
-        isActive && "z-10 ring-2 ring-ring ring-offset-background",
+        "relative h-10 w-10 rounded-md border border-input bg-background text-sm transition-all",
+        isActive && "ring-2 ring-offset-background ring-ring",
         className
       )}
-      {...props}
+      {...rest}
     >
-      {char}
+      {char && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          {char}
+        </div>
+      )}
       {hasFakeCaret && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center">
           <div className="h-4 w-px animate-caret-blink bg-foreground duration-1000" />
         </div>
       )}
@@ -61,7 +59,7 @@ const InputOTPSeparator = React.forwardRef<
   React.ComponentPropsWithoutRef<"div">
 >(({ ...props }, ref) => (
   <div ref={ref} role="separator" {...props}>
-    <Dot />
+    <DashIcon />
   </div>
 ))
 InputOTPSeparator.displayName = "InputOTPSeparator"

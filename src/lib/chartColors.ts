@@ -58,9 +58,9 @@ export function getUserColor(username: string): string {
  * @returns A hex color code
  */
 export function getCategoryColor(categoryName: string): string {
+  const colorArray = Object.values(CATEGORY_COLORS);
   return CHART_COLORS.categories[categoryName] ||
-    // If not in our predefined map, use the category colors array in a deterministic way
-    CATEGORY_COLORS[Math.abs(hashString(categoryName)) % CATEGORY_COLORS.length];
+    colorArray[Math.abs(hashString(categoryName)) % colorArray.length];
 }
 
 /**

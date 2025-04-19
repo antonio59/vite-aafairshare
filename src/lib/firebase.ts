@@ -1,7 +1,7 @@
 // console.log("--- firebase.ts module executing ---"); // Add this log
 /// <reference types="vite/client" />
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-import { getAuth, Auth, setPersistence, browserLocalPersistence, onAuthStateChanged } from "firebase/auth";
+import { getAuth, Auth, setPersistence, browserLocalPersistence, onAuthStateChanged, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
 
 const environment = import.meta.env.VITE_FIREBASE_ENVIRONMENT || 'development';
@@ -67,12 +67,31 @@ if (getApps().length === 0) {
     console.log("Running on localhost - applying special auth settings");
     auth.useDeviceLanguage();
   }
+
+  // Debug assignment
+  console.log("Setting window.firebaseAppConfig for debugging:", app.options);
+  // @ts-ignore
+  window.firebaseAppConfig = app.options;
 } else {
   console.log("Firebase already initialized. Getting existing app instance.");
   app = getApp();
   auth = getAuth(app);
   db = getFirestore(app);
+
+  // Debug assignment
+  console.log("Setting window.firebaseAppConfig for debugging:", app.options);
+  // @ts-ignore
+  window.firebaseAppConfig = app.options;
 }
 
+// Create and configure Google Auth Provider
+const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
+googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+
 // Export the initialized services
-export { app, auth, db };
+export { app, auth, db, googleProvider };
+
+// Expose Firebase app instance for debugging (remove after inspection)
+// @ts-ignore
+window.firebaseApp = app;

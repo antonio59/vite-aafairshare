@@ -12,9 +12,15 @@
     "target": "es2017",
     "composite": true,
     "declaration": true,
-    "rootDir": "."
+    "rootDir": ".",
+    "types": []
   },
   "include": [
-    "*.ts"
+    "**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "../node_modules",
+    "dist"
   ]
 } 

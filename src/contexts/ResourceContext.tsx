@@ -5,8 +5,8 @@
  * It separates these concerns from the AuthContext to improve code organization.
  */
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Category, Location } from '@/types/expense';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { Category, Location } from '@shared/types';
 import { getCategories, getLocations } from '@/services/resources.service';
 import { useAuth } from './AuthContext';
 
@@ -37,7 +37,7 @@ export function ResourceProvider({ children }: { children: React.ReactNode }) {
   const { currentUser } = useAuth();
   
   // Function to load resources
-  const loadResources = async () => {
+  const loadResources = useCallback(async () => {
     if (!currentUser) {
       // Reset states if no user is authenticated
       setCategories([]);
@@ -70,17 +70,17 @@ export function ResourceProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLocationsLoading(false);
     }
-  };
+  }, [currentUser]);
   
   // Initial load when user changes
   useEffect(() => {
     loadResources();
-  }, [currentUser]);
+  }, [loadResources]);
   
   // Refresh function for manual reload
-  const refreshResources = async () => {
+  const refreshResources = useCallback(async () => {
     await loadResources();
-  };
+  }, [loadResources]);
   
   const value: ResourceContextType = {
     categories,

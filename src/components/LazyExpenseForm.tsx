@@ -1,6 +1,6 @@
-import React, { Suspense, lazy } from 'react';
+import { Suspense, lazy } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Category, Location, User, ExpenseWithDetails } from '@shared/schema';
+import { Category, Location, User, ExpenseWithDetails } from '@shared/types';
 
 // Lazy load the ExpenseForm component
 const ExpenseForm = lazy(() => 
@@ -38,7 +38,7 @@ const FormSkeleton = () => (
 
 // Define props interface
 interface LazyExpenseFormProps {
-  onClose: (needsRefetch?: boolean) => void;
+  onClose: () => void;
   expense?: ExpenseWithDetails;
   categories: Category[];
   locations: Location[];

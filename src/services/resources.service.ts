@@ -5,7 +5,7 @@
  * categories and locations used in the expense tracking app.
  */
 
-import { Category, Location } from '@/types/expense';
+import { Category, Location } from '@shared/types';
 import { 
   getDocuments, 
   createDocument, 

@@ -1,4 +1,4 @@
-import { Settlement as SettlementType, User } from "@shared/schema"; // Import base Settlement and User types
+import { Settlement as SettlementType, User } from "@shared/types"; // Import base Settlement and User types
 import {
   Card,
   CardContent,

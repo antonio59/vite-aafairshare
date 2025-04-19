@@ -21,10 +21,7 @@ import {
   deleteDoc, 
   serverTimestamp,
   QueryConstraint,
-  DocumentReference,
-  DocumentData,
-  DocumentSnapshot,
-  QuerySnapshot
+  DocumentReference
 } from 'firebase/firestore';
 
 /**
@@ -34,7 +31,7 @@ import {
  * @param data - The data to store in the document
  * @returns A promise that resolves to the document reference
  */
-export const createDocument = async <T extends Record<string, any>>(
+export const createDocument = async <T extends Record<string, unknown>>(
   collectionName: string, 
   data: T
 ): Promise<DocumentReference> => {
@@ -53,7 +50,7 @@ export const createDocument = async <T extends Record<string, any>>(
  * @param data - The data to update in the document
  * @returns A promise that resolves when the update is complete
  */
-export const updateDocument = async <T extends Record<string, any>>(
+export const updateDocument = async <T extends Record<string, unknown>>(
   collectionName: string,
   docId: string,
   data: Partial<T>

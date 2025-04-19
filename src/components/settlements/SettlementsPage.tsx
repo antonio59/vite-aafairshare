@@ -3,13 +3,29 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useExpenses } from '../../contexts/ExpenseContext';
 import './SettlementsPage.css';
 
+// Add types for settlements and summary
+interface Settlement {
+  id: string;
+  fromUserId: string;
+  toUserId: string;
+  amount: number;
+  date: Date;
+  month: string;
+  status: string;
+}
+interface MonthSummary {
+  month: string;
+  totalExpenses: number;
+  userExpenses: Record<string, number>;
+}
+
 export default function SettlementsPage() {
   const { currentUser } = useAuth();
   const { expenses, loading: expensesLoading } = useExpenses();
-  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
-  const [settlements, setSettlements] = useState([]);
+  const [currentMonth, setCurrentMonth] = useState<string>(getCurrentMonth());
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [summary, setSummary] = useState(null);
+  const [summary, setSummary] = useState<MonthSummary | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   // Fetch settlements from Firestore
@@ -33,14 +49,15 @@ export default function SettlementsPage() {
   
   // Calculate settlement summary when expenses change
   useEffect(() => {
-    if (expensesLoading || !expenses.length) {
+    if (expensesLoading || !expenses.length || !currentUser) {
       setSummary(null);
       return;
     }
     
     // Filter expenses for the current month
     const monthlyExpenses = expenses.filter(expense => {
-      const expenseMonth = expense.month || getMonthFromDate(expense.date);
+      // Use type guard for month property
+      const expenseMonth = 'month' in expense && expense.month ? expense.month : getMonthFromDate(expense.date);
       return expenseMonth === currentMonth;
     });
     
@@ -63,7 +80,7 @@ export default function SettlementsPage() {
     });
   }, [expenses, expensesLoading, currentMonth, currentUser]);
   
-  const handleMonthChange = (newMonth) => {
+  const handleMonthChange = (newMonth: string) => {
     setCurrentMonth(newMonth);
   };
   
@@ -72,34 +89,27 @@ export default function SettlementsPage() {
   };
   
   const handleSettlementConfirm = async () => {
+    if (!currentUser || !summary) return;
     try {
-      // In a real implementation, this would create a settlement in Firestore
-      // and send email notifications to both users
-      
-      // Mock implementation
-      const newSettlement = {
+      const newSettlement: Settlement = {
         id: `settlement-${Date.now()}`,
         fromUserId: currentUser.uid,
-        toUserId: 'other-user-id', // In a real app, this would be the other user's ID
-        amount: summary.totalExpenses / 2, // 50/50 split
+        toUserId: 'other-user-id',
+        amount: summary.totalExpenses / 2,
         date: new Date(),
         month: currentMonth,
         status: 'completed'
       };
-      
       setSettlements([newSettlement, ...settlements]);
       setIsDialogOpen(false);
-      
-      // This would trigger an email notification in a real implementation
       console.log('Settlement created, emails would be sent to both users');
     } catch (error) {
       console.error('Error creating settlement:', error);
     }
   };
   
-  const handleUnsettlement = async (settlementId) => {
+  const handleUnsettlement = async (settlementId: string) => {
     try {
-      // In a real implementation, this would delete the settlement from Firestore
       setSettlements(settlements.filter(s => s.id !== settlementId));
     } catch (error) {
       console.error('Error deleting settlement:', error);
@@ -107,23 +117,23 @@ export default function SettlementsPage() {
   };
   
   // Helper functions
-  function getCurrentMonth() {
+  function getCurrentMonth(): string {
     const now = new Date();
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   }
   
-  function getMonthFromDate(date) {
+  function getMonthFromDate(date: string | Date): string {
     const d = new Date(date);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   }
   
-  function formatMonthYear(monthStr) {
+  function formatMonthYear(monthStr: string): string {
     const [year, month] = monthStr.split('-');
     const date = new Date(parseInt(year), parseInt(month) - 1, 1);
     return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   }
   
-  function formatCurrency(amount) {
+  function formatCurrency(amount: number): string {
     return new Intl.NumberFormat('en-GB', {
       style: 'currency',
       currency: 'GBP'
@@ -200,7 +210,7 @@ export default function SettlementsPage() {
         </div>
       )}
       
-      {isDialogOpen && (
+      {isDialogOpen && summary && (
         <div className="modal">
           <div className="modal-content">
             <h2>Confirm Settlement</h2>
@@ -221,10 +231,9 @@ export default function SettlementsPage() {
   );
   
   // Helper function to get previous month
-  function getPreviousMonth(monthStr) {
-    const [year, month] = monthStr.split('-').map(Number);
-    const prevMonth = month === 1 ? 12 : month - 1;
-    const prevYear = month === 1 ? year - 1 : year;
-    return `${prevYear}-${String(prevMonth).padStart(2, '0')}`;
+  function getPreviousMonth(monthStr: string): string {
+    const [year, month] = monthStr.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 2, 1);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
   }
 }

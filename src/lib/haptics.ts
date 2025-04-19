@@ -9,7 +9,7 @@ const hasVibration = (): boolean => {
 
 // Check if the device is iOS
 const isIOS = (): boolean => {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
 };
 
 // Check if the device is Android

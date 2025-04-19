@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input"; // Import Input
 import { Pencil, Trash2, Search } from "lucide-react"; // Import Search icon
 import { formatDate, formatCurrency, getCategoryColorClass } from "@/lib/utils"; // Import getCategoryColorClass
-import { type ExpenseWithDetails, type User } from "@shared/schema";
+import { type ExpenseWithDetails, type User } from "@shared/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface ExpenseTableProps {
@@ -70,7 +70,7 @@ const ExpenseTableRow = memo(({
       {formatCurrency(expense.amount)}
     </TableCell>
     <TableCell className="py-2 px-3 text-xs">
-      {expense.paidByUser?.username ?? "-"}
+      {expense.paidBy?.username ?? "-"}
     </TableCell>
     <TableCell className="py-2 px-3 text-xs">{expense.splitType || "50/50"}</TableCell>
     <TableCell className="py-2 px-1 text-xs">
@@ -138,7 +138,7 @@ const ExpenseCard = memo(({
       <div className="flex flex-col"> {/* Make this div a column */}
         {/* Div for Paid by and Split */}
         <div>
-          <span>Paid by: {expense.paidByUser?.username ?? "-"}</span>
+          <span>Paid by: {expense.paidBy?.username ?? "-"}</span>
           <span className="mx-1.5">•</span> {/* Separator */}
           <span>Split: {expense.splitType || "50/50"}</span>
         </div>
@@ -199,7 +199,7 @@ function ExpenseTableComponent({ expenses, onEdit, onDelete, isLoading, isMonthS
       // Check each field that should be searchable
       const categoryMatch = exp.category?.name?.toLowerCase().includes(lowerCaseFilter);
       const locationMatch = exp.location?.name?.toLowerCase().includes(lowerCaseFilter);
-      const paidByMatch = exp.paidByUser?.username?.toLowerCase().includes(lowerCaseFilter);
+      const paidByMatch = exp.paidBy?.username?.toLowerCase().includes(lowerCaseFilter);
       const descriptionMatch = exp.description?.toLowerCase().includes(lowerCaseFilter);
 
       // Return true if any field matches

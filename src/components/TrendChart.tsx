@@ -1,7 +1,6 @@
-import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendData } from "@shared/schema";
+import { TrendData } from "@shared/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatMonthYear, stringToColor, formatCurrency } from "@/lib/utils";
 import {
@@ -14,6 +13,8 @@ import {
   Tooltip,
   Legend
 } from 'recharts';
+import { TooltipProps } from 'recharts';
+import { NameType, ValueType, Payload } from 'recharts/types/component/DefaultTooltipContent';
 
 interface TrendChartProps {
   trendData?: TrendData;
@@ -52,12 +53,9 @@ export default function TrendChart({ trendData, isLoading = false }: TrendChartP
     );
   }
 
-  // Format month labels (e.g., 2025-03 → Mar 2025)
-  const formattedMonths = trendData.months.map(month => formatMonthYear(month));
-
   // Prepare data for Recharts
   const chartData = trendData.months.map((month, index) => {
-    const dataPoint: any = {
+    const dataPoint: Record<string, string | number> = {
       month: formatMonthYear(month),
       total: trendData.totalsByMonth[index],
     };
@@ -98,14 +96,14 @@ export default function TrendChart({ trendData, isLoading = false }: TrendChartP
     }));
 
   // Custom tooltip formatter
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameType>) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded shadow-lg">
           <p className="font-medium mb-1">{label}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry: Payload<ValueType, NameType>, index: number) => (
             <p key={`item-${index}`} style={{ color: entry.color }}>
-              {entry.name}: {formatCurrency(entry.value)}
+              {entry.name}: {formatCurrency(Number(entry.value))}
             </p>
           ))}
         </div>
@@ -161,7 +159,7 @@ export default function TrendChart({ trendData, isLoading = false }: TrendChartP
                   <YAxis tickFormatter={formatYAxis} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  {activeCategories.map((category, index) => (
+                  {activeCategories.map((category) => (
                     <Line
                       key={category.dataKey}
                       type="monotone"
@@ -185,7 +183,7 @@ export default function TrendChart({ trendData, isLoading = false }: TrendChartP
                   <YAxis tickFormatter={formatYAxis} />
                   <Tooltip content={<CustomTooltip />} />
                   <Legend />
-                  {activeLocations.map((location, index) => (
+                  {activeLocations.map((location) => (
                     <Line
                       key={location.dataKey}
                       type="monotone"

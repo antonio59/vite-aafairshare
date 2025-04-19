@@ -4,8 +4,7 @@
  * This service provides methods for managing expenses in the application.
  */
 
-import { Expense, ExpenseWithDetails, Category, Location, User } from '@/types/expense';
-import { CategoryIconName } from '@/lib/constants';
+import { Expense, ExpenseWithDetails, Category, Location, User, CategoryIconName } from '@shared/types';
 import { 
   getDocuments, 
   createDocument, 
@@ -15,6 +14,9 @@ import {
 } from './firestore.service';
 import { getCategories } from './resources.service';
 import { getLocations } from './resources.service';
+import { getMonthFromDate } from '@/lib/utils';
+import { toUUID, toISODateString } from '@shared/utils/typeGuards';
+import type { PositiveNumber } from '@shared/types';
 
 // Collection name
 const EXPENSES_COLLECTION = 'expenses';
@@ -41,12 +43,21 @@ export const getExpensesByMonth = async (month: string): Promise<Expense[]> => {
 export const createExpense = async (
   expense: Omit<Expense, 'id' | 'createdAt'>
 ): Promise<string> => {
-  // Make sure the month is derived from the date if not provided
+  // Ensure all branded types and required fields are set
   const expenseWithMonth = {
     ...expense,
-    month: expense.month || formatDateToMonth(expense.date)
+    // TODO: Use a branded utility for PositiveNumber
+    amount: expense.amount as PositiveNumber,
+    categoryId: toUUID(expense.categoryId),
+    locationId: toUUID(expense.locationId),
+    paidById: toUUID(expense.paidById),
+    splitBetweenIds: expense.splitBetweenIds.map(id => toUUID(id)),
+    splitType: expense.splitType || '50/50', // Default to '50/50' if not set
+    month: expense.month || getMonthFromDate(expense.date),
+    date: toISODateString(expense.date),
+    createdAt: toISODateString(new Date()),
+    updatedAt: toISODateString(expense.updatedAt)
   };
-  
   const docRef = await createDocument(EXPENSES_COLLECTION, expenseWithMonth);
   return docRef.id;
 };
@@ -63,11 +74,22 @@ export const updateExpense = async (
   expense: Partial<Omit<Expense, 'id' | 'createdAt'>>
 ): Promise<void> => {
   // If the date is updated, also update the month
-  const updates = { ...expense };
-  if (expense.date) {
-    updates.month = formatDateToMonth(expense.date);
+  const updates: any = { ...expense };
+  if (expense.amount !== undefined) updates.amount = expense.amount as PositiveNumber; // TODO: Use branded utility
+  if (expense.categoryId !== undefined) updates.categoryId = toUUID(expense.categoryId);
+  if (expense.locationId !== undefined) updates.locationId = toUUID(expense.locationId);
+  if (expense.paidById !== undefined) updates.paidById = toUUID(expense.paidById);
+  if (expense.splitBetweenIds !== undefined) updates.splitBetweenIds = expense.splitBetweenIds.map(id => toUUID(id));
+  if (expense.date !== undefined) {
+    updates.date = toISODateString(expense.date);
+    updates.month = getMonthFromDate(expense.date);
   }
-  
+  if (expense.splitType === undefined) {
+    updates.splitType = '50/50';
+  } else {
+    updates.splitType = expense.splitType;
+  }
+  if (expense.updatedAt !== undefined) updates.updatedAt = toISODateString(expense.updatedAt);
   return updateDocument(EXPENSES_COLLECTION, id, updates);
 };
 
@@ -130,12 +152,17 @@ export const getExpensesWithDetails = async (
     };
     
     // Lookup user or create placeholder if missing
-    const user = userMap.get(expense.paidByUserId);
-    const paidBy = user || {
-      id: expense.paidByUserId,
-      uid: expense.paidByUserId,
+    const user = userMap.get(expense.paidById);
+    // Construct a fully valid User object for paidBy
+    const paidBy: User = user || {
+      id: toUUID(expense.paidById),
+      uid: expense.paidById,
       email: 'unknown@example.com',
-      displayName: 'Unknown User'
+      username: 'Unknown User',
+      photoURL: null,
+      createdAt: toISODateString(new Date().toISOString()),
+      updatedAt: toISODateString(new Date().toISOString()),
+      isAnonymous: false
     };
     
     // Return enriched expense
@@ -146,16 +173,4 @@ export const getExpensesWithDetails = async (
       paidBy
     };
   });
-};
-
-/**
- * Helper function to format a date to 'YYYY-MM' format for month
- * 
- * @param date - The date to format
- * @returns The formatted month string
- */
-const formatDateToMonth = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  return `${year}-${month}`;
 }; 

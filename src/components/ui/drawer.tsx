@@ -59,7 +59,8 @@ const DrawerContent = React.forwardRef<
         // Check if the child is DrawerTitle
         if (children.type === DrawerTitle ||
             (children.type && typeof children.type !== 'string' &&
-             (children.type as any).displayName === DrawerPrimitive.Title.displayName)) {
+             'displayName' in children.type &&
+             (children.type as { displayName?: string }).displayName === DrawerPrimitive.Title.displayName)) {
           return true;
         }
 

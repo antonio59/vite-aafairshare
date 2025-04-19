@@ -1,7 +1,7 @@
 // import { utils, writeFile } from 'xlsx'; // Remove xlsx import
-import { ExpenseWithDetails, SettlementWithUsers, MonthSummary, User } from '@shared/schema';
+import { ExpenseWithDetails, SettlementWithUsers, MonthSummary, User } from '@shared/types';
 import { formatCurrency, formatDate, formatMonthYear } from './utils';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
 // Extend jsPDF with lastAutoTable property - needed for type checking
@@ -55,7 +55,7 @@ export const exportExpenses = ({ format, month, expenses, settlements = [], summ
     'Category': expense.category?.name ?? 'N/A',
     'Location': expense.location?.name ?? 'N/A',
     'Amount': formatNumber(Number(expense.amount)),
-    'Paid By': expense.paidByUser?.username ?? 'Unknown',
+    'Paid By': expense.paidBy?.username ?? 'Unknown',
     'Split': expense.splitType,
     'Description': expense.description || ''
   }));

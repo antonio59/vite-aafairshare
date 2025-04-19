@@ -8,11 +8,18 @@ import { formatCurrency, formatMonthYear, getCurrentMonth, getMonthFromDate } fr
 import { getUserColor, getCategoryColor, getLocationColor } from "@/lib/chartColors";
 import { DataChart, TrendChart } from "@/components/AnalyticsChart";
 import { useAuth } from "@/contexts/AuthContext";
-
-import { MonthSummary, User, TrendData, Expense, Settlement, Category, Location } from "@shared/schema";
+import { MonthSummary, User, TrendData, Expense, Settlement, Category, Location } from "@shared/types";
 import { db } from "@/lib/firebase";
 import { collection, query, where, orderBy, onSnapshot, Timestamp } from "firebase/firestore";
 import { subMonths, startOfMonth } from "date-fns";
+import type { UUID, ISODateString } from '@shared/types';
+
+// Helper to safely format dates to ISO string
+function toISODateString(dateValue: unknown): ISODateString | undefined {
+  if (!dateValue) return undefined;
+  const date = new Date(dateValue as string | number | Date);
+  return isNaN(date.getTime()) ? undefined : (date.toISOString() as ISODateString);
+}
 
 export default function Analytics() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
@@ -138,8 +145,18 @@ export default function Analytics() {
       const fetchedExpenses = snapshot.docs.map(doc => {
          const data = doc.data();
          return {
-           id: doc.id, ...data,
-           date: (data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate() : new Date(),
+           id: doc.id as UUID,
+           amount: data.amount ?? 0,
+           description: data.description ?? '',
+           categoryId: data.categoryId ?? '',
+           locationId: data.locationId ?? '',
+           paidById: data.paidById ?? '',
+           splitBetweenIds: data.splitBetweenIds ?? [],
+           splitType: data.splitType ?? '50/50',
+           month: data.month ?? '',
+           date: toISODateString(data.date),
+           createdAt: toISODateString(data.createdAt),
+           updatedAt: toISODateString(data.updatedAt),
          } as Expense;
       });
       setCurrentMonthExpenses(fetchedExpenses);
@@ -170,8 +187,15 @@ export default function Analytics() {
        const fetchedSettlements = snapshot.docs.map(doc => {
          const data = doc.data();
          return {
-           id: doc.id, ...data,
-           date: (data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate() : new Date(),
+           id: doc.id as UUID,
+           fromUserId: data.fromUserId ?? '',
+           toUserId: data.toUserId ?? '',
+           amount: data.amount ?? 0,
+           status: data.status ?? 'PENDING',
+           month: data.month ?? '',
+           date: toISODateString(data.date),
+           createdAt: toISODateString(data.createdAt),
+           updatedAt: toISODateString(data.updatedAt),
          } as Settlement;
        });
        setCurrentMonthSettlements(fetchedSettlements);
@@ -203,9 +227,25 @@ export default function Analytics() {
      const unsubscribe = onSnapshot(q, (snapshot) => {
          const fetchedExpenses = snapshot.docs.map(doc => {
              const data = doc.data();
+             // Helper to convert Firestore Timestamp or string to ISO date string (YYYY-MM-DD)
+             const toISO = (val: unknown): string => {
+               if (val instanceof Timestamp) return val.toDate().toISOString().slice(0, 10);
+               if (typeof val === 'string') return val.slice(0, 10);
+               return '';
+             };
              return {
-                 id: doc.id, ...data,
-                 date: (data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate() : new Date(),
+                 id: doc.id as UUID,
+                 amount: data.amount ?? 0,
+                 description: data.description ?? '',
+                 categoryId: data.categoryId ?? '',
+                 locationId: data.locationId ?? '',
+                 paidById: data.paidById ?? '',
+                 splitBetweenIds: data.splitBetweenIds ?? [],
+                 splitType: data.splitType ?? '50/50',
+                 month: data.month ?? '',
+                 date: toISO(data.date),
+                 createdAt: toISO(data.createdAt),
+                 updatedAt: toISO(data.updatedAt),
              } as Expense;
          });
          setTrendExpenses(fetchedExpenses);
@@ -270,8 +310,8 @@ export default function Analytics() {
       currentMonthExpenses.forEach(exp => {
         const amount = Number(exp.amount) || 0;
         totalExpenses += amount;
-        if (exp.paidByUserId === user1.id) userExpensesPaid[user1.id] += amount;
-        else if (exp.paidByUserId === user2.id) userExpensesPaid[user2.id] += amount;
+        if (exp.paidById === user1.id) userExpensesPaid[user1.id] += amount;
+        else if (exp.paidById === user2.id) userExpensesPaid[user2.id] += amount;
 
         categoryTotalsMap.set(exp.categoryId, (categoryTotalsMap.get(exp.categoryId) || 0) + amount);
         locationTotalsMap.set(exp.locationId, (locationTotalsMap.get(exp.locationId) || 0) + amount);
@@ -294,7 +334,7 @@ export default function Analytics() {
         currentMonthSettlements.forEach(settle => {
           const fromUser = users.find(u => u.id === settle.fromUserId)?.username || 'Unknown';
           const toUser = users.find(u => u.id === settle.toUserId)?.username || 'Unknown';
-          console.log(`${fromUser} paid ${toUser}: ${formatCurrency(settle.amount)} on ${settle.date.toLocaleDateString()}`);
+          console.log(`${fromUser} paid ${toUser}: ${formatCurrency(settle.amount)} on ${new Date(settle.date).toISOString() as ISODateString}`);
         });
         console.groupEnd();
       }
@@ -339,13 +379,24 @@ export default function Analytics() {
       const locationMap = new Map(locations.map(l => [l.id, l]));
 
       const categoryTotals = Array.from(categoryTotalsMap.entries()).map(([id, amount]) => ({
-          category: categoryMap.get(id) || { id, name: 'Unknown', color: '#888' },
+          category: categoryMap.get(id) || { 
+            id, 
+            name: 'Unknown', 
+            color: '#888888',
+            icon: 'other' as const,
+            createdAt: new Date()
+          },
           amount,
           percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0
       })).sort((a, b) => b.amount - a.amount);
 
       const locationTotals = Array.from(locationTotalsMap.entries()).map(([id, amount]) => ({
-          location: locationMap.get(id) || { id, name: 'Unknown' },
+          location: locationMap.get(id) || { 
+            id, 
+            name: 'Unknown',
+            color: '#888888',
+            createdAt: new Date()
+          },
           amount,
           percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0
       })).sort((a, b) => b.amount - a.amount);
@@ -391,7 +442,10 @@ export default function Analytics() {
     trendExpenses.forEach(exp => {
       const month = getMonthFromDate(exp.date);
       const amount = Number(exp.amount) || 0;
-
+      if (!month || typeof month !== 'string' || month.length !== 7) {
+        console.warn('Skipping invalid month in trend calculation:', month, exp);
+        return;
+      }
       monthlyTotals[month] = (monthlyTotals[month] || 0) + amount;
 
       if (!categoryMonthly[exp.categoryId]) categoryMonthly[exp.categoryId] = {};
@@ -401,8 +455,11 @@ export default function Analytics() {
       locationMonthly[exp.locationId][month] = (locationMonthly[exp.locationId][month] || 0) + amount;
     });
 
-    // Sort months chronologically
-    const months = Object.keys(monthlyTotals).sort();
+    // Sort months chronologically, filter out invalid/empty months
+    const months = Object.keys(monthlyTotals)
+      .filter(month => !!month && typeof month === 'string' && month.length === 7)
+      .sort();
+    console.log('TrendChart months:', months);
     const totalsByMonth = months.map(month => monthlyTotals[month]);
 
     // Create maps for efficient lookups

@@ -35,10 +35,10 @@ export interface DataItem {
 export interface DataChartProps {
   title: string;
   data: DataItem[];
-  valueFormatter?: (value: number) => string;
+  valueFormatter?: (_value: number) => string;
   height?: number;
   isLoading?: boolean;
-  getItemColor?: (name: string, index: number) => string;
+  getItemColor?: (_name: string, _index: number) => string;
   emptyMessage?: string;
 }
 
@@ -120,8 +120,19 @@ export function DataChart({
     return null;
   };
 
+  // Add this above renderCustomizedLabel
+  interface PieLabelProps {
+    cx: number;
+    cy: number;
+    midAngle: number;
+    innerRadius: number;
+    outerRadius: number;
+    percent: number;
+    index: number;
+  }
+
   // Custom label for pie chart
-  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: PieLabelProps) => {
     const RADIAN = Math.PI / 180;
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
@@ -308,8 +319,8 @@ export interface TrendChartProps {
       color?: string;
     }>;
   };
-  valueFormatter?: (value: number) => string;
-  xAxisFormatter?: (value: string) => string;
+  valueFormatter?: (_value: number) => string;
+  xAxisFormatter?: (_value: string) => string;
   height?: number;
   isLoading?: boolean;
   emptyMessage?: string;
@@ -357,7 +368,7 @@ export function TrendChart({
 
   // Prepare data for recharts
   const chartData = data.months.map((month, i) => {
-    const dataPoint: Record<string, any> = {
+    const dataPoint: Record<string, number | string> = {
       month: xAxisFormatter(month),
     };
     

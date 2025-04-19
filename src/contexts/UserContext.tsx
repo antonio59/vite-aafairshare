@@ -10,6 +10,7 @@ import { User } from '@shared/types';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useAuth } from './AuthContext';
+import { toUser, toUUID, toISODateString } from '@shared/utils/typeGuards';
 
 interface UserContextType {
   allUsers: User[];
@@ -49,29 +50,37 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const fetchedUsers = snapshot.docs.map(doc => {
         const userData = doc.data();
-        return {
-          id: doc.id,
+        return toUser({
+          ...userData,
+          id: toUUID(doc.id),
           uid: doc.id,
           email: userData.email || '',
-          displayName: userData.username || userData.displayName || '',
-          photoURL: userData.photoURL,
-          username: userData.username || userData.displayName || '' // Add username for backward compatibility
-        } as User;
-      });
+          username: userData.username || userData.displayName || '',
+          photoURL: userData.photoURL ?? null,
+          createdAt: toISODateString(userData.createdAt),
+          updatedAt: toISODateString(userData.updatedAt ?? new Date()),
+          isAnonymous: userData.isAnonymous ?? false,
+        });
+      }).filter(Boolean) as User[];
       
       console.log(`[UserContext] Loaded ${fetchedUsers.length} users`);
       
       // Add current user if not already in the list
       if (currentUser && !fetchedUsers.some(u => u.id === currentUser.uid)) {
         console.log('[UserContext] Adding current user to users list');
-        fetchedUsers.push({
-          id: currentUser.uid,
+        const userObj = toUser({
+          id: toUUID(currentUser.uid),
           uid: currentUser.uid,
           email: currentUser.email || '',
-          displayName: currentUser.displayName || currentUser.email?.split('@')[0] || 'User',
-          photoURL: currentUser.photoURL,
-          username: currentUser.displayName || currentUser.email?.split('@')[0] || 'User'
+          username: currentUser.email?.split('@')[0] || 'User',
+          photoURL: currentUser.photoURL ?? null,
+          createdAt: toISODateString(new Date()),
+          updatedAt: toISODateString(new Date()),
+          isAnonymous: currentUser.isAnonymous,
         });
+        if (userObj) {
+          fetchedUsers.push(userObj);
+        }
       }
       
       setAllUsers(fetchedUsers);

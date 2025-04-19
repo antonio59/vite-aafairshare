@@ -1,12 +1,19 @@
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
+import type { Location } from '@shared/types';
 import './LocationForm.css';
 
-export default function LocationForm({ location, onSuccess, onCancel }) {
+interface LocationFormProps {
+  location?: Location;
+  onSuccess: (location: Location) => void;
+  onCancel: () => void;
+}
+
+export default function LocationForm({ location, onSuccess, onCancel }: LocationFormProps) {
   const [name, setName] = useState(location?.name || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     
     if (!name.trim()) {
@@ -18,22 +25,16 @@ export default function LocationForm({ location, onSuccess, onCancel }) {
     setError('');
     
     try {
-      // In a real implementation, this would save to Firestore
-      // For now, we'll just simulate a successful save
-      
-      const locationData = {
+      const locationData: Location = {
         id: location?.id || `loc-${Date.now()}`,
-        name: name.trim()
+        name: name.trim(),
+        createdAt: new Date()
       };
       
-      // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      if (onSuccess) {
-        onSuccess(locationData);
-      }
+      onSuccess(locationData);
       
-      // Reset form if it's a new location
       if (!location) {
         setName('');
       }

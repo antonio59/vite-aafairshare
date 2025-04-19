@@ -10,7 +10,7 @@ import { User } from '@shared/types';
 import { 
   onAuthStateChange, 
   signInWithGoogle, 
-  signOutUser, 
+  logout as signOutUser, 
   getCurrentUser 
 } from '@/services/auth.service';
 import { onNetworkStatusChange, isNetworkOnline } from '@/services/offline.service';
@@ -90,12 +90,11 @@ export function useSession(): [SessionState, SessionActions] {
   }, []);
 
   // Refresh the session
-  const refreshSession = useCallback((): void => {
+  const refreshSession = useCallback(async (): Promise<void> => {
     // Reset session expiry
     updateLastActive();
-    
     // Check if user is authenticated
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
     if (user) {
       setState(prev => ({
         ...prev,
@@ -189,10 +188,12 @@ export function useSession(): [SessionState, SessionActions] {
     });
     
     // If user is already authenticated when component mounts
-    const currentUser = getCurrentUser();
-    if (currentUser && !isExpired) {
-      updateLastActive();
-    }
+    (async () => {
+      const currentUser = await getCurrentUser();
+      if (currentUser && !isExpired) {
+        updateLastActive();
+      }
+    })();
     
     return () => {
       unsubscribe();

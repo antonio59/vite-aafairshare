@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   ResponsiveContainer,
   BarChart,
@@ -18,7 +18,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BarChart2, PieChart as PieChartIcon, LineChart as LineChartIcon, ZoomIn, ZoomOut, RefreshCw } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
 
 // Chart type options
 type ChartType = 'bar' | 'pie' | 'line';
@@ -31,9 +30,10 @@ const COLORS = [
 
 interface EnhancedChartProps {
   title: string;
-  data: any[];
+  data: unknown[];
   dataKey: string;
   nameKey: string;
+  // eslint-disable-next-line no-unused-vars
   valueFormatter?: (value: number) => string;
   categoryColors?: Record<string, string>;
   showControls?: boolean;
@@ -46,7 +46,7 @@ export function EnhancedChart({
   data,
   dataKey,
   nameKey,
-  valueFormatter = (value) => `${value}`,
+  valueFormatter = (value: number) => `${value}`,
   categoryColors = {},
   showControls = true,
   initialChartType = 'bar',
@@ -57,7 +57,7 @@ export function EnhancedChart({
   const [zoomLevel, setZoomLevel] = useState(1);
 
   // Handle pie chart active sector
-  const onPieEnter = (_: any, index: number) => {
+  const onPieEnter = (_: unknown, index: number) => {
     setActiveIndex(index);
   };
 
@@ -66,13 +66,16 @@ export function EnhancedChart({
   };
 
   // Custom tooltip formatter
-  const customTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+  const customTooltip = ({ active, payload }: { active?: boolean; payload?: unknown[] }) => {
+    if (active && Array.isArray(payload) && payload.length) {
+      const item = payload[0] as { payload?: unknown; value?: unknown };
+      const itemPayload = (item.payload && typeof item.payload === 'object') ? item.payload as Record<string, unknown> : {};
+      const name = itemPayload[nameKey];
       return (
         <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded shadow-lg">
-          <p className="font-medium">{payload[0].payload[nameKey]}</p>
+          <p className="font-medium">{typeof name === 'string' ? name : ''}</p>
           <p className="text-primary">
-            {valueFormatter(payload[0].value)}
+            {typeof item.value === 'number' ? valueFormatter(item.value) : ''}
           </p>
         </div>
       );
@@ -81,48 +84,59 @@ export function EnhancedChart({
   };
 
   // Render active shape for pie chart (for interactive hover effect)
-  const renderActiveShape = (props: any) => {
+  const renderActiveShape = (props: unknown) => {
+    // Always return a valid React element (never null)
+    if (!props || typeof props !== 'object') {
+      return <g />;
+    }
     const {
       cx, cy, innerRadius, outerRadius, startAngle, endAngle,
       fill, payload, percent, value
-    } = props;
-
+    } = props as Record<string, unknown>;
+    const safePayload = (payload && typeof payload === 'object' && typeof nameKey === 'string') ? payload as Record<string, unknown> : {};
+    const name = typeof nameKey === 'string' ? safePayload[nameKey] : undefined;
     return (
       <g>
-        <text x={cx} y={cy} dy={-20} textAnchor="middle" fill={fill} className="text-sm">
-          {payload[nameKey]}
+        <text x={cx as number} y={cy as number} dy={-20} textAnchor="middle" fill={fill as string} className="text-sm">
+          {typeof name === 'string' ? name : ''}
         </text>
-        <text x={cx} y={cy} dy={0} textAnchor="middle" fill={fill} className="text-lg font-medium">
-          {valueFormatter(value)}
+        <text x={cx as number} y={cy as number} dy={0} textAnchor="middle" fill={fill as string} className="text-lg font-medium">
+          {typeof value === 'number' ? valueFormatter(value) : ''}
         </text>
-        <text x={cx} y={cy} dy={20} textAnchor="middle" fill={fill} className="text-xs">
-          {`${(percent * 100).toFixed(1)}%`}
+        <text x={cx as number} y={cy as number} dy={20} textAnchor="middle" fill={fill as string} className="text-xs">
+          {typeof percent === 'number' ? `${(percent * 100).toFixed(1)}%` : ''}
         </text>
         <Sector
-          cx={cx}
-          cy={cy}
-          innerRadius={innerRadius}
-          outerRadius={outerRadius + 10}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          fill={fill}
+          cx={cx as number}
+          cy={cy as number}
+          innerRadius={innerRadius as number}
+          outerRadius={typeof outerRadius === 'number' ? outerRadius + 10 : undefined}
+          startAngle={startAngle as number}
+          endAngle={endAngle as number}
+          fill={fill as string}
         />
         <Sector
-          cx={cx}
-          cy={cy}
-          startAngle={startAngle}
-          endAngle={endAngle}
-          innerRadius={innerRadius - 5}
-          outerRadius={outerRadius}
-          fill={fill}
+          cx={cx as number}
+          cy={cy as number}
+          startAngle={startAngle as number}
+          endAngle={endAngle as number}
+          innerRadius={typeof innerRadius === 'number' ? innerRadius - 5 : undefined}
+          outerRadius={outerRadius as number}
+          fill={fill as string}
         />
       </g>
     );
   };
 
   // Get color for a data item
-  const getItemColor = (item: any, index: number) => {
-    return categoryColors[item[nameKey]] || COLORS[index % COLORS.length];
+  const getItemColor = (item: unknown, index: number) => {
+    if (item && typeof item === 'object' && typeof nameKey === 'string') {
+      const key = (item as Record<string, unknown>)[nameKey];
+      if (typeof key === 'string') {
+        return categoryColors[key] || COLORS[index % COLORS.length];
+      }
+    }
+    return COLORS[index % COLORS.length];
   };
 
   // Render the appropriate chart based on type

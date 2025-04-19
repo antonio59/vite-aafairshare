@@ -216,7 +216,7 @@ async function processOperation(operation: OfflineOperation): Promise<void> {
       break;
       
     default:
-      throw new Error(`Unknown operation type: ${(operation as any).type}`);
+      throw new Error(`Unknown operation type: ${operation.type}`);
   }
 }
 

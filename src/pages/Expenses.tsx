@@ -7,7 +7,8 @@ import { PlusIcon } from "lucide-react";
 // Removed unused QueryKey import
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 // Removed unused Settlement, SettlementWithUsers imports
-import { Category, Expense, ExpenseWithDetails, Location, MonthSummary, User } from "@shared/schema";
+import { Category, Expense, ExpenseWithDetails, Location, MonthSummary, User } from "@shared/types";
+import { validateUUID, validateISODateString } from '@shared/types';
 // Removed unused DocumentReference, QueryDocumentSnapshot, DocumentData imports
 import {
   collection,
@@ -36,6 +37,7 @@ import {
 // import { queryClient } from "@/lib/queryClient";
 import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toISODateString } from "@shared/utils/typeGuards";
 
 // Removed unused fetchSettlementsData function
 // async function fetchSettlementsData(...) { ... }
@@ -49,10 +51,15 @@ const createEmptySummary = (month: string): MonthSummary => ({
   settlementDirection: { fromUserId: '', toUserId: '' },
   categoryTotals: [],
   locationTotals: [],
-  splitTypeTotals: {},
+  splitTypeTotals: {
+    "50/50": 0,
+    "100%": 0
+  },
   dateDistribution: {}
 });
 
+const UNKNOWN_UUID = validateUUID('00000000-0000-4000-8000-000000000000', 'id');
+const UNKNOWN_DATE = new Date(); // Use Date for createdAt in Category/Location fallback
 
 export default function Expenses() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
@@ -97,7 +104,7 @@ export default function Expenses() {
             finalExpenses = await Promise.all(
             expenseDocs.map(async expenseDoc => {
               const expenseData = expenseDoc.data() as Expense;
-              const userDocRef = doc(db, "users", expenseData.paidByUserId);
+              const userDocRef = doc(db, "users", expenseData.paidById);
               const userDoc = await getDoc(userDocRef);
               const userData = userDoc.exists()
                 ? { id: userDoc.id, ...(userDoc.data() as Omit<User, 'id'>) } as User
@@ -110,10 +117,30 @@ export default function Expenses() {
 
               const expenseWithDetails: ExpenseWithDetails = {
                 ...expenseData,
-                id: expenseDoc.id,
-                paidByUser: userData,
-                category: categorySnap.exists() ? { id: categorySnap.id, ...(categorySnap.data() as Omit<Category, 'id'>) } : undefined,
-                location: locationSnap.exists() ? { id: locationSnap.id, ...(locationSnap.data() as Omit<Location, 'id'>) } : undefined
+                id: validateUUID(expenseDoc.id, 'id'),
+                paidBy: userData ?? {
+                  id: validateUUID(expenseData.paidById, 'id'),
+                  uid: '',
+                  email: '',
+                  username: 'Unknown',
+                  photoURL: null,
+                  createdAt: validateISODateString(UNKNOWN_DATE.toISOString(), 'createdAt'),
+                  updatedAt: validateISODateString(UNKNOWN_DATE.toISOString(), 'updatedAt'),
+                  isAnonymous: false,
+                },
+                category: categorySnap.exists() ? { id: validateUUID(categorySnap.id, 'id'), ...(categorySnap.data() as Omit<Category, 'id'>) } : {
+                  id: validateUUID('', 'id'),
+                  name: 'Unknown',
+                  icon: 'other',
+                  createdAt: new Date(),
+                  color: '#999'
+                },
+                location: locationSnap.exists() ? { id: validateUUID(locationSnap.id, 'id'), ...(locationSnap.data() as Omit<Location, 'id'>) } : {
+                  id: validateUUID('', 'id'),
+                  name: 'Unknown',
+                  createdAt: new Date(),
+                  color: '#999'
+                }
               };
               return expenseWithDetails;
             })
@@ -220,7 +247,7 @@ export default function Expenses() {
     staleTime: 60000, // Reduced staleTime to 1 minute
   });
 
-  // Strictly typed Users query (Keep using React Query)
+  // Strictly typed Users query
   const { data: users = [] } = useQuery<User[]>({
     queryKey: ['users'],
     queryFn: async (): Promise<User[]> => {
@@ -251,10 +278,14 @@ export default function Expenses() {
           }
 
           const userData: User = {
-            id: doc.id,
-            username: data.username || 'Unknown',
+            id: validateUUID(doc.id, 'id'),
+            uid: validateUUID(doc.id, 'id'),
             email: data.email || '',
-            ...data
+            username: data.username || data.email?.split('@')[0] || 'Unknown',
+            photoURL: data.photoURL,
+            createdAt: data.createdAt ? validateISODateString(new Date(data.createdAt.seconds * 1000).toISOString(), 'createdAt') : validateISODateString(UNKNOWN_DATE.toISOString(), 'createdAt'),
+            updatedAt: data.updatedAt ? validateISODateString(new Date(data.updatedAt.seconds * 1000).toISOString(), 'updatedAt') : validateISODateString(UNKNOWN_DATE.toISOString(), 'updatedAt'),
+            isAnonymous: data.isAnonymous,
           };
 
           validUsers.push(userData);
@@ -421,10 +452,10 @@ export default function Expenses() {
           }
           categoryTotals[expense.categoryId] += expense.amount;
 
-          if (!userExpenses[expense.paidByUserId]) {
-            userExpenses[expense.paidByUserId] = 0;
+          if (!userExpenses[expense.paidById]) {
+            userExpenses[expense.paidById] = 0;
           }
-          userExpenses[expense.paidByUserId] += expense.amount;
+          userExpenses[expense.paidById] += expense.amount;
         });
 
         const calculatedSummary: MonthSummary = {
@@ -436,10 +467,13 @@ export default function Expenses() {
           categoryTotals: Object.entries(categoryTotals).map(([categoryId, amount]) => ({
             amount,
             percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0,
-            category: categories.find(c => c.id === categoryId) || { id: categoryId, name: 'Unknown', color: '#999' }
+            category: categories.find(c => c.id === categoryId) ?? { id: validateUUID(categoryId, 'id'), name: 'Unknown', icon: 'other', createdAt: new Date(), color: '#999' }
           })),
           locationTotals: [],
-          splitTypeTotals: {},
+          splitTypeTotals: {
+            "50/50": 0,
+            "100%": 0
+          },
           dateDistribution: {}
         };
 
@@ -467,15 +501,24 @@ export default function Expenses() {
   const handleExport = (format: 'csv' | 'pdf') => {
     // Use displayedExpenses from local state (needs mapping back to ExpenseWithDetails if used)
     const expensesToExport = (displayedExpenses || []).map(exp => {
-        const category = categories.find(c => c.id === exp.categoryId);
-        const location = locations.find(l => l.id === exp.locationId);
-        const paidByUser = users.find(u => u.id === exp.paidByUserId);
-        return {
-            ...exp,
-            category: category || undefined,
-            location: location || undefined,
-            paidByUser: paidByUser || undefined,
-        } as ExpenseWithDetails;
+      const category = categories.find(c => c.id === exp.categoryId) ?? { id: UNKNOWN_UUID, name: 'Unknown', icon: 'other', createdAt: UNKNOWN_DATE, color: '#999' };
+      const location = locations.find(l => l.id === exp.locationId) ?? { id: UNKNOWN_UUID, name: 'Unknown', createdAt: UNKNOWN_DATE, color: '#999' };
+      const paidBy = users.find(u => u.id === exp.paidById) ?? {
+        id: UNKNOWN_UUID,
+        uid: UNKNOWN_UUID,
+        email: '',
+        username: 'Unknown',
+        photoURL: null,
+        createdAt: validateISODateString(UNKNOWN_DATE.toISOString(), 'createdAt'),
+        updatedAt: validateISODateString(UNKNOWN_DATE.toISOString(), 'updatedAt'),
+        isAnonymous: false,
+      };
+      return {
+        ...exp,
+        category,
+        location,
+        paidBy
+      } as ExpenseWithDetails;
     });
     if (expensesToExport && expensesToExport.length > 0) {
       exportExpenses({
@@ -497,16 +540,24 @@ export default function Expenses() {
 
   // Map raw expenses to ExpenseWithDetails for the table prop
   const tableExpenses: ExpenseWithDetails[] = (displayedExpenses || []).map(exp => {
-      // Find category and location details (assuming categories/locations are loaded)
-      const category = categories.find(c => c.id === exp.categoryId);
-      const location = locations.find(l => l.id === exp.locationId);
-      const paidByUser = users.find(u => u.id === exp.paidByUserId);
-      return {
-          ...exp,
-          category: category || undefined,
-          location: location || undefined,
-          paidByUser: paidByUser || undefined,
-      };
+    const category = categories.find(c => c.id === exp.categoryId) ?? { id: UNKNOWN_UUID, name: 'Unknown', icon: 'other', createdAt: UNKNOWN_DATE, color: '#999' };
+    const location = locations.find(l => l.id === exp.locationId) ?? { id: UNKNOWN_UUID, name: 'Unknown', createdAt: UNKNOWN_DATE, color: '#999' };
+    const paidBy = users.find(u => u.id === exp.paidById) ?? {
+      id: UNKNOWN_UUID,
+      uid: UNKNOWN_UUID,
+      email: '',
+      username: 'Unknown',
+      photoURL: null,
+      createdAt: validateISODateString(UNKNOWN_DATE.toISOString(), 'createdAt'),
+      updatedAt: validateISODateString(UNKNOWN_DATE.toISOString(), 'updatedAt'),
+      isAnonymous: false,
+    };
+    return {
+      ...exp,
+      category,
+      location,
+      paidBy
+    };
   });
 
   const handleDeleteExpense = async (expense: ExpenseWithDetails) => {
@@ -550,7 +601,7 @@ export default function Expenses() {
             finalExpenses = await Promise.all(
               expenseDocs.map(async expenseDoc => {
                 const expenseData = expenseDoc.data() as Expense;
-                const userDocRef = doc(db, "users", expenseData.paidByUserId);
+                const userDocRef = doc(db, "users", expenseData.paidById);
                 const userDoc = await getDoc(userDocRef);
                 const userData = userDoc.exists()
                   ? { id: userDoc.id, ...(userDoc.data() as Omit<User, 'id'>) } as User
@@ -563,10 +614,30 @@ export default function Expenses() {
 
                 const expenseWithDetails: ExpenseWithDetails = {
                   ...expenseData,
-                  id: expenseDoc.id,
-                  paidByUser: userData,
-                  category: categorySnap.exists() ? { id: categorySnap.id, ...(categorySnap.data() as Omit<Category, 'id'>) } : undefined,
-                  location: locationSnap.exists() ? { id: locationSnap.id, ...(locationSnap.data() as Omit<Location, 'id'>) } : undefined
+                  id: validateUUID(expenseDoc.id, 'id'),
+                  paidBy: userData ?? {
+                    id: validateUUID(expenseData.paidById, 'id'),
+                    uid: '',
+                    email: '',
+                    username: 'Unknown',
+                    photoURL: null,
+                    createdAt: toISODateString(new Date()),
+                    updatedAt: toISODateString(new Date()),
+                    isAnonymous: false,
+                  },
+                  category: categorySnap.exists() ? { id: categorySnap.id, ...(categorySnap.data() as Omit<Category, 'id'>) } : {
+                    id: '',
+                    name: 'Unknown',
+                    icon: 'other',
+                    createdAt: new Date(),
+                    color: '#999'
+                  },
+                  location: locationSnap.exists() ? { id: locationSnap.id, ...(locationSnap.data() as Omit<Location, 'id'>) } : {
+                    id: '',
+                    name: 'Unknown',
+                    createdAt: new Date(),
+                    color: '#999'
+                  }
                 };
                 return expenseWithDetails;
               })

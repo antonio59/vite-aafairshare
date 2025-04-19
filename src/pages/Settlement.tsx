@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
 import { Tooltip } from "@/components/ui/tooltip"; // Import Tooltip
 import { Check, CalendarClock, X } from "lucide-react";
-import { Settlement as SettlementType, User, Expense } from "@shared/schema"; // Import correct types (MonthSummary removed as it's not fully used here)
+import { Settlement as SettlementType, User, Expense, PositiveNumber } from "@shared/types"; // Import correct types
 import { getCurrentMonth, formatCurrency, getPreviousMonth, formatDate } from "@/lib/utils"; // Added formatDate
 // Removed format import from date-fns
 import { useToast } from "@/hooks/use-toast";
@@ -28,9 +28,9 @@ import {
   addDoc,
   deleteDoc,
   doc,
-  Timestamp,
-  serverTimestamp // Import serverTimestamp
+  Timestamp
 } from "firebase/firestore";
+import { toUUID, toISODateString } from "@shared/utils/typeGuards";
 
 // Define a specific type for the summary data needed on this page
 interface SettlementPageSummary {
@@ -38,6 +38,9 @@ interface SettlementPageSummary {
   totalExpenses: number;
   userExpenses: Record<string, number>; // { userId: amount }
 }
+
+// Helper to coerce string | null | undefined to string | undefined
+const toOptionalString = (value: string | null | undefined): string | undefined => typeof value === 'string' ? value : undefined;
 
 export default function Settlement() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
@@ -69,11 +72,10 @@ export default function Settlement() {
     const usersCol = collection(db, "users");
     const unsubscribe = onSnapshot(usersCol, (snapshot) => {
       const fetchedUsers = snapshot.docs.map(doc => ({
-        id: doc.id,
-        // id field matches Firebase UID
-        email: doc.data().email || null,
-        username: doc.data().username,
-        photoURL: doc.data().photoURL || undefined // Fetch photoURL
+        id: toUUID(doc.id), // Ensure UUID branded type
+        email: toOptionalString(doc.data().email),
+        username: toOptionalString(doc.data().username),
+        photoURL: toOptionalString(doc.data().photoURL), // Fetch photoURL
       } as User));
       setUsers(fetchedUsers);
       setUsersLoading(false);
@@ -95,9 +97,18 @@ export default function Settlement() {
       const fetchedExpenses = snapshot.docs.map(doc => {
          const data = doc.data();
          return {
-           id: doc.id,
-           ...data,
-           date: (data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate() : new Date(), // Convert Timestamp
+           id: toUUID(doc.id),
+           amount: data.amount as PositiveNumber, // Ensure PositiveNumber
+           description: data.description ?? '',
+           categoryId: toUUID(data.categoryId),
+           locationId: toUUID(data.locationId),
+           paidById: toUUID(data.paidById),
+           splitBetweenIds: Array.isArray(data.splitBetweenIds) ? data.splitBetweenIds.map(toUUID) : [],
+           splitType: data.splitType ?? '50/50',
+           month: data.month ?? '',
+           date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
+           createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
+           updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
          } as Expense;
       });
       setExpenses(fetchedExpenses);
@@ -120,8 +131,18 @@ export default function Settlement() {
        const fetchedSettlements = snapshot.docs.map(doc => {
          const data = doc.data();
          return {
-           id: doc.id, ...data,
-           date: (data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate() : new Date(),
+           id: toUUID(doc.id),
+           amount: data.amount as PositiveNumber,
+           date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
+           fromUserId: toUUID(data.fromUserId),
+           toUserId: toUUID(data.toUserId),
+           notes: data.notes ?? '',
+           recordedBy: data.recordedBy ?? '',
+           status: toOptionalString(data.status),
+           month: data.month ?? '',
+           createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
+           updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
+           username: toOptionalString(data.username != null && typeof data.username === 'string' ? data.username : undefined),
          } as SettlementType;
        });
        setSettlements(fetchedSettlements);
@@ -147,9 +168,18 @@ export default function Settlement() {
        const fetched = snapshot.docs.map(doc => {
          const data = doc.data();
          return {
-           id: doc.id,
-           ...data,
-           date: (data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate() : new Date(), // Convert Timestamp
+           id: toUUID(doc.id),
+           amount: data.amount as PositiveNumber,
+           date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
+           fromUserId: toUUID(data.fromUserId),
+           toUserId: toUUID(data.toUserId),
+           notes: data.notes ?? '',
+           recordedBy: data.recordedBy ?? '',
+           status: toOptionalString(data.status),
+           month: data.month ?? '',
+           createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
+           updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
+           username: toOptionalString(data.username != null && typeof data.username === 'string' ? data.username : undefined),
          } as SettlementType;
        });
        setPreviousMonthSettlements(fetched);
@@ -167,9 +197,18 @@ export default function Settlement() {
          const fetched = snapshot.docs.map(doc => {
            const data = doc.data();
            return {
-             id: doc.id,
-             ...data,
-             date: (data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate() : new Date(), // Convert Timestamp
+             id: toUUID(doc.id),
+             amount: data.amount as PositiveNumber,
+             description: data.description ?? '',
+             categoryId: toUUID(data.categoryId),
+             locationId: toUUID(data.locationId),
+             paidById: toUUID(data.paidById),
+             splitBetweenIds: Array.isArray(data.splitBetweenIds) ? data.splitBetweenIds.map(toUUID) : [],
+             splitType: data.splitType ?? '50/50',
+             month: data.month ?? '',
+             date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
+             createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
+             updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
            } as Expense;
          });
          setPreviousMonthExpenses(fetched);
@@ -234,8 +273,8 @@ export default function Settlement() {
       totalExpenses += amount; // Still calculate total overall expenses
 
       // Track who paid what
-      if (exp.paidByUserId === user1.id) userExpensesPaid[user1.id] += amount;
-      else if (exp.paidByUserId === user2.id) userExpensesPaid[user2.id] += amount;
+      if (exp.paidById === user1.id) userExpensesPaid[user1.id] += amount;
+      else if (exp.paidById === user2.id) userExpensesPaid[user2.id] += amount;
 
       // Handle different split types for balance calculation
       // Default to "50/50" if splitType is missing or null
@@ -243,15 +282,15 @@ export default function Settlement() {
 
       if (splitType === "50/50") {
         totalSplitExpenses += amount;
-        if (exp.paidByUserId === user1.id) {
+        if (exp.paidById === user1.id) {
            user1_paid_50_50 += amount;
          }
       } else if (splitType === "100%") {
         // Assumption: If split is 100%, the person who *didn't* pay owes the full amount.
-        if (exp.paidByUserId === user1.id) {
+        if (exp.paidById === user1.id) {
           // User1 paid, so User2 owes User1 this amount
           user1_paid_100_owed_by_other += amount;
-        } else if (exp.paidByUserId === user2.id) {
+        } else if (exp.paidById === user2.id) {
           // User2 paid, so User1 owes User2 this amount
           user2_paid_100_owed_by_other += amount;
         }
@@ -353,7 +392,7 @@ export default function Settlement() {
         toUserId: settlementDirection.toUserId, // Use state variable
         notes: `Settlement for ${currentMonth}`,
         recordedBy: currentUser.uid, // Optional: track who recorded
-        createdAt: serverTimestamp() // Use server timestamp
+        createdAt: Timestamp.fromDate(new Date()), // Use server timestamp
       };
 
       await addDoc(collection(db, "settlements"), settlementData);
@@ -449,7 +488,7 @@ return (
                       const name = receivingUser ? getUserName(receivingUserId) : 'User';
                       return (
                         <Avatar className="h-12 w-12 mb-2">
-                          <AvatarImage src={receivingUser?.photoURL} alt={name} />
+                          <AvatarImage src={toOptionalString(receivingUser?.photoURL)} alt={name} />
                           <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                       );
@@ -475,7 +514,7 @@ return (
                         return (
                           <Avatar className="h-12 w-12 mb-2">
                             {/* Add null check for photoURL */}
-                            <AvatarImage src={foundUser.photoURL ?? undefined} alt={name} />
+                            <AvatarImage src={toOptionalString(foundUser.photoURL)} alt={name} />
                             <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
                         );
@@ -543,7 +582,7 @@ return (
               <Card className="border-gray-200 h-fit shadow-sm">
                 <CardContent className="p-3 flex items-center">
                   <Avatar className="h-7 w-7 mr-3 flex-shrink-0">
-                    <AvatarImage src={user.photoURL} alt={userName} />
+                    <AvatarImage src={toOptionalString(user.photoURL)} alt={userName} />
                     <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col flex-1 min-w-0 leading-tight">

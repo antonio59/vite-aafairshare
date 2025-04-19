@@ -75,11 +75,11 @@ export async function sendSettlementEmail(params) {
 
   // Calculate totals for each user
   const fromUserTotal = expenses
-    .filter(exp => exp.paidByUserId === fromUser.id)
+    .filter(exp => exp.paidById === fromUser.id)
     .reduce((sum, exp) => sum + Number(exp.amount), 0);
 
   const toUserTotal = expenses
-    .filter(exp => exp.paidByUserId === toUser.id)
+    .filter(exp => exp.paidById === toUser.id)
     .reduce((sum, exp) => sum + Number(exp.amount), 0);
 
   const totalExpenses = fromUserTotal + toUserTotal;

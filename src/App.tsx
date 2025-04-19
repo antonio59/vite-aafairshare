@@ -19,7 +19,6 @@ const NotFound = lazy(() => import("./pages/not-found"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Analytics = lazy(() => import("./pages/Analytics"));
 const Settlement = lazy(() => import("./pages/Settlement"));
-const RecurringExpenses = lazy(() => import("./pages/RecurringExpenses"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Login = lazy(() => import("./pages/Login"));
 
@@ -112,16 +111,6 @@ function App() {
                             <ProtectedRoute>
                               <MainLayout>
                                 <Settlement />
-                              </MainLayout>
-                            </ProtectedRoute>
-                          }
-                        />
-                        <Route
-                          path="/recurring"
-                          element={
-                            <ProtectedRoute>
-                              <MainLayout>
-                                <RecurringExpenses />
                               </MainLayout>
                             </ProtectedRoute>
                           }
