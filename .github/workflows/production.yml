@@ -20,13 +20,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
-          cache: 'npm'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@8.15.6
 
       - name: Install Dependencies
-        run: |
-          npm install -g npm@9.8.0
-          npm install -g firebase-tools@12.4.6
-          npm ci
+        run: pnpm install
 
       - name: Copy Environment File
         run: cp .env.production .env
@@ -36,7 +36,7 @@ jobs:
           echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_PRODUCTION }}' > serviceAccountKey.json
 
       - name: Build
-        run: npm run build:production
+        run: pnpm run build:production
 
       - name: Deploy to Firebase
         env:
@@ -47,7 +47,7 @@ jobs:
               "default": "aafairshare"
             }
           }' > .firebaserc
-          firebase deploy --only hosting
+          pnpm exec firebase deploy --only hosting
 
       - name: Deployment Status
         run: |

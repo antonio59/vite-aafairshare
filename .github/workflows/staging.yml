@@ -3,7 +3,7 @@ name: Staging Deployment
 on:
   push:
     branches:
-      - develop
+      - staging
       - 'feature/**'
       - 'bugfix/**'
   workflow_dispatch:
@@ -22,17 +22,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
-          cache: 'npm'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm install -g pnpm@8.15.6
 
       - name: Install Dependencies
-        run: |
-          # Update npm itself first
-          npm install -g npm@9.8.0
-          npm install -g firebase-tools@12.4.6
-          
-          # Install dependencies using clean install
-          echo "Installing dependencies..."
-          npm ci
+        run: pnpm install
 
       - name: Create Environment Files
         run: |
@@ -46,7 +42,7 @@ jobs:
           echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_STAGING }}' > serviceAccountKey.staging.json
 
       - name: Build
-        run: npm run build:staging
+        run: pnpm run build:staging
 
       - name: Deploy to Firebase
         env:
@@ -57,7 +53,7 @@ jobs:
               "default": "aafairshare---staging"
             }
           }' > .firebaserc
-          firebase deploy --only hosting:aafairshare---staging --project aafairshare---staging
+          pnpm exec firebase deploy --only hosting:aafairshare---staging --project aafairshare---staging
 
       - name: Deployment Status
         run: |
