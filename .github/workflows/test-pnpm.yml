@@ -1,0 +1,21 @@
+name: Test pnpm Setup
+
+on:
+  push:
+    branches: [ test-pnpm ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.6
+      - run: pnpm --version
+      - run: pnpm install 
