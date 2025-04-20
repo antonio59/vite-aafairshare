@@ -1,0 +1,57 @@
+name: Production Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: |
+          npm install -g npm@9.8.0
+          npm install -g firebase-tools@12.4.6
+          npm ci
+
+      - name: Copy Environment File
+        run: cp .env.production .env
+
+      - name: Create Service Account Key File
+        run: |
+          echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_PRODUCTION }}' > serviceAccountKey.json
+
+      - name: Build
+        run: npm run build:production
+
+      - name: Deploy to Firebase
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ./serviceAccountKey.json
+        run: |
+          echo '{
+            "projects": {
+              "default": "aafairshare"
+            }
+          }' > .firebaserc
+          firebase deploy --only hosting
+
+      - name: Deployment Status
+        run: |
+          echo "### 🚀 Production Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "* Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "* Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "* Environment: Production" >> $GITHUB_STEP_SUMMARY 
