@@ -132,9 +132,28 @@ src/
 
 ## Scripts & Automation
 
-This project includes several scripts and backend automations for data migration, maintenance, and operational workflows.
+This project uses a unified GitHub Actions workflow for deploying to both staging and production environments using pnpm and Firebase Hosting.
 
-### Data Sync & Migration Scripts
+### Deployment Workflow
+
+- **Unified Workflow:**
+  - The `.github/workflows/deploy.yml` workflow handles both staging and production deployments.
+  - **Push to `staging` branch:** Deploys to the staging Firebase project (`aafairshare---staging`).
+  - **Push to `main` branch:** Deploys to the production Firebase project (`aafairshare`).
+  - The workflow uses pnpm for dependency management and build, and conditionally deploys based on the branch.
+
+#### How to Deploy
+- **To test in staging:**
+  1. Push or merge your changes to the `staging` branch.
+  2. The workflow will build and deploy to the staging Firebase environment.
+- **To deploy to production:**
+  1. Merge or cherry-pick your changes to the `main` branch.
+  2. The workflow will build and deploy to the production Firebase environment.
+
+#### Example Workflow File
+See `.github/workflows/deploy.yml` for the full configuration.
+
+### Other Scripts
 
 - **sync-monthly-data.ts**
   - **What it does:** Syncs Firestore data for a given month (categories, locations, expenses, settlements) from production to staging.
