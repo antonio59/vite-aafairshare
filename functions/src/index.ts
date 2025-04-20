@@ -609,7 +609,7 @@ async function notifySyncFailure(error: unknown, month: string) {
 export const onSettlementMarkedSettled = functions
   .region('europe-west1')
   .firestore.document('settlements/{settlementId}')
-  .onUpdate(async (change, context) => {
+  .onUpdate(async (change) => {
     const before = change.before.data();
     const after = change.after.data();
     if (!before || !after) return;

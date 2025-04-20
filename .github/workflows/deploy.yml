@@ -1,3 +1,4 @@
+# test change
 name: Deploy to Firebase Hosting
 
 on:
@@ -22,8 +23,10 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install pnpm
-        run: npm install -g pnpm@8.15.6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.15.6
 
       - name: Install dependencies
         run: pnpm install
