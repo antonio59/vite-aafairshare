@@ -15,6 +15,12 @@ on:
     branches:
       - main
       - staging
+      - 'feature/**'
+      - 'bugfix/**'
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.github/workflows/dependency-updates.yml'
   workflow_dispatch:
     inputs:
       environment:
