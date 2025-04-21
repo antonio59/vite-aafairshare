@@ -20,13 +20,14 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { db } from "@/lib/firebase";
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from "firebase/firestore";
+import { collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, addDoc } from "firebase/firestore";
 import { CATEGORY_ICONS } from "@/lib/constants";
 import type { CategoryIconName } from "@shared/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 export default function Settings() {
+  const [editingLocation, setEditingLocation] = useState<Location | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("categories");
   const setLocationFormOpen = useState(false)[1];
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
@@ -77,6 +78,8 @@ export default function Settings() {
 
 
   const openDeleteDialog = (type: 'category' | 'location', id: string) => {
+    setEditingLocation(undefined); // reset editing on delete
+
     setItemToDelete({ type, id });
     setDeleteDialogOpen(true);
   };
@@ -183,7 +186,7 @@ export default function Settings() {
                 <CardTitle>Locations</CardTitle>
                 <CardDescription>Manage expense locations</CardDescription>
               </div>
-              <Button onClick={() => {  setLocationFormOpen(true); }}> {/* Reset selected on add */}
+              <Button onClick={() => { setEditingLocation(undefined); setLocationFormOpen(true); }}> {/* Reset editingLocation on add */}
                 <Plus className="h-4 w-4 mr-2" /> Add Location
               </Button>
             </CardHeader>
@@ -198,10 +201,12 @@ export default function Settings() {
                       <CardContent className="flex items-center justify-between p-3 sm:p-4"> {/* Adjusted Padding */}
                         <span>{location.name}</span>
                         <div className="flex space-x-1 sm:space-x-2"> {/* Adjusted Spacing */}
-                          <Button variant="ghost" size="icon" onClick={() => { setLocationFormOpen(true); }} className="h-8 w-8 text-gray-500  hover:text-primary ">
+                          <Button variant="ghost" size="icon" onClick={() => { setEditingLocation(location); setLocationFormOpen(true); }} className="h-8 w-8 text-gray-500  hover:text-primary ">
                             <Pencil className="h-4 w-4" /> <span className="sr-only">Edit</span>
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('location', location.id)} className="h-8 w-8 text-gray-500  hover:text-red-500 ">
+                          <Button variant="ghost" size="icon" onClick={async () => {
+  await deleteDoc(doc(db, 'locations', location.id));
+}} className="h-8 w-8 text-gray-500  hover:text-red-500 ">
                             <Trash className="h-4 w-4" /> <span className="sr-only">Delete</span>
                           </Button>
                         </div>
@@ -246,14 +251,22 @@ export default function Settings() {
 
       {/* Location Form */}
       <LocationForm
-         
-         onSuccess={() => {
+         _location={editingLocation}
+         onSuccess={async (locationData) => {
+           if (editingLocation) {
+             // Update existing location in Firestore
+             const locationRef = doc(db, 'locations', locationData.id);
+             await updateDoc(locationRef, { name: locationData.name });
+             setEditingLocation(undefined);
+           } else {
+             // Add new location to Firestore
+             await addDoc(collection(db, 'locations'), { name: locationData.name });
+           }
            setLocationFormOpen(false);
-           
          }}
          onCancel={() => {
            setLocationFormOpen(false);
-           
+           setEditingLocation(undefined);
          }}
        />
 
