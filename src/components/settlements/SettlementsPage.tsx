@@ -21,7 +21,7 @@ interface MonthSummary {
 
 export default function SettlementsPage() {
   const { currentUser } = useAuth();
-  const { expenses, loading: expensesLoading } = useExpenses();
+  const { _expenses, loading: expensesLoading } = useExpenses();
   const [currentMonth, setCurrentMonth] = useState<string>(getCurrentMonth());
   const [settlements, setSettlements] = useState<Settlement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,13 +49,13 @@ export default function SettlementsPage() {
   
   // Calculate settlement summary when expenses change
   useEffect(() => {
-    if (expensesLoading || !expenses.length || !currentUser) {
+    if (expensesLoading || !_expenses.length || !currentUser) {
       setSummary(null);
       return;
     }
     
     // Filter expenses for the current month
-    const monthlyExpenses = expenses.filter(expense => {
+    const monthlyExpenses = _expenses.filter((expense: any) => {
       // Use type guard for month property
       const expenseMonth = 'month' in expense && expense.month ? expense.month : getMonthFromDate(expense.date);
       return expenseMonth === currentMonth;
@@ -67,7 +67,7 @@ export default function SettlementsPage() {
     }
     
     // Calculate total expenses
-    const totalExpenses = monthlyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const totalExpenses = monthlyExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
     
     // In a real app, we would calculate per-user expenses
     // For now, we'll use a simplified model
@@ -78,7 +78,7 @@ export default function SettlementsPage() {
         [currentUser.uid]: totalExpenses
       }
     });
-  }, [expenses, expensesLoading, currentMonth, currentUser]);
+  }, [_expenses, expensesLoading, currentMonth, currentUser]);
   
   const handleMonthChange = (newMonth: string) => {
     setCurrentMonth(newMonth);

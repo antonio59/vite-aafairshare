@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import MonthSelector from "@/components/MonthSelector";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
@@ -22,7 +22,7 @@ function toISODateString(dateValue: unknown): ISODateString | undefined {
 }
 
 export default function Analytics() {
-  const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
+  const [currentMonth] = useState(getCurrentMonth());
   const { toast } = useToast();
   const { currentUser, loading: authLoading } = useAuth();
 
@@ -502,9 +502,7 @@ export default function Analytics() {
     }
   }, [calculatedTrendData]);
 
-  const handleMonthChange = (month: string) => {
-    setCurrentMonth(month);
-  };
+  
 
   // Helper function to get username by ID
   const getUsernameById = (userId: string): string => {
@@ -521,7 +519,7 @@ export default function Analytics() {
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
         <div className="text-center space-y-4">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">Loading Analytics...</h2>
+          <h2 className="text-lg font-medium text-gray-900 ">Loading Analytics...</h2>
         </div>
       </div>
     );
@@ -531,7 +529,7 @@ export default function Analytics() {
   if (!currentUser) {
     return (
       <div className="flex items-center justify-center min-h-[calc(100vh-200px)]">
-        <p className="text-lg text-gray-600 dark:text-gray-400">Please log in to view analytics.</p>
+        <p className="text-lg text-gray-600 ">Please log in to view analytics.</p>
       </div>
     );
   }
@@ -596,13 +594,12 @@ export default function Analytics() {
   return (
     <div className="space-y-6 px-4 md:px-6 pb-24">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-50">Analytics Dashboard</h1>
-        <MonthSelector value={currentMonth} onChange={handleMonthChange} />
+        <h1 className="text-2xl font-bold text-gray-900 ">Analytics Dashboard</h1>
       </div>
 
       {/* Summary Card */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="col-span-1 md:col-span-3 overflow-hidden border-gray-200 dark:border-gray-700">
+        <Card className="col-span-1 md:col-span-3 overflow-hidden border-gray-200 ">
           <CardHeader className="pb-4">
             <CardTitle className="text-xl">Monthly Summary</CardTitle>
           </CardHeader>
@@ -613,19 +610,19 @@ export default function Analytics() {
               <div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Total Expenses</p>
+                    <p className="text-sm text-gray-500 ">Total Expenses</p>
                     <p className="text-3xl sm:text-4xl font-bold text-primary mt-2 financial-value">
                       {formatCurrency(summary.totalExpenses)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Fair Share (50/50)</p>
+                    <p className="text-sm text-gray-500 ">Fair Share (50/50)</p>
                     <p className="text-2xl sm:text-3xl font-bold text-orange-500 mt-2 financial-value">
                       {formatCurrency(summary.totalExpenses / 2)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500 ">
                       Settlement ({getUsernameById(summary.settlementDirection.fromUserId)} → {getUsernameById(summary.settlementDirection.toUserId)})
                     </p>
                     <p className="text-2xl sm:text-3xl font-bold text-emerald-500 mt-2 financial-value">
@@ -635,9 +632,9 @@ export default function Analytics() {
                 </div>
                 
                 {/* Add settlement calculation breakdown */}
-                <div className="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                <div className="mt-6 border-t border-gray-200  pt-4">
                   <details>
-                    <summary className="cursor-pointer text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">
+                    <summary className="cursor-pointer text-sm font-medium text-gray-500  hover:text-gray-700 ">
                       Show settlement calculation details
                     </summary>
                     <div className="mt-2 text-sm grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -651,7 +648,7 @@ export default function Analytics() {
                           <div className="mt-2">
                             <p className="font-medium">Existing Settlements:</p>
                             {currentMonthSettlements.map((settlement, idx) => (
-                              <p key={idx} className="text-gray-600 dark:text-gray-400">
+                              <p key={idx} className="text-gray-600 ">
                                 {getUsernameById(settlement.fromUserId)} paid {getUsernameById(settlement.toUserId)} {formatCurrency(settlement.amount)}
                               </p>
                             ))}
@@ -661,7 +658,7 @@ export default function Analytics() {
                       <div>
                         {summary.settlementAmount > 0 ? (
                           <>
-                            <p className="text-emerald-600 dark:text-emerald-400">
+                            <p className="text-emerald-600 ">
                               {getUsernameById(summary.settlementDirection.fromUserId)} should pay {getUsernameById(summary.settlementDirection.toUserId)} {formatCurrency(summary.settlementAmount)}
                             </p>
                             <p className="text-sm text-gray-500 mt-1">
@@ -671,7 +668,7 @@ export default function Analytics() {
                             </p>
                           </>
                         ) : (
-                          <p className="text-emerald-600 dark:text-emerald-400">Expenses are already balanced for this month!</p>
+                          <p className="text-emerald-600 ">Expenses are already balanced for this month!</p>
                         )}
                       </div>
                     </div>
@@ -680,7 +677,7 @@ export default function Analytics() {
               </div>
             ) : (
               <div className="p-8 text-center">
-                <p className="text-gray-600 dark:text-gray-400">No summary data available for this month.</p>
+                <p className="text-gray-600 ">No summary data available for this month.</p>
               </div>
             )}
           </CardContent>
@@ -718,7 +715,7 @@ export default function Analytics() {
       </div>
 
       {/* Trend Charts */}
-      <h2 className="text-xl font-semibold mt-8 mb-4 text-gray-900 dark:text-gray-50">Expense Trends</h2>
+      <h2 className="text-xl font-semibold mt-8 mb-4 text-gray-900 ">Expense Trends</h2>
       <div className="grid grid-cols-1 gap-6">
         {/* Total Monthly Expenses Trend */}
         <TrendChart

@@ -65,14 +65,14 @@ export default function Login() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4 sm:p-6 lg:p-8">
       {/* Branding Area */}
       <div className="mb-10 text-center space-y-3">
-         <h1 className="text-5xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+         <h1 className="text-5xl font-bold tracking-tight text-gray-900 ">
            AAFairShare
          </h1>
          <p className="text-muted-foreground text-lg">Split expenses fairly and easily.</p>
       </div>
 
       {/* Login Card */}
-      <Card className="w-full max-w-md border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-300">
+      <Card className="w-full max-w-md border border-gray-200  shadow-sm hover:shadow-md transition-shadow duration-300">
         <CardHeader className="text-center pb-4">
           <CardTitle className="text-2xl font-semibold">Welcome Back</CardTitle>
           <CardDescription className="text-base">
@@ -83,7 +83,7 @@ export default function Login() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full flex items-center justify-center py-6 text-base font-medium transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
+            className="w-full flex items-center justify-center py-6 text-base font-medium transition-all duration-200 hover:bg-gray-50  border-gray-200 "
             onClick={handleGoogleLogin}
             disabled={loadingGoogle}
           >
@@ -100,7 +100,7 @@ export default function Login() {
       </Card>
 
       {/* Footer */}
-      <footer className="mt-12 text-center text-sm text-gray-500 dark:text-gray-400">
+      <footer className="mt-12 text-center text-sm text-gray-500 ">
         &copy; {new Date().getFullYear()} AAFairShare. All rights reserved.
       </footer>
     </div>

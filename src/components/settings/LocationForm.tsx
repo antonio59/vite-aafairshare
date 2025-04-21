@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+ import { useState, FormEvent } from 'react';
 import type { Location } from '@shared/types';
 import './LocationForm.css';
 
@@ -8,8 +8,8 @@ interface LocationFormProps {
   onCancel: () => void;
 }
 
-export default function LocationForm({ location, onSuccess, onCancel }: LocationFormProps) {
-  const [name, setName] = useState(location?.name || '');
+export default function LocationForm({ location: _location, onSuccess, onCancel }: LocationFormProps) {
+  const [name, setName] = useState(_location?.name || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   
@@ -26,16 +26,15 @@ export default function LocationForm({ location, onSuccess, onCancel }: Location
     
     try {
       const locationData: Location = {
-        id: location?.id || `loc-${Date.now()}`,
-        name: name.trim(),
-        createdAt: new Date()
+        id: _location?.id || `loc-${Date.now()}`,
+        name: name.trim()
       };
       
       await new Promise(resolve => setTimeout(resolve, 500));
       
       onSuccess(locationData);
       
-      if (!location) {
+      if (!_location) {
         setName('');
       }
     } catch (error) {
@@ -78,7 +77,7 @@ export default function LocationForm({ location, onSuccess, onCancel }: Location
           className="submit-button"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : location ? 'Update Location' : 'Create Location'}
+          {isSubmitting ? 'Saving...' : _location ? 'Update Location' : 'Create Location'}
         </button>
       </div>
     </form>

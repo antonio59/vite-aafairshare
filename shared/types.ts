@@ -134,10 +134,8 @@ export interface UserDisplay {
 
 // Location type for expense locations
 export interface Location {
-  id: UUID;
+  id: string;
   name: string;
-  color?: string;      // Optional color field
-  createdAt: ISODateString | Date;
 }
 
 // Category type for expense categories

@@ -23,7 +23,7 @@ interface SettlementHistoryProps {
   settlements: SettlementType[]; // Use base Settlement type
   users: User[]; // Add users prop for lookup
   isLoading?: boolean;
-  onUnsettlement?: (id: string) => void; // ID is now string
+  onUnsettlement?: (_id: string) => void; // ID is now string
 }
 
 export default function SettlementHistory(props: SettlementHistoryProps) {

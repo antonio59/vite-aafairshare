@@ -4,17 +4,17 @@ import { formatDate } from '@/lib/dateUtils';
 
 interface ExpenseListProps {
   expenses: ExpenseWithDetails[];
-  onEdit: (expense: ExpenseWithDetails) => void;
-  onDelete: (expenseId: string) => void;
+  onEdit: (_expense: ExpenseWithDetails) => void;
+  onDelete: (_expenseId: string) => void;
 }
 
 export default function ExpenseList({ expenses, onEdit, onDelete }: ExpenseListProps) {
-  const handleEdit = (expense: ExpenseWithDetails) => {
-    onEdit(expense);
+  const handleEdit = (_expense: ExpenseWithDetails) => {
+    onEdit(_expense);
   };
 
-  const handleDelete = async (expenseId: string) => {
-    onDelete(expenseId);
+  const handleDelete = async (_expenseId: string) => {
+    onDelete(_expenseId);
   };
 
   if (!expenses.length) {

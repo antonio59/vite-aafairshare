@@ -23,14 +23,14 @@ import { toUser, toUUID, toISODateString } from "@shared/utils/typeGuards";
 
 // Create a Google provider instance
 const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('https://www.googleapis.com/auth/userinfo.email');
+googleProvider.addScope('https://www.googleapis.com/auth/userinfo._email');
 googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  signup: (email: string, password: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
+  signup: (_email: string, _password: string) => Promise<void>;
+  login: (_email: string, _password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   allUsers?: User[];
@@ -41,6 +41,7 @@ interface AuthContextType {
   locationsLoading?: boolean;
 }
 
+ 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth(): AuthContextType {
@@ -73,12 +74,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [locationsLoading, setLocationsLoading] = useState(true);
 
-  async function signup(email: string, password: string) {
-    await createUserWithEmailAndPassword(auth, email, password);
+  async function signup(_email: string, _password: string) {
+    await createUserWithEmailAndPassword(auth, _email, _password);
   }
 
-  async function login(email: string, password: string) {
-    await signInWithEmailAndPassword(auth, email, password);
+  async function login(_email: string, _password: string) {
+    await signInWithEmailAndPassword(auth, _email, _password);
   }
   
   async function signInWithGoogle() {
@@ -99,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const userData = userSnap.data();
           console.log('[AuthContext] User authenticated:', { 
             id: userData.id, 
-            email: userData.email,
+            _email: userData._email,
             username: userData.username
           });
           setCurrentUser(
@@ -154,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           ...userData,
           id: toUUID(doc.id),
           uid: doc.id,
-          email: userData.email || '',
+          _email: userData._email || '',
           username: userData.username || userData.displayName || '',
           photoURL: userData.photoURL ?? null,
           createdAt: toISODateString(userData.createdAt),
@@ -224,10 +225,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onSnapshot(locationsQuery, (snapshot) => {
       const fetchedLocations = snapshot.docs.map(doc => {
         const data = doc.data();
-        return { 
-          ...data,
+        return {
           id: doc.id,
-          createdAt: convertTimestamp(data.createdAt)
+          name: data.name
         } as Location;
       });
       

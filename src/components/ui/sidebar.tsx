@@ -12,18 +12,12 @@ import { Skeleton } from "@/components/ui/skeleton"
 // Correctly import only the exported Tooltip component
 import { Tooltip } from "@/components/ui/tooltip"
 
-const SIDEBAR_COOKIE_NAME = "sidebar:state"
-const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+
 const SIDEBAR_WIDTH = "16rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
 type SidebarContext = {
-  state: "expanded" | "collapsed"
-  open: boolean
-  setOpen: (open: boolean) => void
-  openMobile: boolean
-  setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
 }
@@ -41,17 +35,12 @@ function useSidebar() {
 
 const SidebarProvider = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & {
-    defaultOpen?: boolean
-    open?: boolean
-    onOpenChange?: (open: boolean) => void
-  }
+  React.ComponentProps<"div">
+
 >(
   (
     {
-      defaultOpen = true,
-      open: openProp,
-      onOpenChange: setOpenProp,
+
       className,
       style,
       children,
@@ -60,34 +49,12 @@ const SidebarProvider = React.forwardRef<
     ref
   ) => {
     const isMobile = useIsMobile()
-    const [openMobile, setOpenMobile] = React.useState(false)
+    const [, setOpenMobile] = React.useState(false)
 
-    // This is the internal state of the sidebar.
-    // We use openProp and setOpenProp for control from outside the component.
-    const [_open, _setOpen] = React.useState(defaultOpen)
-    const open = openProp ?? _open
-    const setOpen = React.useCallback(
-      (value: boolean | ((value: boolean) => boolean)) => {
-        if (setOpenProp) {
-          return setOpenProp?.(
-            typeof value === "function" ? value(open) : value
-          )
-        }
-
-        _setOpen(value)
-
-        // This sets the cookie to keep the sidebar state.
-        document.cookie = `${SIDEBAR_COOKIE_NAME}=${open}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
-      },
-      [setOpenProp, open]
-    )
-
-    // Helper to toggle the sidebar.
+    // Helper to toggle the sidebar (only affects mobile sidebar now)
     const toggleSidebar = React.useCallback(() => {
-      return isMobile
-        ? setOpenMobile((open) => !open)
-        : setOpen((open) => !open)
-    }, [isMobile, setOpen, setOpenMobile])
+      setOpenMobile((open) => !open)
+    }, [setOpenMobile])
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -105,21 +72,13 @@ const SidebarProvider = React.forwardRef<
       return () => window.removeEventListener("keydown", handleKeyDown)
     }, [toggleSidebar])
 
-    // We add a state so that we can do data-state="expanded" or "collapsed".
-    // This makes it easier to style the sidebar with Tailwind classes.
-    const state = open ? "expanded" : "collapsed"
-
     const contextValue = React.useMemo<SidebarContext>(
       () => ({
-        state,
-        open,
-        setOpen,
-        isMobile,
-        openMobile,
         setOpenMobile,
+        isMobile,
         toggleSidebar,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [setOpenMobile, isMobile, toggleSidebar]
     )
 
     return (
@@ -481,7 +440,7 @@ const SidebarMenuButton = React.forwardRef<
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
-    const { isMobile, state } = useSidebar()
+    const { isMobile } = useSidebar()
 
     // Render the base button component
     const button = (
@@ -503,8 +462,8 @@ const SidebarMenuButton = React.forwardRef<
     }
 
     // If a tooltip string is provided, wrap the button with the custom Tooltip component
-    // Only show tooltip when sidebar is collapsed and not on mobile
-    if (state === "collapsed" && !isMobile) {
+    // Only show tooltip when not on mobile
+    if (!isMobile) {
       return (
         <Tooltip content={tooltip} position="right">
           {button}

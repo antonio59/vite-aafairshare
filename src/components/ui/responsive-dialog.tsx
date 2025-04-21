@@ -28,18 +28,16 @@ import { cn } from "@/lib/utils";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 // DialogPrimitive import removed as Close button is handled by DialogContent wrapper now
 
-interface ResponsiveDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+export interface ResponsiveDialogProps {
+  onOpenChange: () => void;
   title: string;
-  description?: string; // Keep description prop
+  description?: string;
   children: React.ReactNode;
   footer?: React.ReactNode;
   className?: string;
 }
 
 export function ResponsiveDialog({
-  open,
   onOpenChange,
   title,
   description, // Description prop received
@@ -55,11 +53,13 @@ export function ResponsiveDialog({
 
   // Generate stable IDs based on the safe title
   const titleId = `dialog-title-${safeTitle.replace(/\s+/g, '-').toLowerCase()}`;
-  const descriptionId = `dialog-desc-${safeTitle.replace(/\s+/g, '-').toLowerCase()}`;
+  const descriptionId = `dialog-description-${safeTitle.replace(/\s+/g, '-').toLowerCase()}`;
 
   // Always render Dialog
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      onOpenChange={onOpenChange}
+    >
       <DialogContent
         className={cn(
           "sm:max-w-[600px]", // Keep desktop max-width

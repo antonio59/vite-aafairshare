@@ -4,14 +4,14 @@ import { CATEGORY_ICONS, CATEGORY_ICONS_EMOJI } from '@/lib/constants';
 import './CategoryForm.css';
 
 interface CategoryFormProps {
-  category?: Category;
-  onSuccess: (category: Category) => void;
+  _category?: Category;
+  onSuccess: (_category: Category) => void;
   onCancel: () => void;
 }
 
-export default function CategoryForm({ category: _category, onSuccess, onCancel }: CategoryFormProps) {
-  const [name, setName] = useState(_category?.name || '');
-  const [icon, setIcon] = useState<string>(_category?.icon || 'other');
+export default function CategoryForm({ _category: __category, onSuccess, onCancel }: CategoryFormProps) {
+  const [name, setName] = useState(__category?.name || '');
+  const [icon, setIcon] = useState<string>(__category?.icon || 'other');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   
@@ -30,8 +30,8 @@ export default function CategoryForm({ category: _category, onSuccess, onCancel 
     setError('');
     
     try {
-      const categoryData: Category = {
-        id: _category?.id || `cat-${Date.now()}`,
+      const _categoryData: Category = {
+        id: __category?.id || `cat-${Date.now()}`,
         name: name.trim(),
         icon,
         createdAt: new Date()
@@ -39,32 +39,32 @@ export default function CategoryForm({ category: _category, onSuccess, onCancel 
       
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      onSuccess(categoryData);
+      onSuccess(_categoryData);
       
-      if (!_category) {
+      if (!__category) {
         setName('');
         setIcon('other');
       }
     } catch (error) {
-      console.error('Error submitting category form:', error);
-      setError('Failed to save category');
+      console.error('Error submitting _category form:', error);
+      setError('Failed to save _category');
     } finally {
       setIsSubmitting(false);
     }
   };
   
   return (
-    <form onSubmit={handleSubmit} className="category-form">
+    <form onSubmit={handleSubmit} className="_category-form">
       {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
-        <label htmlFor="category-name">Category Name</label>
+        <label htmlFor="_category-name">Category Name</label>
         <input
-          id="category-name"
+          id="_category-name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Enter category name"
+          placeholder="Enter _category name"
           required
         />
       </div>
@@ -108,7 +108,7 @@ export default function CategoryForm({ category: _category, onSuccess, onCancel 
           className="submit-button"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : _category ? 'Update Category' : 'Create Category'}
+          {isSubmitting ? 'Saving...' : __category ? 'Update Category' : 'Create Category'}
         </button>
       </div>
     </form>

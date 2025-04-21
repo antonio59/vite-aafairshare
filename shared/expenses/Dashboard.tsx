@@ -7,11 +7,11 @@ import { getCategoryColorClass } from '@/lib/utils';
 const Dashboard = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const { currentUser } = useAuth() as AuthContextType;
-  const { expenses, loading } = useExpenses();
+  const { _expenses, loading } = useExpenses();
 
-  // Filter expenses by current month
+  // Filter _expenses by current month
   const currentMonthKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
-  const filteredExpenses = expenses.filter((expense: ExpenseWithDetails) => expense.month === currentMonthKey);
+  const filteredExpenses = _expenses.filter((expense: ExpenseWithDetails) => expense.month === currentMonthKey);
 
   const navigateMonth = (direction: number) => {
     const newDate = new Date(currentDate);
@@ -60,7 +60,7 @@ const Dashboard = () => {
   const totals = calculateTotals();
 
   if (loading) {
-    return <div className="p-4 text-center">Loading expenses...</div>;
+    return <div className="p-4 text-center">Loading _expenses...</div>;
   }
 
   return (
@@ -167,7 +167,7 @@ const Dashboard = () => {
             ) : (
               <tr>
                 <td colSpan={8} className="px-6 py-4 text-center text-sm text-gray-500">
-                  No expenses found for this month.
+                  No _expenses found for this month.
                 </td>
               </tr>
             )}

@@ -132,14 +132,11 @@ export default function Expenses() {
                   id: validateUUID('', 'id'),
                   name: 'Unknown',
                   icon: 'other',
-                  createdAt: new Date(),
-                  color: '#999'
+                  createdAt: new Date()
                 },
                 location: locationSnap.exists() ? { id: validateUUID(locationSnap.id, 'id'), ...(locationSnap.data() as Omit<Location, 'id'>) } : {
                   id: validateUUID('', 'id'),
-                  name: 'Unknown',
-                  createdAt: new Date(),
-                  color: '#999'
+                  name: 'Unknown'
                 }
               };
               return expenseWithDetails;
@@ -467,7 +464,7 @@ export default function Expenses() {
           categoryTotals: Object.entries(categoryTotals).map(([categoryId, amount]) => ({
             amount,
             percentage: totalExpenses > 0 ? (amount / totalExpenses) * 100 : 0,
-            category: categories.find(c => c.id === categoryId) ?? { id: validateUUID(categoryId, 'id'), name: 'Unknown', icon: 'other', createdAt: new Date(), color: '#999' }
+            category: categories.find(c => c.id === categoryId) ?? { id: validateUUID(categoryId, 'id'), name: 'Unknown', icon: 'other', createdAt: new Date() }
           })),
           locationTotals: [],
           splitTypeTotals: {
@@ -501,8 +498,8 @@ export default function Expenses() {
   const handleExport = (format: 'csv' | 'pdf') => {
     // Use displayedExpenses from local state (needs mapping back to ExpenseWithDetails if used)
     const expensesToExport = (displayedExpenses || []).map(exp => {
-      const category = categories.find(c => c.id === exp.categoryId) ?? { id: UNKNOWN_UUID, name: 'Unknown', icon: 'other', createdAt: UNKNOWN_DATE, color: '#999' };
-      const location = locations.find(l => l.id === exp.locationId) ?? { id: UNKNOWN_UUID, name: 'Unknown', createdAt: UNKNOWN_DATE, color: '#999' };
+      const category = categories.find(c => c.id === exp.categoryId) ?? { id: UNKNOWN_UUID, name: 'Unknown', icon: 'other', createdAt: new Date() };
+      const location = locations.find(l => l.id === exp.locationId) ?? { id: UNKNOWN_UUID, name: 'Unknown' };
       const paidBy = users.find(u => u.id === exp.paidById) ?? {
         id: UNKNOWN_UUID,
         uid: UNKNOWN_UUID,
@@ -540,8 +537,8 @@ export default function Expenses() {
 
   // Map raw expenses to ExpenseWithDetails for the table prop
   const tableExpenses: ExpenseWithDetails[] = (displayedExpenses || []).map(exp => {
-    const category = categories.find(c => c.id === exp.categoryId) ?? { id: UNKNOWN_UUID, name: 'Unknown', icon: 'other', createdAt: UNKNOWN_DATE, color: '#999' };
-    const location = locations.find(l => l.id === exp.locationId) ?? { id: UNKNOWN_UUID, name: 'Unknown', createdAt: UNKNOWN_DATE, color: '#999' };
+    const category = categories.find(c => c.id === exp.categoryId) ?? { id: UNKNOWN_UUID, name: 'Unknown', icon: 'other', createdAt: new Date() };
+    const location = locations.find(l => l.id === exp.locationId) ?? { id: UNKNOWN_UUID, name: 'Unknown' };
     const paidBy = users.find(u => u.id === exp.paidById) ?? {
       id: UNKNOWN_UUID,
       uid: UNKNOWN_UUID,
@@ -629,14 +626,11 @@ export default function Expenses() {
                     id: '',
                     name: 'Unknown',
                     icon: 'other',
-                    createdAt: new Date(),
-                    color: '#999'
+                    createdAt: new Date()
                   },
                   location: locationSnap.exists() ? { id: locationSnap.id, ...(locationSnap.data() as Omit<Location, 'id'>) } : {
                     id: '',
-                    name: 'Unknown',
-                    createdAt: new Date(),
-                    color: '#999'
+                    name: 'Unknown'
                   }
                 };
                 return expenseWithDetails;

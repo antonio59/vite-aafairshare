@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import { AuthProvider } from './contexts/AuthContext';
-import { ThemeProvider } from './contexts/ThemeContext';
+
 import { FeatureFlagProvider } from './contexts/FeatureFlagContext';
 
 // Register service worker for PWA - Commented out for now
@@ -35,13 +35,13 @@ const renderApp = () => {
   const root = createRoot(container);
   root.render(
     <React.StrictMode>
-      <ThemeProvider>
+
         <AuthProvider>
           <FeatureFlagProvider>
             <App />
           </FeatureFlagProvider>
         </AuthProvider>
-      </ThemeProvider>
+
     </React.StrictMode>
   );
 };

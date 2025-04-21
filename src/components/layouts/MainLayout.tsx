@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
-import { ThemeToggle } from "@/components/ThemeToggle";
+
 import { SkipLink } from "@/components/SkipLink";
 import { SwipeContainer } from "@/components/SwipeContainer";
 // Import DropdownMenu for mobile profile
@@ -123,14 +123,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
             </Link>
           ))}
         </nav>
-        {/* Theme Toggle */}
-        <div className="px-4 py-2 border-t border-border flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-foreground">Theme</span>
-            <ThemeToggle />
-          </div>
-        </div>
-
         {/* Sidebar Profile Section */}
         <div className="p-4 border-t border-gray-200 flex-shrink-0">
           {currentUser ? (
@@ -182,9 +174,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
           {/* Mobile Actions */}
           <div className="flex items-center space-x-3">
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
             {/* Mobile User Profile Dropdown */}
             {currentUser ? (
               <DropdownMenu>

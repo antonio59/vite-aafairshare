@@ -28,7 +28,7 @@ import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("categories");
-  const [isLocationFormOpen, setLocationFormOpen] = useState(false);
+  const setLocationFormOpen = useState(false)[1];
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   const [selectedLocation, setSelectedLocation] = useState<Location | undefined>(undefined);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -128,7 +128,7 @@ export default function Settings() {
         </TabsList>
 
         <TabsContent value="categories">
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 ">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Categories</CardTitle>
@@ -147,20 +147,20 @@ export default function Settings() {
                     // Get the icon component, default to a placeholder if not found
                     const IconComponent = category.icon ? CATEGORY_ICONS[category.icon as CategoryIconName] || (() => <span className="text-xs">?</span>) : (() => <span className="text-xs">?</span>);
                     return (
-                      <Card key={category.id} className="border-gray-200 dark:border-gray-700">
+                      <Card key={category.id} className="border-gray-200 ">
                         <CardContent className="flex items-center justify-between p-3 sm:p-4">
                           <div className="flex items-center space-x-3 sm:space-x-4">
                             {/* Color Swatch */}
                             <div className={`h-5 w-5 rounded-full border ${getCategoryBackgroundColorClass(category.name)}`}></div>
                             {/* Icon */}
-                            <IconComponent className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                            <IconComponent className="h-5 w-5 text-gray-600 " />
                             <span>{category.name}</span>
                         </div>
                         <div className="flex space-x-1 sm:space-x-2"> {/* Adjusted Spacing */}
-                          <Button variant="ghost" size="icon" onClick={() => { setSelectedCategory(category); setCategoryFormOpen(true); }} className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary">
+                          <Button variant="ghost" size="icon" onClick={() => { setSelectedCategory(category); setCategoryFormOpen(true); }} className="h-8 w-8 text-gray-500  hover:text-primary ">
                             <Pencil className="h-4 w-4" /> <span className="sr-only">Edit</span>
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('category', category.id)} className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400">
+                          <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('category', category.id)} className="h-8 w-8 text-gray-500  hover:text-red-500 ">
                             <Trash className="h-4 w-4" /> <span className="sr-only">Delete</span>
                           </Button>
                         </div>
@@ -170,14 +170,14 @@ export default function Settings() {
                   })} {/* Add closing brace for the map block */}
                 </div>
               ) : (
-                <div className="p-4 text-center"><p className="text-gray-600 dark:text-gray-400">No categories found.</p></div>
+                <div className="p-4 text-center"><p className="text-gray-600 ">No categories found.</p></div>
               )}
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="locations">
-          <Card className="border-gray-200 dark:border-gray-700">
+          <Card className="border-gray-200 ">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Locations</CardTitle>
@@ -194,14 +194,14 @@ export default function Settings() {
               ) : locations.length > 0 ? (
                  <div className="space-y-4"> {/* Reverted to vertical stack */}
                   {locations.map((location) => (
-                    <Card key={location.id} className="border-gray-200 dark:border-gray-700">
+                    <Card key={location.id} className="border-gray-200 ">
                       <CardContent className="flex items-center justify-between p-3 sm:p-4"> {/* Adjusted Padding */}
                         <span>{location.name}</span>
                         <div className="flex space-x-1 sm:space-x-2"> {/* Adjusted Spacing */}
-                          <Button variant="ghost" size="icon" onClick={() => { setSelectedLocation(location); setLocationFormOpen(true); }} className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primary">
+                          <Button variant="ghost" size="icon" onClick={() => { setSelectedLocation(location); setLocationFormOpen(true); }} className="h-8 w-8 text-gray-500  hover:text-primary ">
                             <Pencil className="h-4 w-4" /> <span className="sr-only">Edit</span>
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('location', location.id)} className="h-8 w-8 text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400">
+                          <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('location', location.id)} className="h-8 w-8 text-gray-500  hover:text-red-500 ">
                             <Trash className="h-4 w-4" /> <span className="sr-only">Delete</span>
                           </Button>
                         </div>
@@ -210,7 +210,7 @@ export default function Settings() {
                   ))}
                 </div>
               ) : (
-                 <div className="p-4 text-center"><p className="text-gray-600 dark:text-gray-400">No locations found.</p></div>
+                 <div className="p-4 text-center"><p className="text-gray-600 ">No locations found.</p></div>
               )}
             </CardContent>
           </Card>
@@ -237,7 +237,7 @@ export default function Settings() {
             </DialogDescription>
           </DialogHeader>
           <CategoryForm
-            category={selectedCategory}
+            _category={selectedCategory}
             onSuccess={handleCategorySuccess}
             onCancel={() => setCategoryFormOpen(false)}
           />
@@ -246,10 +246,9 @@ export default function Settings() {
 
       {/* Location Form */}
       <LocationForm
-        open={isLocationFormOpen}
-        onOpenChange={(open) => {
-          setLocationFormOpen(open);
-          if (!open) setSelectedLocation(undefined);
+        onOpenChange={() => {
+          setLocationFormOpen(false);
+          setSelectedLocation(undefined);
         }}
         location={selectedLocation}
         description="Locations help track where expenses occur."

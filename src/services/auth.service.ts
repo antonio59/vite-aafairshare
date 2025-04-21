@@ -77,7 +77,7 @@ export async function logout(): Promise<void> {
  * @returns An unsubscribe function to remove the listener
  */
 export const onAuthStateChange = (
-  callback: (user: User | null) => void
+    callback: (_user: User | null) => void
 ): (() => void) => {
   return onAuthStateChanged(auth, (async (firebaseUser) => {
     if (firebaseUser) {

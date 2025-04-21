@@ -5,8 +5,8 @@ interface FeatureFlags {
 }
 
 interface FeatureFlagContextType {
-  flags: FeatureFlags;
-  toggleFlag: (flag: keyof FeatureFlags) => void;
+  _flags: FeatureFlags;
+  toggleFlag: (_flag: keyof FeatureFlags) => void;
 }
 
 const defaultFlags: FeatureFlags = {
@@ -28,26 +28,26 @@ interface FeatureFlagProviderProps {
 }
 
 export function FeatureFlagProvider({ children }: FeatureFlagProviderProps) {
-  const [flags, setFlags] = useState<FeatureFlags>(() => {
-    // Try to load flags from localStorage
+  const [_flags, setFlags] = useState<FeatureFlags>(() => {
+    // Try to load _flags from localStorage
     const savedFlags = localStorage.getItem('featureFlags');
     return savedFlags ? JSON.parse(savedFlags) : defaultFlags;
   });
 
-  // Save flags to localStorage whenever they change
+  // Save _flags to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('featureFlags', JSON.stringify(flags));
-  }, [flags]);
+    localStorage.setItem('featureFlags', JSON.stringify(_flags));
+  }, [_flags]);
 
-  const toggleFlag = (flag: keyof FeatureFlags) => {
+  const toggleFlag = (_flag: keyof FeatureFlags) => {
     setFlags(prev => ({
       ...prev,
-      [flag]: !prev[flag]
+      [_flag]: !prev[_flag]
     }));
   };
 
   return (
-    <FeatureFlagContext.Provider value={{ flags, toggleFlag }}>
+    <FeatureFlagContext.Provider value={{ _flags, toggleFlag }}>
       {children}
     </FeatureFlagContext.Provider>
   );

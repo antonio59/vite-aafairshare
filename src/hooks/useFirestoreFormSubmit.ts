@@ -27,7 +27,7 @@ interface UseFirestoreFormSubmitOptions {
 
 // Define the return type of the hook
 interface UseFirestoreFormSubmitResult {
-  // eslint-disable-next-line no-unused-vars
+   
   handleSubmit: (_data: object) => Promise<void>;
   isSubmitting: boolean;
 }

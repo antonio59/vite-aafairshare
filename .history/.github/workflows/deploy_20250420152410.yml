@@ -1,0 +1,65 @@
+# test change
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main      # For production
+      - staging   # For staging
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        run: npm install -g pnpm@8.15.6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+          cache: 'pnpm'
+
+      - name: Debug pnpm
+        run: |
+          which pnpm
+          pnpm --version
+
+      - run: pnpm install
+
+      - name: Build
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            pnpm run build:production
+          else
+            pnpm run build:staging
+          fi
+
+      - name: Create Service Account Key File
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_PRODUCTION }}' > serviceAccountKey.json
+          else
+            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_STAGING }}' > serviceAccountKey.staging.json
+          fi
+
+      - name: Deploy to Firebase Hosting
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.ref_name == 'main' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo '{ "projects": { "default": "aafairshare" } }' > .firebaserc
+            pnpm exec firebase deploy --only hosting
+          else
+            echo '{ "projects": { "default": "aafairshare---staging" } }' > .firebaserc
+            pnpm exec firebase deploy --only hosting:aafairshare---staging --project aafairshare---staging
+          fi
+
+      - name: Deployment Status
+        run: |
+          echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "* Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "* Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "* Environment: ${{ github.ref_name == 'main' && 'Production' || 'Staging' }}" >> $GITHUB_STEP_SUMMARY 

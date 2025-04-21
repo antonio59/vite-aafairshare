@@ -9,11 +9,11 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700',
-        success: 'bg-green-50 dark:bg-green-900/20 text-green-900 dark:text-green-100 border border-green-200 dark:border-green-800',
-        error: 'bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-100 border border-red-200 dark:border-red-800',
-        warning: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-900 dark:text-yellow-100 border border-yellow-200 dark:border-yellow-800',
-        info: 'bg-blue-50 dark:bg-blue-900/20 text-blue-900 dark:text-blue-100 border border-blue-200 dark:border-blue-800',
+        default: 'bg-white  text-gray-900  border border-gray-200 ',
+        success: 'bg-green-50  text-green-900  border border-green-200 ',
+        error: 'bg-red-50  text-red-900  border border-red-200 ',
+        warning: 'bg-yellow-50  text-yellow-900  border border-yellow-200 ',
+        info: 'bg-blue-50  text-blue-900  border border-blue-200 ',
       },
       position: {
         top: 'top-4',
@@ -101,7 +101,7 @@ export function MobileToast({
       {showClose && (
         <button
           onClick={handleClose}
-          className="flex-shrink-0 rounded-full p-1 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          className="flex-shrink-0 rounded-full p-1 hover:bg-gray-200  transition-colors"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
@@ -126,9 +126,10 @@ export function MobileToastContainer({ children }: ToastContainerProps) {
 
 // Toast provider context
 type ToastContextType = {
-  showToast: (props: MobileToastProps) => void;
+  showToast: (_props: MobileToastProps) => void;
 };
 
+ 
 const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
 
 export function useMobileToast() {
@@ -142,9 +143,9 @@ export function useMobileToast() {
 export function MobileToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<(MobileToastProps & { id: string })[]>([]);
 
-  const showToast = (props: MobileToastProps) => {
+  const showToast = (_props: MobileToastProps) => {
     const id = Math.random().toString(36).substring(2, 9);
-    setToasts((prev) => [...prev, { ...props, id }]);
+    setToasts((prev) => [...prev, { ..._props, id }]);
   };
 
   const removeToast = (id: string) => {

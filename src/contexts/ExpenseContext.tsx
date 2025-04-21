@@ -13,13 +13,13 @@ import { toUUID, toISODateString } from '@shared/utils/typeGuards';
 import { createExpense, updateExpense as updateExpenseService, deleteExpense as deleteExpenseService } from '@/services/expenses.service';
 
 interface ExpenseContextType {
-  expenses: ExpenseWithDetails[];
+  _expenses: ExpenseWithDetails[];
   loading: boolean;
   error: Error | null;
-  fetchExpenses: (month: string) => Promise<void>;
-  addExpense: (expense: Expense) => Promise<void>;
-  updateExpense: (id: string, expense: Partial<Expense>) => Promise<void>;
-  deleteExpense: (id: string) => Promise<void>;
+  fetchExpenses: (_month: string) => Promise<void>;
+  addExpense: (_expense: Expense) => Promise<void>;
+  updateExpense: (_id: string, _expense: Partial<Expense>) => Promise<void>;
+  deleteExpense: (_id: string) => Promise<void>;
 }
 
 const ExpenseContext = createContext<ExpenseContextType | null>(null);
@@ -33,16 +33,16 @@ export function useExpenses() {
 }
 
 export function ExpenseProvider({ children }: { children: React.ReactNode }) {
-  const [expenses, setExpenses] = useState<ExpenseWithDetails[]>([]);
+  const [_expenses, setExpenses] = useState<ExpenseWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { currentUser } = useAuth();
 
-  const convertToExpenseWithDetails = async (expense: Expense): Promise<ExpenseWithDetails> => {
+  const convertToExpenseWithDetails = async (_expense: Expense): Promise<ExpenseWithDetails> => {
     // Fetch related data
-    const categoryDoc = await getDoc(doc(db, 'categories', expense.categoryId));
-    const locationDoc = await getDoc(doc(db, 'locations', expense.locationId));
-    const userDoc = await getDoc(doc(db, 'users', expense.paidById));
+    const categoryDoc = await getDoc(doc(db, 'categories', _expense.categoryId));
+    const locationDoc = await getDoc(doc(db, 'locations', _expense.locationId));
+    const userDoc = await getDoc(doc(db, 'users', _expense.paidById));
 
     if (!categoryDoc.exists() || !locationDoc.exists() || !userDoc.exists()) {
       throw new Error('Required related data not found');
@@ -54,7 +54,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
 
     const paidBy: User = {
       id: toUUID(userDoc.id),
-      uid: userDoc.id,
+      uid: userDoc.id, // Add uid if required by User type
       email: userData?.email || '',
       username: userData?.username || userData?.email?.split('@')[0] || 'Unknown',
       photoURL: userData?.photoURL || null,
@@ -64,7 +64,7 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
     };
 
     return {
-      ...expense,
+      ..._expense,
       category: {
         id: categoryDoc.id,
         name: category.name,
@@ -73,20 +73,19 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
       },
       location: {
         id: locationDoc.id,
-        name: location.name,
-        createdAt: location.createdAt
+        name: location.name
       },
       paidBy
     };
   };
 
-  const fetchExpenses = useCallback(async (month: string) => {
+  const fetchExpenses = useCallback(async (_month: string) => {
     if (!currentUser) return;
 
     try {
       setLoading(true);
-      const expensesRef = collection(db, 'expenses');
-      const q = query(expensesRef, where('month', '==', month));
+      const _expensesRef = collection(db, '_expenses');
+      const q = query(_expensesRef, where('_month', '==', _month));
       const querySnapshot = await getDocs(q);
 
       const expensePromises = querySnapshot.docs.map(async (doc) => {
@@ -103,32 +102,34 @@ export function ExpenseProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       console.error('Error fetching expenses:', err);
       setError(err instanceof Error ? err : new Error('Failed to fetch expenses'));
+      console.error('Error fetching _expenses:', err);
+      setError(err instanceof Error ? err : new Error('Failed to fetch _expenses'));
     } finally {
       setLoading(false);
     }
   }, [currentUser]);
 
-  const addExpense = useCallback(async (expense: Expense) => {
-    await createExpense(expense);
+  const addExpense = useCallback(async (_expense: Expense) => {
+    await createExpense(_expense);
   }, []);
 
-  const updateExpense = useCallback(async (id: string, expense: Partial<Expense>) => {
-    await updateExpenseService(id, expense);
+  const updateExpense = useCallback(async (_id: string, _expense: Partial<Expense>) => {
+    await updateExpenseService(_id, _expense);
   }, []);
 
-  const deleteExpense = useCallback(async (id: string) => {
-    await deleteExpenseService(id);
+  const deleteExpense = useCallback(async (_id: string) => {
+    await deleteExpenseService(_id);
   }, []);
 
   const value = useMemo(() => ({
-    expenses,
+    _expenses,
     loading,
     error,
-    fetchExpenses: (month: string) => fetchExpenses(month),
+    fetchExpenses: (_month: string) => fetchExpenses(_month),
     addExpense,
     updateExpense,
     deleteExpense
-  }), [expenses, loading, error, fetchExpenses, addExpense, updateExpense, deleteExpense]);
+  }), [_expenses, loading, error, fetchExpenses, addExpense, updateExpense, deleteExpense]);
 
   return (
     <ExpenseContext.Provider value={value}>

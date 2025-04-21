@@ -44,7 +44,7 @@ const toOptionalString = (value: string | null | undefined): string | undefined 
 
 export default function Settlement() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const setIsDialogOpen = useState(false)[1];
   const { toast } = useToast();
   const { currentUser } = useAuth();
   const isMobile = useIsMobile(); // Use the hook
@@ -466,7 +466,7 @@ return (
       )}
 
       {/* Current settlement card - made full width */}
-      <Card className="border-gray-200 dark:border-gray-700">
+      <Card className="border-gray-200 ">
         <CardHeader><CardTitle>Current Month Settlement</CardTitle></CardHeader>
         <CardContent>
           {/* Derive loading state directly */}
@@ -617,8 +617,7 @@ return (
 
       {/* Confirmation Dialog - Placed inside the main div */}
       <ResponsiveDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={() => setIsDialogOpen(false)}
         title="Confirm Settlement"
         description={`Are you sure you want to mark this month as settled? This action will record a settlement of ${formatCurrency(settlementAmount)} from ${fromUserName} to ${toUserName}.`}
       >

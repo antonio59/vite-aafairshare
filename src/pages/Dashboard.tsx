@@ -380,8 +380,8 @@ export default function Dashboard() {
     });
 
     const fairShare = totalSplitExpenses / 2;
-    let user1Balance = user1_paid_50_50 - fairShare + user1_paid_100_owed_by_other - user2_paid_100_owed_by_other;
-    let settlementAmount = Math.abs(user1Balance);
+    const user1Balance = user1_paid_50_50 - fairShare + user1_paid_100_owed_by_other - user2_paid_100_owed_by_other;
+    const settlementAmount = Math.abs(user1Balance);
     let settlementDirection = { fromUserId: "", toUserId: "" };
 
     if (user2Id) {
@@ -622,7 +622,7 @@ export default function Dashboard() {
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex-grow w-full md:w-auto">
-               <LazyMonthSelector value={currentMonth} onChange={handleMonthChange} />
+               <LazyMonthSelector onChange={handleMonthChange} />
             </div>
             <div className="flex items-center justify-end gap-3 flex-shrink-0">
               {/* Custom dropdown implementation instead of Radix UI */}
@@ -644,20 +644,20 @@ export default function Dashboard() {
                 {/* Dropdown content */}
                 {isExportMenuOpen && (
                   <div 
-                    className="absolute right-0 z-10 mt-2 w-40 p-1 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                    className="absolute right-0 z-10 mt-2 w-40 p-1 origin-top-right rounded-md bg-white  shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
                     role="menu"
                     aria-labelledby="export-menu-button"
                     onClick={() => setIsExportMenuOpen(false)}
                   >
                     <button
-                      className="w-full text-left px-4 py-2 text-sm rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2 text-sm rounded-sm hover:bg-gray-100 "
                       role="menuitem"
                       onClick={() => handleExport('csv')}
                     >
                       Export as CSV
                     </button>
                     <button
-                      className="w-full text-left px-4 py-2 text-sm rounded-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2 text-sm rounded-sm hover:bg-gray-100 "
                       role="menuitem"
                       onClick={() => handleExport('pdf')}
                     >

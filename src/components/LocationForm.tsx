@@ -22,8 +22,7 @@ import { stringToColor } from "@/lib/utils";
 type EditableItem = Record<string, unknown>;
 
 interface LocationFormProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: () => void;
   location?: Location; // Use Location type from schema
   description?: string;
 }
@@ -43,7 +42,7 @@ function toEditableItem(location: Location): EditableItem {
   };
 }
 
-export default function LocationForm({ open, onOpenChange, location, description }: LocationFormProps) {
+export default function LocationForm({ onOpenChange, location, description }: LocationFormProps) {
   // Removed local isSubmitting state and toast
 
   // Form setup
@@ -54,7 +53,7 @@ export default function LocationForm({ open, onOpenChange, location, description
     }
   });
 
-  // Update form when location changes or form opens/closes
+  // Update form when location changes or form __opens/closes
   useEffect(() => {
     if (location) {
       form.reset({
@@ -66,7 +65,7 @@ export default function LocationForm({ open, onOpenChange, location, description
         name: ""
       });
     }
-  }, [location, form, open]); // Add open dependency
+  }, [location, form]);
 
   // Use the custom hook for submission logic
   const { handleSubmit: handleFirestoreSubmit, isSubmitting } = useFirestoreFormSubmit({
@@ -74,7 +73,7 @@ export default function LocationForm({ open, onOpenChange, location, description
     item: location ? toEditableItem(location) : undefined,
     onSuccess: () => {
       // No need to invalidate queries here if Settings listener handles it
-      onOpenChange(false); // Close dialog on success
+      onOpenChange(); // Close dialog on success
       form.reset({ name: "" }); // Reset form
     },
     // onError is handled by the hook's default toast
@@ -92,7 +91,7 @@ export default function LocationForm({ open, onOpenChange, location, description
   // Create footer buttons (uses isSubmitting from the hook)
   const formFooter = (
     <>
-      <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting} className="flex-1 h-11 min-w-[120px] transition-all hover:bg-muted/80 active:scale-[0.98] border-gray-200 dark:border-gray-700 text-foreground">
+      <Button type="button" variant="outline" onClick={() => onOpenChange()} disabled={isSubmitting} className="flex-1 h-11 min-w-[120px] transition-all hover:bg-muted/80 active:scale-[0.98] border-gray-200 dark:border-gray-700 text-foreground">
         Cancel
       </Button>
       <Button type="submit" disabled={isSubmitting} className="flex-1 h-11 min-w-[120px] transition-all hover:brightness-105 active:scale-[0.98] bg-primary text-primary-foreground hover:bg-primary/90" form="location-form">
@@ -103,7 +102,7 @@ export default function LocationForm({ open, onOpenChange, location, description
 
   return (
     <ResponsiveDialog
-      open={open}
+
       onOpenChange={onOpenChange}
       title={location ? "Edit Location" : "Add New Location"}
       description={description || "Locations help track where expenses occur"}

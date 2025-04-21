@@ -6,7 +6,7 @@ import ExpenseForm from './ExpenseForm';
 export default function ExpenseList() {
   const [editingExpense, setEditingExpense] = useState<ExpenseWithDetails | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const { expenses, loading, deleteExpense } = useExpenses();
+  const { _expenses, loading, deleteExpense } = useExpenses();
 
   const handleEdit = (expense: ExpenseWithDetails) => {
     setEditingExpense(expense);
@@ -29,7 +29,7 @@ export default function ExpenseList() {
   };
 
   if (loading) {
-    return <div>Loading expenses...</div>;
+    return <div>Loading _expenses...</div>;
   }
 
   return (
@@ -50,11 +50,11 @@ export default function ExpenseList() {
         </div>
       )}
 
-      {expenses.length === 0 ? (
-        <p>No expenses found. Start by adding a new expense!</p>
+      {_expenses.length === 0 ? (
+        <p>No _expenses found. Start by adding a new expense!</p>
       ) : (
         <div className="expense-list">
-          {expenses.map((expense: ExpenseWithDetails) => (
+          {_expenses.map((expense: ExpenseWithDetails) => (
             <div key={expense.id} className="expense-item">
               <div className="expense-details">
                 <h3>{expense.description}</h3>

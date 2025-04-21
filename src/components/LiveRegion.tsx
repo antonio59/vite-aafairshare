@@ -12,10 +12,10 @@ interface LiveRegionProps {
  * @param assertive Whether to use assertive politeness (default: false)
  * @param clearAfter Time in ms after which to clear the message (default: 5000)
  */
-export function LiveRegion({ 
-  message, 
-  assertive = false, 
-  clearAfter = 5000 
+export function LiveRegion({
+  message,
+  assertive,
+  clearAfter = 5000
 }: LiveRegionProps) {
   const [currentMessage, setCurrentMessage] = useState(message);
 
@@ -37,16 +37,16 @@ export function LiveRegion({
     <div
       className="sr-only"
       role="status"
-      aria-live={assertive ? 'assertive' : 'polite'}
+      aria-live={assertive ? "assertive" : "polite"}
       aria-atomic="true"
     >
-      {currentMessage}
+      {message}
     </div>
   );
 }
 
 // Create a global announcement system
-let announceCallback: ((message: string, assertive?: boolean) => void) | null = null;
+let announceCallback: ((_message: string, _assertive?: boolean) => void) | null = null;
 
 export function LiveRegionAnnouncer() {
   const [message, setMessage] = useState('');
@@ -71,9 +71,9 @@ export function LiveRegionAnnouncer() {
  * @param message The message to announce
  * @param assertive Whether to use assertive politeness (default: false)
  */
-export function announce(message: string, assertive = false) {
+export function announce(_message: string, _assertive = false) {
   if (announceCallback) {
-    announceCallback(message, assertive);
+    announceCallback(_message, _assertive);
   } else {
     console.warn('LiveRegionAnnouncer not mounted');
   }

@@ -2,7 +2,7 @@
  * LazyExpenseTable Component
  * 
  * A lazy-loaded wrapper around ExpenseTable that improves initial load performance
- * by deferring the loading of the expense table until it's needed.
+ * by deferring the loading of the __expense table until it's needed.
  */
 
 import React, { Suspense, lazy, memo } from 'react';
@@ -36,10 +36,10 @@ ExpenseTableSkeleton.displayName = 'ExpenseTableSkeleton';
 export interface LazyExpenseTableProps {
   /** List of expenses with detailed information to display */
   expenses: ExpenseWithDetails[];
-  /** Handler for editing an expense */
-  onEdit: (expense: ExpenseWithDetails) => void;
-  /** Handler for deleting an expense */
-  onDelete: (expense: ExpenseWithDetails) => void;
+  /** Handler for editing an _expense */
+  onEdit: (_expense: ExpenseWithDetails) => void;
+  /** Handler for deleting an _expense */
+  onDelete: (_expense: ExpenseWithDetails) => void;
   /** Whether data is currently loading */
   isLoading: boolean;
   /** Whether the current month is settled (disables edit/delete) */
@@ -55,7 +55,7 @@ export interface LazyExpenseTableProps {
 }
 
 /**
- * LazyExpenseTableComponent - A lazily loaded expense table with loading skeleton
+ * LazyExpenseTableComponent - A lazily loaded __expense table with loading skeleton
  * 
  * This component uses React.Suspense to defer loading the actual ExpenseTable
  * component until it's needed, improving initial page load performance.

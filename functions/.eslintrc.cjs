@@ -1,8 +1,21 @@
+
+/* eslint-disable no-undef */
+/* eslint-env node */
+
 module.exports = {
+  ignores: [
+    'node_modules/',
+    'dist/',
+    'build/',
+    'lib/',
+    'functions/lib/',
+    'coverage/'
+  ],
   root: true,
   env: {
     es6: true,
     node: true,
+    commonjs: true,
   },
   extends: [
     'eslint:recommended',
@@ -36,4 +49,4 @@ module.exports = {
       }
     }
   ]
-} 
+}

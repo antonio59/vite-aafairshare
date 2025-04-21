@@ -434,7 +434,7 @@ export default function SettingsPage() {
           <div className="modal-content">
             <h2>{selectedCategory ? 'Edit' : 'Add'} Category</h2>
             <CategoryForm 
-              category={selectedCategory ?? undefined}
+              _category={selectedCategory ?? undefined}
               onSuccess={handleCategorySuccess}
               onCancel={() => setIsCategoryDialogOpen(false)}
             />

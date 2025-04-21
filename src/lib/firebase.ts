@@ -70,7 +70,7 @@ if (getApps().length === 0) {
 
   // Debug assignment
   console.log("Setting window.firebaseAppConfig for debugging:", app.options);
-  // @ts-ignore
+  // @ts-expect-error: Expose firebase config on window for debugging
   window.firebaseAppConfig = app.options;
 } else {
   console.log("Firebase already initialized. Getting existing app instance.");
@@ -80,7 +80,7 @@ if (getApps().length === 0) {
 
   // Debug assignment
   console.log("Setting window.firebaseAppConfig for debugging:", app.options);
-  // @ts-ignore
+  // @ts-expect-error: Expose firebase config on window for debugging
   window.firebaseAppConfig = app.options;
 }
 
@@ -93,5 +93,5 @@ googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
 export { app, auth, db, googleProvider };
 
 // Expose Firebase app instance for debugging (remove after inspection)
-// @ts-ignore
+// @ts-expect-error: Expose firebase config on window for debugging
 window.firebaseApp = app;

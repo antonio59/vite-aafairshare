@@ -1,13 +1,13 @@
 // import React, { lazy, Suspense, ComponentType } from "react"; // Removed unused React import
 import { lazy, Suspense, useEffect } from "react"; // Removed ComponentType
 import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
-import { QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider as QueryCli } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ResourceProvider } from "./contexts/ResourceContext";
 import { UserProvider } from "./contexts/UserContext";
-import { ThemeProvider } from "./contexts/ThemeContext";
+
 import MainLayout from "@/components/layouts/MainLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { LiveRegionAnnouncer } from "@/components/LiveRegion";
@@ -68,8 +68,8 @@ function App() {
   console.log("App: Rendering App component");
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
+    <QueryCli client={queryClient}>
+
         <AuthProvider>
           <ResourceProvider>
             <UserProvider>
@@ -147,8 +147,8 @@ function App() {
             </UserProvider>
           </ResourceProvider>
         </AuthProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+
+    </QueryCli>
   );
 }
 

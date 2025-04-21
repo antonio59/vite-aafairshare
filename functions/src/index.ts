@@ -265,7 +265,7 @@ export const onSettlementCreated = functions
         for (const tryPath of possiblePaths) {
           try {
             functions.logger.log(`Trying font path: ${tryPath}`);
-            pdfFonts = require(tryPath);
+            pdfFonts = await import(tryPath);
             fontPath = tryPath;
             functions.logger.log(`Successfully loaded fonts from: ${fontPath}`);
             break;

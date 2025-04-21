@@ -51,14 +51,14 @@ export const DatePicker = React.forwardRef<
             aria-expanded={open}
             aria-label="Pick a date"
           />
-          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-gray-400 pointer-events-none" aria-hidden="true" />
+          <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500  pointer-events-none" aria-hidden="true" />
         </div>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content
           align="start"
           sideOffset={8}
-          className="z-50 mt-2 bg-background border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-0 w-[var(--datepicker-width,272px)] min-w-0"
+          className="z-50 mt-2 bg-background border border-gray-200  rounded-lg shadow-lg p-0 w-[var(--datepicker-width,272px)] min-w-0"
           style={{ width: '100%' }}
         >
           <ReactDatePicker
@@ -75,19 +75,19 @@ export const DatePicker = React.forwardRef<
                 "w-9 h-9 flex items-center justify-center rounded-md transition-colors cursor-pointer text-sm",
                 isSelected && "bg-primary text-primary-foreground hover:bg-primary/90",
                 isToday && !isSelected && "border border-primary text-primary font-semibold",
-                isDisabled && "text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-50",
+                isDisabled && "text-gray-400  cursor-not-allowed opacity-50",
                 !isSelected && !isDisabled && "hover:bg-accent hover:text-accent-foreground"
               );
             }}
             weekDayClassName={(_date: Date) =>
-              "text-xs font-medium text-gray-400 dark:text-gray-500 pb-1"
+              "text-xs font-medium text-gray-400  pb-1"
             }
             renderCustomHeader={({ monthDate, decreaseMonth, increaseMonth }) => (
               <div className="flex items-center justify-between px-2 py-1 mb-2">
                 <button
                   type="button"
                   onClick={decreaseMonth}
-                  className="p-1 rounded hover:bg-accent text-gray-500 dark:text-gray-400"
+                  className="p-1 rounded hover:bg-accent text-gray-500 "
                   aria-label="Previous month"
                 >
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"/></svg>
@@ -98,7 +98,7 @@ export const DatePicker = React.forwardRef<
                 <button
                   type="button"
                   onClick={increaseMonth}
-                  className="p-1 rounded hover:bg-accent text-gray-500 dark:text-gray-400"
+                  className="p-1 rounded hover:bg-accent text-gray-500 "
                   aria-label="Next month"
                 >
                   <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/></svg>
