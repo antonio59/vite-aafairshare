@@ -3,13 +3,12 @@ import type { Location } from '@shared/types';
 import './LocationForm.css';
 
 interface LocationFormProps {
-  _location?: Location;
   onSuccess: (location: Location) => void;
   onCancel: () => void;
 }
 
-export default function LocationForm({ _location, onSuccess, onCancel }: LocationFormProps) { // _location is intentionally unused for lint compliance
-  const [name, setName] = useState(_location?.name || '');
+export default function LocationForm({ onSuccess, onCancel }: LocationFormProps) {
+  const [name, setName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   
@@ -26,7 +25,7 @@ export default function LocationForm({ _location, onSuccess, onCancel }: Locatio
     
     try {
       const locationData: Location = {
-        id: _location?.id || `loc-${Date.now()}`,
+        id: `loc-${Date.now()}`,
         name: name.trim()
       };
       
@@ -34,9 +33,7 @@ export default function LocationForm({ _location, onSuccess, onCancel }: Locatio
       
       onSuccess(locationData);
       
-      if (!_location) {
-        setName('');
-      }
+      setName('');
     } catch (error) {
       console.error('Error submitting location form:', error);
       setError('Failed to save location');
@@ -77,7 +74,7 @@ export default function LocationForm({ _location, onSuccess, onCancel }: Locatio
           className="submit-button"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : _location ? 'Update Location' : 'Create Location'}
+          {isSubmitting ? 'Saving...' : 'Create Location'}
         </button>
       </div>
     </form>

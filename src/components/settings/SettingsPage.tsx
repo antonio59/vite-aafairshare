@@ -448,7 +448,7 @@ export default function SettingsPage() {
           <div className="modal-content">
             <h2>{selectedLocation ? 'Edit' : 'Add'} Location</h2>
             <LocationForm 
-              _location={selectedLocation ?? undefined}
+              
               onSuccess={handleLocationSuccess}
               onCancel={() => setIsLocationDialogOpen(false)}
             />

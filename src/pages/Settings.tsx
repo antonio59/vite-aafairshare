@@ -30,7 +30,7 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState("categories");
   const setLocationFormOpen = useState(false)[1];
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
-  const [selectedLocation, setSelectedLocation] = useState<Location | undefined>(undefined);
+  
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ type: 'category' | 'location'; id: string } | null>(null);
   const { toast } = useToast();
@@ -183,7 +183,7 @@ export default function Settings() {
                 <CardTitle>Locations</CardTitle>
                 <CardDescription>Manage expense locations</CardDescription>
               </div>
-              <Button onClick={() => { setSelectedLocation(undefined); setLocationFormOpen(true); }}> {/* Reset selected on add */}
+              <Button onClick={() => {  setLocationFormOpen(true); }}> {/* Reset selected on add */}
                 <Plus className="h-4 w-4 mr-2" /> Add Location
               </Button>
             </CardHeader>
@@ -198,7 +198,7 @@ export default function Settings() {
                       <CardContent className="flex items-center justify-between p-3 sm:p-4"> {/* Adjusted Padding */}
                         <span>{location.name}</span>
                         <div className="flex space-x-1 sm:space-x-2"> {/* Adjusted Spacing */}
-                          <Button variant="ghost" size="icon" onClick={() => { setSelectedLocation(location); setLocationFormOpen(true); }} className="h-8 w-8 text-gray-500  hover:text-primary ">
+                          <Button variant="ghost" size="icon" onClick={() => { setLocationFormOpen(true); }} className="h-8 w-8 text-gray-500  hover:text-primary ">
                             <Pencil className="h-4 w-4" /> <span className="sr-only">Edit</span>
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => openDeleteDialog('location', location.id)} className="h-8 w-8 text-gray-500  hover:text-red-500 ">
@@ -246,14 +246,14 @@ export default function Settings() {
 
       {/* Location Form */}
       <LocationForm
-         _location={selectedLocation}
+         
          onSuccess={() => {
            setLocationFormOpen(false);
-           setSelectedLocation(undefined);
+           
          }}
          onCancel={() => {
            setLocationFormOpen(false);
-           setSelectedLocation(undefined);
+           
          }}
        />
 
