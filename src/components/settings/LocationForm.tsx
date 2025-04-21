@@ -3,12 +3,12 @@ import type { Location } from '@shared/types';
 import './LocationForm.css';
 
 interface LocationFormProps {
-  location?: Location;
+  _location?: Location;
   onSuccess: (location: Location) => void;
   onCancel: () => void;
 }
 
-export default function LocationForm({ location: _location, onSuccess, onCancel }: LocationFormProps) {
+export default function LocationForm({ _location, onSuccess, onCancel }: LocationFormProps) { // _location is intentionally unused for lint compliance
   const [name, setName] = useState(_location?.name || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');

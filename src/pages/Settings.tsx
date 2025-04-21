@@ -7,7 +7,7 @@ import { Category, Location } from "@shared/types";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import CategoryForm from "@/components/settings/CategoryForm";
-import LocationForm from "@/components/LocationForm";
+import LocationForm from "@/components/settings/LocationForm";
 import { getCategoryBackgroundColorClass } from "@/lib/utils";
 import {
   AlertDialog,
@@ -143,7 +143,7 @@ export default function Settings() {
                 <div className="space-y-2"> <Skeleton className="h-12" /> <Skeleton className="h-12" /> <Skeleton className="h-12" /> </div>
               ) : categories.length > 0 ? (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {categories.map((category) => {
+                  {categories.map((category: Category) => {
                     // Get the icon component, default to a placeholder if not found
                     const IconComponent = category.icon ? CATEGORY_ICONS[category.icon as CategoryIconName] || (() => <span className="text-xs">?</span>) : (() => <span className="text-xs">?</span>);
                     return (
@@ -193,7 +193,7 @@ export default function Settings() {
                  <div className="space-y-2"> <Skeleton className="h-12" /> <Skeleton className="h-12" /> <Skeleton className="h-12" /> </div>
               ) : locations.length > 0 ? (
                  <div className="space-y-4"> {/* Reverted to vertical stack */}
-                  {locations.map((location) => (
+                  {locations.map((location: Location) => (
                     <Card key={location.id} className="border-gray-200 ">
                       <CardContent className="flex items-center justify-between p-3 sm:p-4"> {/* Adjusted Padding */}
                         <span>{location.name}</span>
@@ -246,13 +246,16 @@ export default function Settings() {
 
       {/* Location Form */}
       <LocationForm
-        onOpenChange={() => {
-          setLocationFormOpen(false);
-          setSelectedLocation(undefined);
-        }}
-        location={selectedLocation}
-        description="Locations help track where expenses occur."
-      />
+         _location={selectedLocation}
+         onSuccess={() => {
+           setLocationFormOpen(false);
+           setSelectedLocation(undefined);
+         }}
+         onCancel={() => {
+           setLocationFormOpen(false);
+           setSelectedLocation(undefined);
+         }}
+       />
 
       {/* Delete Confirmation Dialog using AlertDialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
