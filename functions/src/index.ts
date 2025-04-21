@@ -1,8 +1,8 @@
 import * as functions from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
-import {DocumentSnapshot} from "firebase-functions/v1/firestore";
-import {EventContext} from "firebase-functions/v1";
+// import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
+// import { EventContext } from "firebase-functions"; // Removed, use correct context typing
 import {Parser} from "@json2csv/plainjs";
 import PdfPrinter from "pdfmake";
 import type {
@@ -89,7 +89,7 @@ const isFirestoreTimestamp = (value: unknown): value is { toDate: () => Date } =
 export const onSettlementCreated = functions
   .region("europe-west1") // Specify region using v1 syntax
   .firestore.document("settlements/{settlementId}")
-  .onCreate(async (snap: DocumentSnapshot, context: EventContext) => {
+  .onCreate(async (snap: admin.firestore.DocumentSnapshot, context) => {
     const settlement = snap.data() as Settlement;
     const {month, amount, fromUserId, toUserId} = settlement;
 
@@ -609,7 +609,7 @@ async function notifySyncFailure(error: unknown, month: string) {
 export const onSettlementMarkedSettled = functions
   .region('europe-west1')
   .firestore.document('settlements/{settlementId}')
-  .onUpdate(async (change) => {
+  .onUpdate(async (change: functions.Change<admin.firestore.DocumentSnapshot>) => {
     const before = change.before.data();
     const after = change.after.data();
     if (!before || !after) return;

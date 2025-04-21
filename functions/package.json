@@ -19,7 +19,7 @@
     "@json2csv/plainjs": "^7.0.6",
     "@types/pdfmake": "^0.2.11",
     "firebase-admin": "^12.7.0",
-    "firebase-functions": "^6.0.1",
+    "firebase-functions": "^6.3.2",
     "pdfmake": "^0.2.18"
   },
   "devDependencies": {
