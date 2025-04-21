@@ -21,14 +21,14 @@ interface LazyMonthSelectorProps {
   onChange: (month: string) => void;
 }
 
-export function LazyMonthSelector({ onChange }: LazyMonthSelectorProps) {
+export function LazyMonthSelector({ onChange: _onChange }: LazyMonthSelectorProps) {
   // No unused arguments; this function only uses its props.
 
   // If the consumer passes an unused argument, allow it as _month for lint compliance.
 
   return (
     <Suspense fallback={<MonthSelectorSkeleton />}>
-      <MonthSelector onChange={onChange} />
+      <MonthSelector onChange={_onChange} />
     </Suspense>
   );
 }

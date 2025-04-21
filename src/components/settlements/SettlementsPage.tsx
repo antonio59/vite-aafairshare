@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import { ExpenseWithDetails } from '@shared/types';
 import { useExpenses } from '../../contexts/ExpenseContext';
 import './SettlementsPage.css';
 
@@ -55,7 +56,7 @@ export default function SettlementsPage() {
     }
     
     // Filter expenses for the current month
-    const monthlyExpenses = _expenses.filter((expense: any) => {
+    const monthlyExpenses = _expenses.filter((expense: ExpenseWithDetails) => {
       // Use type guard for month property
       const expenseMonth = 'month' in expense && expense.month ? expense.month : getMonthFromDate(expense.date);
       return expenseMonth === currentMonth;
@@ -67,7 +68,7 @@ export default function SettlementsPage() {
     }
     
     // Calculate total expenses
-    const totalExpenses = monthlyExpenses.reduce((sum: number, expense: any) => sum + expense.amount, 0);
+    const totalExpenses = monthlyExpenses.reduce((sum: number, expense: ExpenseWithDetails) => sum + expense.amount, 0);
     
     // In a real app, we would calculate per-user expenses
     // For now, we'll use a simplified model
