@@ -1,0 +1,95 @@
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.expense-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.expense-form label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.expense-form input,
+.expense-form select,
+.expense-form textarea {
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.expense-form .error {
+  color: #e53e3e;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.expense-form .button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.expense-form button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.expense-form button.primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.expense-form button.primary:hover {
+  background-color: #2563eb;
+}
+
+.expense-form button.secondary {
+  background-color: #e5e7eb;
+  color: #1f2937;
+}
+
+.expense-form button.secondary:hover {
+  background-color: #d1d5db;
+}
+
+.category-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.category-item:hover {
+  background-color: #f3f4f6;
+  border-color: #bbb;
+}
+
+.category-item.selected {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}

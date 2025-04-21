@@ -1,11 +1,7 @@
 import '@testing-library/jest-dom';
-import { expect, afterEach, vi, afterAll, beforeAll } from 'vitest';
+import { afterEach, vi, afterAll, beforeAll } from 'vitest';
 import { cleanup } from '@testing-library/react';
-import matchers from '@testing-library/jest-dom/matchers';
 import { setupServer } from 'msw/node';
-
-// Vitest's expect.extend requires 'any' due to lack of type compatibility with jest-dom matchers
-expect.extend(matchers as any);
 
 // Automatically cleanup after each test
 afterEach(() => {

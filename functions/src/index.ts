@@ -1,4 +1,5 @@
 import * as functions from "firebase-functions/v1";
+import type { EventContext } from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
 // import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
@@ -89,7 +90,7 @@ const isFirestoreTimestamp = (value: unknown): value is { toDate: () => Date } =
 export const onSettlementCreated = functions
   .region("europe-west1") // Specify region using v1 syntax
   .firestore.document("settlements/{settlementId}")
-  .onCreate(async (snap: admin.firestore.DocumentSnapshot, context) => {
+  .onCreate(async (snap: admin.firestore.DocumentSnapshot, context: EventContext) => {
     const settlement = snap.data() as Settlement;
     const {month, amount, fromUserId, toUserId} = settlement;
 
