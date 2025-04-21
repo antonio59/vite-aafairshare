@@ -1,14 +1,13 @@
-import * as functions from "firebase-functions/v1";
-import type { EventContext } from "firebase-functions/v1";
+import * as functions from "firebase-functions";
+import type { EventContext } from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
 // import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
 // import { EventContext } from "firebase-functions"; // Removed, use correct context typing
 import {Parser} from "@json2csv/plainjs";
 import PdfPrinter from "pdfmake";
-import type {
-  TDocumentDefinitions, Content, ContentTable, // <-- Remove TableCell
-} from "pdfmake/interfaces"; // Keep this path for CJS
+// If this import fails, fallback to importing types from 'pdfmake' directly.
+import type { TDocumentDefinitions, Content, ContentTable } from "pdfmake";
 // Font definition moved inside handler
 // Assuming shared types are correctly mapped in tsconfig.json
 // Import shared types from the installed 'shared' package
