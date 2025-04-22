@@ -45,6 +45,12 @@ jobs:
             echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_STAGING }}' > serviceAccountKey.staging.json
           fi
 
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Debug Firebase CLI
+        run: firebase --version
+
       - name: Deploy to Firebase Hosting
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.ref_name == 'main' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}

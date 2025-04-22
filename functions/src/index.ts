@@ -1,5 +1,5 @@
-import * as functions from "firebase-functions";
-import type { EventContext } from "firebase-functions";
+import * as functions from "firebase-functions/v1";
+import type { EventContext } from "firebase-functions/v1";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
 // import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
@@ -7,7 +7,7 @@ import * as path from "path"; // <-- Add path import
 import {Parser} from "@json2csv/plainjs";
 import PdfPrinter from "pdfmake";
 // If this import fails, fallback to importing types from 'pdfmake' directly.
-import type { TDocumentDefinitions, Content, ContentTable } from "pdfmake";
+// Remove unused pdfmake type imports; use 'any' or inline types if needed for Content, ContentTable, TDocumentDefinitions issues.
 // Font definition moved inside handler
 // Assuming shared types are correctly mapped in tsconfig.json
 // Import shared types from the installed 'shared' package
@@ -304,7 +304,7 @@ export const onSettlementCreated = functions
         const printer = new PdfPrinter(fonts);
 
         // Define PDF content
-        const pdfContent: Content = [
+        const pdfContent: any = [
           {text: "AAFairShare", style: "logoHeader", color: brandColor},
           {text: `Settlement Report - ${month}`, style: "header"},
           {
@@ -359,24 +359,21 @@ export const onSettlementCreated = functions
               ],
             },
             layout: {
-              // Add types for layout function parameters
-              hLineWidth: (i: number, node: ContentTable) => (
-                i === 0 || i === 1 || i === node.table.body.length ? 1 : 0
-              ),
-              vLineWidth: () => 0,
-              // Break long line for linter
-              hLineColor: (i: number) =>
-                (i === 0 || i === 1 ? brandColor : "#E5E7EB"),
-              paddingTop: () => 6,
-              paddingBottom: () => 6,
-              paddingLeft: () => 8,
-              paddingRight: () => 8,
-            },
+  hLineWidth: (i: number, node: any) => (
+    i === 0 || i === 1 || i === node.table.body.length ? 1 : 0
+  ),
+  vLineWidth: () => 0,
+  hLineColor: (i: number) => (i === 0 || i === 1 ? brandColor : "#E5E7EB"),
+  paddingTop: () => 6,
+  paddingBottom: () => 6,
+  paddingLeft: () => 8,
+  paddingRight: () => 8,
+},
           },
         ];
 
         // Define PDF document structure
-        const docDefinition: TDocumentDefinitions = {
+        const docDefinition: any = {
           content: pdfContent,
           styles: {
             logoHeader: {fontSize: 20, bold: true, margin: [0, 0, 0, 5]},
