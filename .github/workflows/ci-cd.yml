@@ -136,6 +136,12 @@ jobs:
             }' > .firebaserc
           fi
       
+      - name: Debug Firebase Config
+        run: |
+          echo "Using .firebaserc:"
+          cat .firebaserc
+          echo "Using GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+
       - name: Build
         run: pnpm run build:${{ steps.set-env.outputs.environment }}
 
