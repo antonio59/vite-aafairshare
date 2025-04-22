@@ -46,7 +46,7 @@ jobs:
           fi
 
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: npm install -g firebase-tools@13.2.1
 
       - name: Debug Firebase CLI
         run: firebase --version
