@@ -123,7 +123,7 @@ jobs:
             export GOOGLE_APPLICATION_CREDENTIALS=./serviceAccountKey.json
             echo '{
               "projects": {
-                "default": "aafairshare"
+                "default": "aafairshare-37271"
               }
             }' > .firebaserc
           else
