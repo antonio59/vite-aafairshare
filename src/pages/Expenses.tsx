@@ -63,6 +63,13 @@ const UNKNOWN_DATE = new Date(); // Use Date for createdAt in Category/Location 
 
 export default function Expenses() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
+
+  // Always ensure currentMonth is valid
+  useEffect(() => {
+    if (!/^\d{4}-\d{2}$/.test(currentMonth)) {
+      setCurrentMonth(getCurrentMonth());
+    }
+  }, []);
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithDetails | undefined>(undefined);
   const [expenseToDelete, setExpenseToDelete] = useState<ExpenseWithDetails | null>(null);

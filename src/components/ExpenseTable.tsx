@@ -70,7 +70,7 @@ const ExpenseTableRow = memo(({
       {formatCurrency(_expense.amount)}
     </TableCell>
     <TableCell className="py-2 px-3 text-xs">
-      {_expense.paidBy?.username ?? "-"}
+      {_expense.paidBy?.username || "Unknown"}
     </TableCell>
     <TableCell className="py-2 px-3 text-xs">{_expense.splitType || "50/50"}</TableCell>
     <TableCell className="py-2 px-1 text-xs">

@@ -5,6 +5,8 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useToast } from "@/hooks/use-toast";
 // Import __month calculation and __formatting utils
 import { getPreviousMonth, getNextMonth } from "@/lib/utils";
+import { formatMonthYear } from "@/lib/dateUtils";
+import { getCurrentMonth } from "@/lib/utils";
 
 interface MonthSelectorProps {
   value?: string;
@@ -39,18 +41,18 @@ export default function MonthSelector({ value = '', onChange, onExport }: MonthS
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => onChange(getPreviousMonth(value || ''))}
+          onClick={() => onChange(getPreviousMonth(/^\d{4}-\d{2}$/.test(value ?? '') ? value! : getCurrentMonth()))}
           aria-label="Previous month"
           className="mr-1 sm:mr-2 h-7 w-7 sm:h-9 sm:w-9 rounded-full hover:bg-gray-100"
         >
           <ChevronLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           <span className="sr-only">Previous</span>
         </Button>
-        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800">{value} // TODO: _format _month if needed</h2>
+        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-gray-800">{/^\d{4}-\d{2}$/.test(value ?? '') ? formatMonthYear(value!) : formatMonthYear(getCurrentMonth())}</h2>
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => onChange(getNextMonth(value || ''))}
+          onClick={() => onChange(getNextMonth(/^\d{4}-\d{2}$/.test(value ?? '') ? value! : getCurrentMonth()))}
           aria-label="Next month"
           className="ml-1 sm:ml-2 h-7 w-7 sm:h-9 sm:w-9 rounded-full hover:bg-gray-100"
         >

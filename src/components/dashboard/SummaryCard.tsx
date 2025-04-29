@@ -15,7 +15,7 @@ interface SummaryCardProps {
   tooltip?: string;
   isLoading?: boolean;
   photoURL?: string | null;
-  email?: string;
+  username?: string;
 }
 
 export default function SummaryCard({
@@ -27,7 +27,7 @@ export default function SummaryCard({
   tooltip,
   isLoading = false,
   photoURL,
-  email
+  username
 }: SummaryCardProps) {
   const { currentUser } = useAuth();
   const isCurrentUserCard = variant === 'user1';
@@ -68,10 +68,14 @@ export default function SummaryCard({
           <Avatar className="h-12 w-12">
             <AvatarImage
               src={(typeof photoURL === 'string' && photoURL) ? photoURL : currentUser?.photoURL || undefined}
-              alt={email || currentUser?.email || 'User'}
+              alt={username || currentUser?.username || 'User'}
             />
             <AvatarFallback className={cn("text-foreground text-base", getBgColor())}>
-              {(email || currentUser?.email)?.substring(0, 2).toUpperCase()}
+              {(() => {
+                const name = username || currentUser?.username || 'U';
+                const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+                return initials || 'U';
+              })()}
             </AvatarFallback>
           </Avatar>
         ) : (
@@ -81,13 +85,16 @@ export default function SummaryCard({
         )}
       </div>
 
-      <div className="flex-1 min-w-0 grid grid-rows-2 gap-0 items-center overflow-hidden">
+      <div className="flex-1 min-w-0 grid grid-rows-3 gap-0 items-center overflow-hidden">
         <p
           className="text-sm sm:text-base font-medium text-muted-foreground whitespace-normal break-words truncate"
           title={tooltip}
         >
           {title}
         </p>
+        {username && (
+          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{username}</p>
+        )}
         <p className={cn(
           "text-sm sm:text-base font-semibold whitespace-normal break-words no-underline truncate",
           isNegative ? "text-red-500 dark:text-red-400" : "text-foreground"

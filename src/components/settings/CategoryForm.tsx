@@ -54,17 +54,17 @@ export default function CategoryForm({ _category: __category, onSuccess, onCance
   };
   
   return (
-    <form onSubmit={handleSubmit} className="_category-form">
+    <form onSubmit={handleSubmit} className="category-form">
       {error && <div className="error-message">{error}</div>}
       
       <div className="form-group">
-        <label htmlFor="_category-name">Category Name</label>
+        <label htmlFor="category-name">Category Name</label>
         <input
-          id="_category-name"
+          id="category-name"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Enter _category name"
+          placeholder="Enter category name"
           required
         />
       </div>

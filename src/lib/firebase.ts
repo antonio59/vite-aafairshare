@@ -4,10 +4,9 @@ import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth, setPersistence, browserLocalPersistence, onAuthStateChanged, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
 
-const environment = import.meta.env.VITE_FIREBASE_ENVIRONMENT || 'development';
-console.log(`Initializing Firebase in environment: ${environment}`);
+// Always use VITE_FIREBASE_* variables; Vite injects the correct values at build time based on the build mode (production, staging, etc.)
+console.log("Initializing Firebase with environment variables injected by Vite build mode.");
 
-// Load config from environment variables (Vite convention: prefix with VITE_)
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY?.trim(),
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN?.trim(),
@@ -20,9 +19,8 @@ const firebaseConfig = {
 // Basic validation to ensure environment variables are loaded
 if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
   console.error("Firebase configuration environment variables are missing!");
-  console.error("Current environment:", environment);
   console.error("Config:", firebaseConfig);
-  throw new Error(`Firebase configuration error: Missing required fields. Please check your .env.${environment} file`);
+  throw new Error(`Firebase configuration error: Missing required fields. Please check your environment variables and build mode.`);
 }
 
 let app: FirebaseApp;

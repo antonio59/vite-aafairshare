@@ -31,6 +31,7 @@ interface LazySummaryCardProps {
   tooltip?: string;
   photoURL?: string;
   email?: string;
+  username?: string;
   onClick?: () => void;
 }
 

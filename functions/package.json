@@ -2,7 +2,7 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "rimraf lib/ && cpy ../shared lib/shared && tsc && cpy node_modules/pdfmake/build/vfs_fonts.js lib/ && echo 'Copied vfs_fonts.js to lib/'",
+    "build": "pnpm exec rimraf lib/ && pnpm exec rimraf src/shared && pnpm exec cpy '../shared/**/*' src/shared --parents && pnpm exec tsc && pnpm exec tsc-alias && pnpm exec cpy src/shared lib/shared && pnpm exec cpy node_modules/pdfmake/build/vfs_fonts.js lib/ && echo 'Copied vfs_fonts.js to lib/'",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",
@@ -11,10 +11,11 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "22"
+    "node": "20"
   },
-  "main": "lib/index.js",
+  "main": "lib/src/index.js",
   "dependencies": {
+    "@google-cloud/functions-framework": "^3.5.1",
     "@google-cloud/storage": "^7.16.0",
     "@json2csv/plainjs": "^7.0.6",
     "@types/pdfmake": "^0.2.11",
@@ -29,10 +30,8 @@
     "eslint": "^8.9.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-import": "^2.25.4",
-    "firebase-functions-test": "^3.1.0",
     "rimraf": "^6.0.1",
-    "tsc-alias": "^1.8.13",
-    "typescript": "^5.8.2"
-  },
-  "private": true
+    "tsc-alias": "^1.8.15",
+    "typescript": "^5.8.3"
+  }
 }

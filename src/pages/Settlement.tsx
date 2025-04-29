@@ -44,6 +44,13 @@ const toOptionalString = (value: string | null | undefined): string | undefined 
 
 export default function Settlement() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
+
+  // Always ensure currentMonth is valid
+  useEffect(() => {
+    if (!/^\d{4}-\d{2}$/.test(currentMonth)) {
+      setCurrentMonth(getCurrentMonth());
+    }
+  }, []);
   const setIsDialogOpen = useState(false)[1];
   const { toast } = useToast();
   const { currentUser } = useAuth();

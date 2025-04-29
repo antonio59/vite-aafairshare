@@ -137,7 +137,7 @@ export default function MainLayout({ children }: MainLayoutProps) {
                   <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                     {userProfile?.username ?? currentUser.username ?? "User"}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentUser.email}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentUser.username}</p>
                 </div>
                 <button onClick={handleLogout} className="text-xs text-gray-500 hover:text-red-600 transition-colors flex items-center"><LogOut className="mr-1 h-3 w-3" />Logout</button>
               </div>

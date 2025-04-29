@@ -29,7 +29,7 @@ import { VisuallyHidden } from "@/components/ui/visually-hidden";
 export default function Settings() {
   const [editingLocation, setEditingLocation] = useState<Location | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("categories");
-  const setLocationFormOpen = useState(false)[1];
+  const [isLocationFormOpen, setLocationFormOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -249,26 +249,46 @@ export default function Settings() {
         </DialogContent>
       </Dialog>
 
-      {/* Location Form */}
-      <LocationForm
-         _location={editingLocation}
-         onSuccess={async (locationData) => {
-           if (editingLocation) {
-             // Update existing location in Firestore
-             const locationRef = doc(db, 'locations', locationData.id);
-             await updateDoc(locationRef, { name: locationData.name });
-             setEditingLocation(undefined);
-           } else {
-             // Add new location to Firestore
-             await addDoc(collection(db, 'locations'), { name: locationData.name });
-           }
-           setLocationFormOpen(false);
-         }}
-         onCancel={() => {
-           setLocationFormOpen(false);
-           setEditingLocation(undefined);
-         }}
-       />
+      {/* Location Form Modal */}
+      <Dialog open={isLocationFormOpen} onOpenChange={setLocationFormOpen}>
+        <DialogContent
+          className="max-w-md w-full p-0"
+          aria-labelledby="location-dialog-title"
+          aria-describedby="location-dialog-description"
+        >
+          <DialogHeader>
+            <DialogTitle id="location-dialog-title">
+              <VisuallyHidden>{editingLocation ? "Edit Location" : "Add Location"}</VisuallyHidden>
+            </DialogTitle>
+            <DialogDescription id="location-dialog-description">
+              <VisuallyHidden>
+                {editingLocation
+                  ? "Edit the details of the selected location."
+                  : "Fill in the details to add a new location."}
+              </VisuallyHidden>
+            </DialogDescription>
+          </DialogHeader>
+          <LocationForm
+            _location={editingLocation}
+            onSuccess={async (locationData) => {
+              if (editingLocation) {
+                // Update existing location in Firestore
+                const locationRef = doc(db, 'locations', locationData.id);
+                await updateDoc(locationRef, { name: locationData.name });
+                setEditingLocation(undefined);
+              } else {
+                // Add new location to Firestore
+                await addDoc(collection(db, 'locations'), { name: locationData.name });
+              }
+              setLocationFormOpen(false);
+            }}
+            onCancel={() => {
+              setLocationFormOpen(false);
+              setEditingLocation(undefined);
+            }}
+          />
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog using AlertDialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>

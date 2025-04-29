@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "module": "CommonJS", // Change module type
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true, // Often helpful with esModuleInterop
@@ -13,8 +14,8 @@
     "composite": true,
     "declaration": true,
     "paths": {      // Add paths mapping
-      "shared": ["../shared"],
-      "shared/*": ["../shared/*"]
+      "shared": ["src/shared/index.ts"],
+      "shared/*": ["src/shared/*"]
     }
   },
   "compileOnSave": true,
@@ -23,5 +24,9 @@
   ],
   "references": [
     { "path": "../shared" }
+  ],
+  "exclude": [
+    "src/shared/expenses/*.tsx",
+    "src/shared/expenses/*.jsx"
   ]
 }

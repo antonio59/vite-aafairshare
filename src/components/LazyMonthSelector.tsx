@@ -18,17 +18,18 @@ const MonthSelectorSkeleton = () => (
 // Define props interface
  
 interface LazyMonthSelectorProps {
+  value?: string;
   onChange: (_month: string) => void;
-} // No unused 'month' argument in props, lint-compliant
+} // Now supports value prop
 
-export function LazyMonthSelector({ onChange: _onChange }: LazyMonthSelectorProps) {
+export function LazyMonthSelector({ value, onChange: _onChange }: LazyMonthSelectorProps) {
   // No unused arguments; this function only uses its props.
 
   // If the consumer passes an unused argument, allow it as _month for lint compliance.
 
   return (
     <Suspense fallback={<MonthSelectorSkeleton />}>
-      <MonthSelector onChange={_onChange} />
+      <MonthSelector value={value} onChange={_onChange} />
     </Suspense>
   );
 }
