@@ -1,5 +1,5 @@
-import * as functions from "firebase-functions/v1";
-import type { EventContext } from "firebase-functions/v1";
+import * as functions from "firebase-functions";
+import type { EventContext } from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
 // import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
@@ -19,7 +19,6 @@ import type {EmailTemplate} from "./types.ts"; // Assuming types are in ./types
 import { toUUID, toISODateString } from "shared/utils/typeGuards";
 import { ExpenseSplitType, PositiveNumber } from "shared/types";
 import { syncMonthlyDataToStaging } from './lib/syncMonthlyData';
-import type { Content, TDocumentDefinitions } from "pdfmake/interfaces";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp();
@@ -305,7 +304,7 @@ export const onSettlementCreated = functions
         const printer = new PdfPrinter(fonts);
 
         // Define PDF content
-        const pdfContent: Content[] = [
+        const pdfContent: any = [
           {text: "AAFairShare", style: "logoHeader", color: brandColor},
           {text: `Settlement Report - ${month}`, style: "header"},
           {
@@ -374,7 +373,7 @@ export const onSettlementCreated = functions
         ];
 
         // Define PDF document structure
-        const docDefinition: TDocumentDefinitions = {
+        const docDefinition: any = {
           content: pdfContent,
           styles: {
             logoHeader: {fontSize: 20, bold: true, margin: [0, 0, 0, 5]},
