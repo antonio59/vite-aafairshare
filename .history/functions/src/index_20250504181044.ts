@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import * as firestoreV1 from "firebase-functions/v1/firestore";
+import type { EventContext } from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
 // import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
@@ -88,8 +88,8 @@ const isFirestoreTimestamp = (value: unknown): value is { toDate: () => Date } =
 
 // Cloud Function triggered by the creation of a settlement document
 // Cloud Function triggered by the creation of a settlement document
-export const onSettlementCreated = firestoreV1
-  .document("settlements/{settlementId}")
+export const onSettlementCreated = functions
+  .firestore.document("settlements/{settlementId}")
   .onCreate(async (snap: admin.firestore.DocumentSnapshot, context: any) => {
     const settlement = snap.data() as Settlement;
     const {month, amount, fromUserId, toUserId} = settlement;
@@ -604,8 +604,8 @@ async function notifySyncFailure(error: unknown, month: string) {
   }
 }
 
-export const onSettlementMarkedSettled = firestoreV1
-  .document('settlements/{settlementId}')
+export const onSettlementMarkedSettled = functions
+  .firestore.document('settlements/{settlementId}')
   .onUpdate(async (change: functions.Change<admin.firestore.DocumentSnapshot>) => {
     const before = change.before.data();
     const after = change.after.data();

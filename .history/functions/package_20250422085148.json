@@ -2,7 +2,7 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
-    "build": "rimraf lib/ && rimraf src/shared && cpy '../shared/**/*' src/shared --parents && tsc && tsc-alias && cpy src/shared lib/shared && cpy node_modules/pdfmake/build/vfs_fonts.js lib/ && echo 'Copied vfs_fonts.js to lib/'",
+    "build": "pnpm exec rimraf lib/ && pnpm exec rimraf src/shared && pnpm exec cpy '../shared/**/*' src/shared --parents && pnpm exec tsc && pnpm exec tsc-alias && pnpm exec cpy src/shared lib/shared && pnpm exec cpy node_modules/pdfmake/build/vfs_fonts.js lib/ && echo 'Copied vfs_fonts.js to lib/'",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
     "shell": "npm run build && firebase functions:shell",

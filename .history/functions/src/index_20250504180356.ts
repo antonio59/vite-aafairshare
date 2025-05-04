@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions";
-import * as firestoreV1 from "firebase-functions/v1/firestore";
+import type { EventContext } from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
 // import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
@@ -88,9 +88,10 @@ const isFirestoreTimestamp = (value: unknown): value is { toDate: () => Date } =
 
 // Cloud Function triggered by the creation of a settlement document
 // Cloud Function triggered by the creation of a settlement document
-export const onSettlementCreated = firestoreV1
-  .document("settlements/{settlementId}")
-  .onCreate(async (snap: admin.firestore.DocumentSnapshot, context: any) => {
+export const onSettlementCreated = functions
+  .region("europe-west1") // Specify region using v1 syntax
+  .firestore.document("settlements/{settlementId}")
+  .onCreate(async (snap: admin.firestore.DocumentSnapshot, context: EventContext) => {
     const settlement = snap.data() as Settlement;
     const {month, amount, fromUserId, toUserId} = settlement;
 
@@ -305,7 +306,7 @@ export const onSettlementCreated = firestoreV1
         const printer = new PdfPrinter(fonts);
 
         // Define PDF content
-        const pdfContent: any[] = [
+        const pdfContent: Content[] = [
           {text: "AAFairShare", style: "logoHeader", color: brandColor},
           {text: `Settlement Report - ${month}`, style: "header"},
           {
@@ -374,7 +375,7 @@ export const onSettlementCreated = firestoreV1
         ];
 
         // Define PDF document structure
-        const docDefinition: any = {
+        const docDefinition: TDocumentDefinitions = {
           content: pdfContent,
           styles: {
             logoHeader: {fontSize: 20, bold: true, margin: [0, 0, 0, 5]},
@@ -604,8 +605,9 @@ async function notifySyncFailure(error: unknown, month: string) {
   }
 }
 
-export const onSettlementMarkedSettled = firestoreV1
-  .document('settlements/{settlementId}')
+export const onSettlementMarkedSettled = functions
+  .region('europe-west1')
+  .firestore.document('settlements/{settlementId}')
   .onUpdate(async (change: functions.Change<admin.firestore.DocumentSnapshot>) => {
     const before = change.before.data();
     const after = change.after.data();
