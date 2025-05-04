@@ -41,14 +41,12 @@ export default defineConfig({
           'vendor-utils': ['date-fns', 'zod', 'class-variance-authority', 'clsx', 'tailwind-merge'],
           'vendor-charts': ['recharts'],
           'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas', 'canvg'],
+          'vendor-firebase': ['firebase', 'firebase-admin', '@google-cloud/firestore'],
           'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'react-datepicker', 'react-day-picker']
         }
       }
     },
     chunkSizeWarningLimit: 1000, // Increase the warning limit to 1000KB
     sourcemap: true
-  },
-  optimizeDeps: {
-    include: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage']
   }
 }) 
