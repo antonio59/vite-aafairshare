@@ -57,12 +57,8 @@ export default function MonthSelector({ value = '', onChange, onExport }: MonthS
   };
 
   const handleMonthChange = (newMonth: string) => {
-    console.log('MonthSelector: Attempting to change month to:', newMonth);
-    if (isValidMonthFormat(newMonth) && isValidMonthRange(newMonth)) {
-      console.log('MonthSelector: Valid month change, calling onChange with:', newMonth);
+    if (isValidMonthRange(newMonth)) {
       onChange(newMonth);
-    } else {
-      console.warn('MonthSelector: Invalid month change attempted:', newMonth);
     }
   };
   

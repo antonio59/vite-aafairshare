@@ -376,12 +376,12 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                             step="0.01"
                             min="0"
                             placeholder="0.00"
-                            className="border-0 shadow-none pl-7 h-[40px] text-base w-full !text-black !placeholder-black"
+                            className="border-0 shadow-none pl-7 h-[40px] text-base w-full"
                             {...field}
                           />
                         </div>
                       </FormControl>
-                      <FormMessage className="text-xs text-black" />
+                      <FormMessage className="text-xs text-red-600" />
                     </FormItem>
                   )}
                 />
@@ -478,11 +478,10 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                      emptyMessage="No location found."
                      className="h-12 text-base"
                      disabled={isCreatingLocation} // Disable while creating
-                     inputClassName="!text-black !placeholder-black"
                      {...field} // Spread field props (value, onChange, etc.)
                    />
                  </FormControl>
-                 <FormMessage className="text-xs text-black" />
+                 <FormMessage className="text-xs text-destructive" />
               </FormItem>
             )}
           />
@@ -527,7 +526,7 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </FormControl>
-                <FormMessage className="text-xs text-black" />
+                <FormMessage className="text-xs text-destructive" />
               </FormItem>
             )}
           />
@@ -545,11 +544,11 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                 <FormControl>
                   <Input
                     placeholder="Enter description (optional)"
-                    className="h-12 text-base w-full !text-black !placeholder-black"
+                    className="h-12 text-base w-full" // Ensure full width
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-xs text-black" />
+                <FormMessage className="text-xs text-destructive" />
               </FormItem>
             )}
           />

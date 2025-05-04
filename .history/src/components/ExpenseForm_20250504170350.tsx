@@ -376,12 +376,12 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                             step="0.01"
                             min="0"
                             placeholder="0.00"
-                            className="border-0 shadow-none pl-7 h-[40px] text-base w-full !text-black !placeholder-black"
+                            className="border-0 shadow-none pl-7 h-[40px] text-base w-full"
                             {...field}
                           />
                         </div>
                       </FormControl>
-                      <FormMessage className="text-xs text-black" />
+                      <FormMessage className="text-xs text-red-600" />
                     </FormItem>
                   )}
                 />
@@ -442,10 +442,11 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                           aria-label={category.name}
                           className={cn(
                             "flex flex-col items-center justify-center h-20 rounded-lg border border-gray-200 dark:border-gray-700",
-                            // Selected state: black bg, white text
-                            "data-[state=on]:bg-black data-[state=on]:text-white font-semibold",
-                            // Hover state: black bg, white text
-                            "hover:bg-black hover:text-white"
+                            // Selected state: high-contrast text
+                            "data-[state=on]:bg-blue-100 dark:data-[state=on]:bg-blue-900/30 data-[state=on]:border-blue-500 dark:data-[state=on]:border-blue-700",
+                            "data-[state=on]:text-blue-900 dark:data-[state=on]:text-white font-semibold",
+                            // Hover state: high-contrast text
+                            "hover:bg-blue-50 dark:hover:bg-blue-800 hover:text-blue-900 dark:hover:text-white"
                           )}
                         >
                           <IconComponent className="w-6 h-6 mb-1" />
@@ -478,11 +479,10 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                      emptyMessage="No location found."
                      className="h-12 text-base"
                      disabled={isCreatingLocation} // Disable while creating
-                     inputClassName="!text-black !placeholder-black"
                      {...field} // Spread field props (value, onChange, etc.)
                    />
                  </FormControl>
-                 <FormMessage className="text-xs text-black" />
+                 <FormMessage className="text-xs text-destructive" />
               </FormItem>
             )}
           />
@@ -506,8 +506,9 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                       aria-label="Split equally"
                       className={cn(
                         "flex flex-col items-start justify-center h-auto p-3 rounded-lg border border-gray-200 dark:border-gray-700",
-                        "data-[state=on]:bg-black data-[state=on]:text-white font-semibold",
-                        "hover:bg-black hover:text-white text-left"
+                        "data-[state=on]:bg-blue-100 dark:data-[state=on]:bg-blue-900/30 data-[state=on]:border-blue-500 dark:data-[state=on]:border-blue-700",
+                        "data-[state=on]:text-blue-900 dark:data-[state=on]:text-white font-semibold",
+                        "hover:bg-blue-50 dark:hover:bg-blue-800 hover:text-blue-900 dark:hover:text-white text-left"
                       )}
                     >
                       <span className="font-semibold">Equal</span>
@@ -518,8 +519,9 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                        aria-label="Owned by other user"
                        className={cn(
                          "flex flex-col items-start justify-center h-auto p-3 rounded-lg border border-gray-200 dark:border-gray-700",
-                         "data-[state=on]:bg-black data-[state=on]:text-white font-semibold",
-                         "hover:bg-black hover:text-white text-left"
+                         "data-[state=on]:bg-blue-100 dark:data-[state=on]:bg-blue-900/30 data-[state=on]:border-blue-500 dark:data-[state=on]:border-blue-700",
+                         "data-[state=on]:text-blue-900 dark:data-[state=on]:text-white font-semibold",
+                         "hover:bg-blue-50 dark:hover:bg-blue-800 hover:text-blue-900 dark:hover:text-white text-left"
                        )}
                     >
                        <span className="font-semibold">Percent</span>
@@ -527,7 +529,7 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </FormControl>
-                <FormMessage className="text-xs text-black" />
+                <FormMessage className="text-xs text-destructive" />
               </FormItem>
             )}
           />
@@ -545,11 +547,11 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                 <FormControl>
                   <Input
                     placeholder="Enter description (optional)"
-                    className="h-12 text-base w-full !text-black !placeholder-black"
+                    className="h-12 text-base w-full" // Ensure full width
                     {...field}
                   />
                 </FormControl>
-                <FormMessage className="text-xs text-black" />
+                <FormMessage className="text-xs text-destructive" />
               </FormItem>
             )}
           />

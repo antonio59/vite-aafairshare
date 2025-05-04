@@ -43,7 +43,6 @@ interface ComboboxProps {
   className?: string
   disabled?: boolean
   id?: string // Add id prop
-  inputClassName?: string // NEW: allow passing className to input
 }
 
 // Define props for the inner content component
@@ -56,7 +55,6 @@ interface ComboboxContentProps extends ComboboxProps {
   exactMatch: ComboboxItem | null;
   handleBlur: () => void;
   handleKeyDown: (_e: React.KeyboardEvent) => void;
-  inputClassName?: string;
 }
 
 // --- Reusable Content Component ---
@@ -76,7 +74,6 @@ const ComboboxContent: React.FC<ComboboxContentProps> = ({
   exactMatch: _exactMatch,
   handleBlur: _handleBlur,
   handleKeyDown: _handleKeyDown,
-  inputClassName,
 }) => {
   // Enhanced blur handler: close dropdown if input loses focus and no selection is made
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -98,10 +95,10 @@ const ComboboxContent: React.FC<ComboboxContentProps> = ({
         onValueChange={_setSearchQuery}
         onBlur={enhancedHandleBlur}
         onKeyDown={_handleKeyDown}
-        className={cn("h-12 text-base py-3 sm:py-2.5 text-black placeholder-black", inputClassName)} // ENFORCE BLACK
+        className="h-12 text-base py-3 sm:py-2.5"
       />
       <CommandList className="max-h-[250px] sm:max-h-[300px] overflow-y-auto">
-        <CommandEmpty className="py-3 text-base text-black">{emptyMessage}</CommandEmpty>
+        <CommandEmpty className="py-3 text-base">{emptyMessage}</CommandEmpty>
         <CommandGroup>
           {filteredItems.length > 0 ? (
             filteredItems.map((item) => (
@@ -113,7 +110,7 @@ const ComboboxContent: React.FC<ComboboxContentProps> = ({
                   _setOpen(false)
                   _setSearchQuery("")
                 }}
-                className="text-base py-3 sm:py-2.5 text-black" // ENFORCE BLACK
+                className="text-base py-3 sm:py-2.5 text-foreground" // Improved contrast
               >
                 <Check
                   className={cn(
@@ -134,7 +131,7 @@ const ComboboxContent: React.FC<ComboboxContentProps> = ({
                   _setOpen(false)
                   _setSearchQuery("")
                 }}
-                className="text-base py-3 sm:py-2.5 text-black" // ENFORCE BLACK
+                className="text-base py-3 sm:py-2.5 text-foreground" // Improved contrast
               >
                 <Check
                   className={cn(
@@ -160,7 +157,7 @@ const ComboboxContent: React.FC<ComboboxContentProps> = ({
                     _setSearchQuery("")
                   }
                 }}
-                className="text-base py-3 sm:py-2.5 flex items-center text-black" // ENFORCE BLACK
+                className="text-base py-3 sm:py-2.5 flex items-center text-foreground" // Improved contrast
               >
                 <Plus className="mr-2 h-5 w-5 flex-shrink-0" />
                 <span className="truncate">
@@ -188,7 +185,6 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(({
   className,
   disabled = false,
   id,
-  inputClassName,
 }, ref) => {
   const isMobile = useIsMobile(); // Use correct hook name
   const [open, setOpen] = React.useState(false)
@@ -290,8 +286,7 @@ export const Combobox = React.forwardRef<HTMLButtonElement, ComboboxProps>(({
     searchQuery, setSearchQuery, setOpen, filteredItems,
     showCreateNew,
     exactMatch,
-    handleBlur, handleKeyDown,
-    inputClassName,
+    handleBlur, handleKeyDown
   };
 
   if (isMobile) {

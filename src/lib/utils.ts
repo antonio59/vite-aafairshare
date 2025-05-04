@@ -68,7 +68,19 @@ export function formatMonthYear(month: string): string {
 }
 
 export function getCurrentMonth(): string {
-  return format(new Date(), 'yyyy-MM');
+  try {
+    const now = new Date();
+    if (isNaN(now.getTime())) {
+      console.error('getCurrentMonth: Invalid date object created');
+      return format(new Date(), 'yyyy-MM');
+    }
+    // Ensure we're working with a valid date at the start of the month
+    const currentDate = new Date(now.getFullYear(), now.getMonth());
+    return format(currentDate, 'yyyy-MM');
+  } catch (error) {
+    console.error('getCurrentMonth: Error getting current month', error);
+    return format(new Date(), 'yyyy-MM');
+  }
 }
 
 export function getMonthFromDate(date: Date | string | { toDate?: () => Date } | undefined | null): string {
@@ -93,15 +105,33 @@ export function getMonthFromDate(date: Date | string | { toDate?: () => Date } |
 }
 
 export function getNextMonth(month: string): string {
-  const date = parse(month + '-01', 'yyyy-MM-dd', new Date());
-  date.setMonth(date.getMonth() + 1);
-  return format(date, 'yyyy-MM');
+  try {
+    const date = parse(month + '-01', 'yyyy-MM-dd', new Date());
+    if (isNaN(date.getTime())) {
+      console.warn('getNextMonth: Invalid month string', month);
+      return getCurrentMonth();
+    }
+    const nextDate = new Date(date.getFullYear(), date.getMonth() + 1);
+    return format(nextDate, 'yyyy-MM');
+  } catch (error) {
+    console.error('getNextMonth: Error calculating next month', error);
+    return getCurrentMonth();
+  }
 }
 
 export function getPreviousMonth(month: string): string {
-  const date = parse(month + '-01', 'yyyy-MM-dd', new Date());
-  date.setMonth(date.getMonth() - 1);
-  return format(date, 'yyyy-MM');
+  try {
+    const date = parse(month + '-01', 'yyyy-MM-dd', new Date());
+    if (isNaN(date.getTime())) {
+      console.warn('getPreviousMonth: Invalid month string', month);
+      return getCurrentMonth();
+    }
+    const prevDate = new Date(date.getFullYear(), date.getMonth() - 1);
+    return format(prevDate, 'yyyy-MM');
+  } catch (error) {
+    console.error('getPreviousMonth: Error calculating previous month', error);
+    return getCurrentMonth();
+  }
 }
 
 export function calculatePercent(value: number, total: number): number {

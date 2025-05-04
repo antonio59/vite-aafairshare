@@ -376,7 +376,7 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                             step="0.01"
                             min="0"
                             placeholder="0.00"
-                            className="border-0 shadow-none pl-7 h-[40px] text-base w-full !text-black !placeholder-black"
+                            className="border-0 shadow-none pl-7 h-[40px] text-base w-full text-black placeholder-black"
                             {...field}
                           />
                         </div>
@@ -478,8 +478,8 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                      emptyMessage="No location found."
                      className="h-12 text-base"
                      disabled={isCreatingLocation} // Disable while creating
-                     inputClassName="!text-black !placeholder-black"
                      {...field} // Spread field props (value, onChange, etc.)
+                     inputClassName="text-black placeholder-black"
                    />
                  </FormControl>
                  <FormMessage className="text-xs text-black" />
@@ -545,7 +545,7 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                 <FormControl>
                   <Input
                     placeholder="Enter description (optional)"
-                    className="h-12 text-base w-full !text-black !placeholder-black"
+                    className="h-12 text-base w-full text-black placeholder-black"
                     {...field}
                   />
                 </FormControl>

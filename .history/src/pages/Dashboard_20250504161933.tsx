@@ -644,7 +644,7 @@ export default function Dashboard() {
           <h1 className="text-2xl font-semibold">Dashboard</h1>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex-grow w-full md:w-auto">
-               <LazyMonthSelector value={currentMonth} onChange={handleMonthChange} />
+               <LazyMonthSelector onChange={handleMonthChange} />
             </div>
             <div className="flex items-center justify-end gap-3 flex-shrink-0">
               {/* Custom dropdown implementation instead of Radix UI */}
