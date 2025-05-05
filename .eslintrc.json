@@ -62,6 +62,16 @@
       "rules": {
         "no-undef": "off"
       }
+    },
+    {
+      "files": ["functions/src/shared/*.js"],
+      "env": {
+        "node": true,
+        "commonjs": true
+      },
+      "rules": {
+        "no-undef": "off"
+      }
     }
   ],
   "settings": {
