@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import MonthSelector from "@/components/MonthSelector";
 // Removed unused SummaryCard import
 // import SummaryCard from "@/components/SummaryCard";
