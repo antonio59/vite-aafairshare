@@ -60,9 +60,9 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.ref_name == 'main' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo '{ "projects": { "default": "aafairshare-37271" } }' > .firebaserc
-            firebase use aafairshare-37271
-            firebase deploy --only hosting,functions,firestore --project aafairshare-37271
+            echo '{ "projects": { "default": "aafairshare" } }' > .firebaserc
+            firebase use aafairshare
+            firebase deploy --only hosting,functions,firestore
           else
             echo '{ "projects": { "default": "aafairshare---staging" } }' > .firebaserc
             firebase use aafairshare---staging
