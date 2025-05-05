@@ -18,6 +18,10 @@ export default [
       'coverage/',
       'shared/dist/',
       'shared/schema.js',
+      'functions/src/shared/schema.js',
+      'functions/src/shared/*.js',
+      'functions/src/shared/dist/**',
+      'functions/lib/**'
     ],
   },
   {
