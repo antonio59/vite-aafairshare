@@ -1,31 +1,19 @@
 {
   "root": true,
+  "env": {
+    "node": true,
+    "commonjs": true
+  },
+  "parserOptions": {
+    "sourceType": "commonjs"
+  },
+  "rules": {
+    "no-undef": "off"
+  },
   "ignorePatterns": [
     "dist/",
-    "src/shared/dist/**/*.d.ts"
-  ],
-  "overrides": [
-    {
-      "files": ["**/*.d.ts"],
-      "rules": {
-        "no-unused-vars": "off",
-        "@typescript-eslint/no-unused-vars": "off",
-        "@typescript-eslint/no-explicit-any": "off"
-      }
-    }
-  ],
-  "extends": [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended"
-  ],
-  "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
-  "rules": {
-    "@typescript-eslint/no-explicit-any": "error",
-    "no-unused-vars": "off",
-    "@typescript-eslint/no-unused-vars": ["error", {
-      "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^_"
-    }]
-  }
+    "src/shared/dist/**",
+    "src/shared/*.js",
+    "lib/**"
+  ]
 } 
