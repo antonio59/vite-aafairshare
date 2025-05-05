@@ -54,10 +54,5 @@
     "react": {
       "version": "detect"
     }
-  },
-  "ignorePatterns": [
-    "functions/src/shared/dist/**",
-    "functions/src/shared/*.js",
-    "functions/lib/**"
-  ]
+  }
 }
