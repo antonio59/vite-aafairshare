@@ -46,6 +46,15 @@ jobs:
       - name: Debug Firebase CLI
         run: firebase --version
 
+      - name: Debug Firebase Projects
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.ref_name == 'main' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}
+        run: |
+          echo "Contents of .firebaserc:"
+          cat .firebaserc
+          echo "Listing Firebase projects:"
+          firebase projects:list
+
       - name: Deploy to Firebase
         env:
           GOOGLE_APPLICATION_CREDENTIALS: ${{ github.ref_name == 'main' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}
