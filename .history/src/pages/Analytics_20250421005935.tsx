@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { announce } from "@/components/LiveRegion";
 import { formatCurrency, formatMonthYear, getCurrentMonth, getMonthFromDate } from "@/lib/utils";
@@ -597,29 +598,88 @@ export default function Analytics() {
       </div>
 
       {/* Summary Card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-4">
-        <Card className="overflow-hidden border-gray-200">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="col-span-1 md:col-span-3 overflow-hidden border-gray-200 ">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base sm:text-lg">Total Expenses</CardTitle>
+            <CardTitle className="text-xl">Monthly Summary</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl sm:text-3xl font-bold text-primary mt-2">{summary ? formatCurrency(summary.totalExpenses) : '--'}</p>
-          </CardContent>
-        </Card>
-        <Card className="overflow-hidden border-gray-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base sm:text-lg">Fair Share (50/50)</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl sm:text-3xl font-bold text-orange-500 mt-2">{summary ? formatCurrency((summary.totalExpenses || 0) / 2) : '--'}</p>
-          </CardContent>
-        </Card>
-        <Card className="overflow-hidden border-gray-200">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base sm:text-lg">Settlement</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl sm:text-3xl font-bold text-emerald-500 mt-2">{summary ? formatCurrency(summary.settlementAmount) : '--'}</p>
+            {isLoading ? (
+              <Skeleton className="h-24 w-full" />
+            ) : summary ? (
+              <div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+                  <div>
+                    <p className="text-sm text-gray-500 ">Total Expenses</p>
+                    <p className="text-3xl sm:text-4xl font-bold text-primary mt-2 financial-value">
+                      {formatCurrency(summary.totalExpenses)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 ">Fair Share (50/50)</p>
+                    <p className="text-2xl sm:text-3xl font-bold text-orange-500 mt-2 financial-value">
+                      {formatCurrency(summary.totalExpenses / 2)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 ">
+                      Settlement ({getUsernameById(summary.settlementDirection.fromUserId)} → {getUsernameById(summary.settlementDirection.toUserId)})
+                    </p>
+                    <p className="text-2xl sm:text-3xl font-bold text-emerald-500 mt-2 financial-value">
+                      {formatCurrency(summary.settlementAmount)}
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Add settlement calculation breakdown */}
+                <div className="mt-6 border-t border-gray-200  pt-4">
+                  <details>
+                    <summary className="cursor-pointer text-sm font-medium text-gray-500  hover:text-gray-700 ">
+                      Show settlement calculation details
+                    </summary>
+                    <div className="mt-2 text-sm grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      <div>
+                        <p><span className="font-medium">{getUsernameById(currentUser.uid)}</span> paid: {formatCurrency(summary.userExpenses[currentUser.uid])}</p>
+                        <p><span className="font-medium">{getUsernameById(Object.keys(summary.userExpenses).find(id => id !== currentUser.uid) || '')}</span> paid: {formatCurrency(summary.userExpenses[Object.keys(summary.userExpenses).find(id => id !== currentUser.uid) || ''] || 0)}</p>
+                        <p className="mt-1">Fair share (each): {formatCurrency(summary.totalExpenses / 2)}</p>
+                        
+                        {/* Show settlement history if there are any */}
+                        {currentMonthSettlements.length > 0 && (
+                          <div className="mt-2">
+                            <p className="font-medium">Existing Settlements:</p>
+                            {currentMonthSettlements.map((settlement, idx) => (
+                              <p key={idx} className="text-gray-600 ">
+                                {getUsernameById(settlement.fromUserId)} paid {getUsernameById(settlement.toUserId)} {formatCurrency(settlement.amount)}
+                              </p>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div>
+                        {summary.settlementAmount > 0 ? (
+                          <>
+                            <p className="text-emerald-600 ">
+                              {getUsernameById(summary.settlementDirection.fromUserId)} should pay {getUsernameById(summary.settlementDirection.toUserId)} {formatCurrency(summary.settlementAmount)}
+                            </p>
+                            <p className="text-sm text-gray-500 mt-1">
+                              {currentMonthSettlements.length > 0 
+                                ? "This is the remaining amount after accounting for existing settlements."
+                                : "No settlements have been made yet this month."}
+                            </p>
+                          </>
+                        ) : (
+                          <p className="text-emerald-600 ">Expenses are already balanced for this month!</p>
+                        )}
+                      </div>
+                    </div>
+                  </details>
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 text-center">
+                <p className="text-gray-600 ">No summary data available for this month.</p>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

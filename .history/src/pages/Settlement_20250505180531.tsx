@@ -6,11 +6,13 @@ import SettlementHistory from "@/components/SettlementHistory";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
+import { Tooltip } from "@/components/ui/tooltip"; // Import Tooltip
 import { Check, CalendarClock, X } from "lucide-react";
 import { Settlement as SettlementType, User, Expense, PositiveNumber } from "@shared/types"; // Import correct types
 import { getCurrentMonth, formatCurrency, getPreviousMonth, formatDate } from "@/lib/utils"; // Added formatDate
 // Removed format import from date-fns
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile"; // Import useIsMobile
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog"; // Import ResponsiveDialog
 import { DialogFooter, DialogClose } from "@/components/ui/dialog"; // Import DialogFooter & DialogClose from base dialog
@@ -52,6 +54,7 @@ export default function Settlement() {
   const setIsDialogOpen = useState(false)[1];
   const { toast } = useToast();
   const { currentUser } = useAuth();
+  const isMobile = useIsMobile(); // Use the hook
 
   // State for Firestore data
   const [users, setUsers] = useState<User[]>([]);

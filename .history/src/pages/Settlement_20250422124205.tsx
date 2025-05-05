@@ -6,11 +6,13 @@ import SettlementHistory from "@/components/SettlementHistory";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
+import { Tooltip } from "@/components/ui/tooltip"; // Import Tooltip
 import { Check, CalendarClock, X } from "lucide-react";
 import { Settlement as SettlementType, User, Expense, PositiveNumber } from "@shared/types"; // Import correct types
 import { getCurrentMonth, formatCurrency, getPreviousMonth, formatDate } from "@/lib/utils"; // Added formatDate
 // Removed format import from date-fns
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile"; // Import useIsMobile
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog"; // Import ResponsiveDialog
 import { DialogFooter, DialogClose } from "@/components/ui/dialog"; // Import DialogFooter & DialogClose from base dialog
@@ -52,6 +54,7 @@ export default function Settlement() {
   const setIsDialogOpen = useState(false)[1];
   const { toast } = useToast();
   const { currentUser } = useAuth();
+  const isMobile = useIsMobile(); // Use the hook
 
   // State for Firestore data
   const [users, setUsers] = useState<User[]>([]);
@@ -569,25 +572,46 @@ return (
       </Card>
 
       {/* User summaries - moved below settlement card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        {users.map((user) => {
-          const amountPaid = summary?.userExpenses?.[user.id] ?? 0;
-          const userName = getUserName(user.id);
-          return (
-            <Card key={user.id} className="border-gray-200 h-fit shadow-sm">
-              <CardContent className="p-2 sm:p-3 flex items-center">
-                <Avatar className="h-10 w-10 sm:h-11 sm:w-11 mr-2 flex-shrink-0 min-h-[44px] min-w-[44px]">
-                  <AvatarImage src={toOptionalString(user.photoURL)} alt={userName} />
-                  <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col flex-1 min-w-0 leading-tight">
-                  <p className="text-xs font-medium text-gray-500 truncate">{userName} Paid</p>
-                  <p className="text-base font-semibold text-gray-900 truncate">{formatCurrency(amountPaid)}</p>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      <div className="grid grid-cols-2 gap-4 h-fit">
+        {(expensesLoading || usersLoading) ? ( // Derive loading state directly
+          <>
+            <Skeleton className="h-16 w-full" /> {/* Reduced skeleton height */}
+            <Skeleton className="h-16 w-full" />
+          </>
+        ) : (
+          users.map((user) => {
+            // Access amount from the userExpenses record using the user's Firestore ID
+            const amountPaid = summary?.userExpenses?.[user.id] ?? 0;
+            const userName = getUserName(user.id); // Get username once
+
+            // Define the card content JSX first - making it much more compact
+            const userCardContent = (
+              <Card className="border-gray-200 h-fit shadow-sm">
+                <CardContent className="p-3 flex items-center">
+                  <Avatar className="h-7 w-7 mr-3 flex-shrink-0">
+                    <AvatarImage src={toOptionalString(user.photoURL)} alt={userName} />
+                    <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col flex-1 min-w-0 leading-tight">
+                    <p className="text-xs font-medium text-gray-500 hidden sm:block truncate">{userName} Paid</p>
+                    <p className="text-base font-semibold text-gray-900 truncate">{formatCurrency(amountPaid)}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+
+            // Return the content, conditionally wrapped with Tooltip only on mobile
+            return isMobile ? (
+              <Tooltip key={user.id} content={`${userName} Paid`} position="bottom">
+                {userCardContent}
+              </Tooltip>
+            ) : (
+              <React.Fragment key={user.id}>
+                {userCardContent}
+              </React.Fragment>
+            );
+          })
+        )}
       </div>
 
       {/* Settlement history */}

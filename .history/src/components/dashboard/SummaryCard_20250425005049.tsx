@@ -62,24 +62,24 @@ export default function SummaryCard({
   };
 
   return (
-    <div className="bg-card p-2 sm:p-3 rounded-lg border border-gray-200 dark:border-gray-700 h-auto flex items-center min-h-[56px] sm:min-h-[64px]">
-      <div className="shrink-0 mr-2 sm:mr-3">
+    <div className="bg-card p-3 rounded-lg border border-gray-200 dark:border-gray-700 h-full flex items-center">
+      <div className="shrink-0 mr-3">
         {((typeof photoURL === 'string' && photoURL) || (isCurrentUserCard && currentUser?.photoURL)) ? (
-          <Avatar className="h-11 w-11 sm:h-12 sm:w-12 min-h-[44px] min-w-[44px]">
+          <Avatar className="h-12 w-12">
             <AvatarImage
               src={(typeof photoURL === 'string' && photoURL) ? photoURL : currentUser?.photoURL || undefined}
-              alt={username || currentUser?.username || currentUser?.email?.split('@')[0] || 'User'}
+              alt={username || currentUser?.username || 'User'}
             />
             <AvatarFallback className={cn("text-foreground text-base", getBgColor())}>
               {(() => {
-                const name = username || currentUser?.username || currentUser?.email?.split('@')[0] || 'U';
+                const name = username || currentUser?.username || 'U';
                 const initials = name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
                 return initials || 'U';
               })()}
             </AvatarFallback>
           </Avatar>
         ) : (
-          <div className={cn("p-2 sm:p-3 rounded-md min-h-[44px] min-w-[44px] flex items-center justify-center", getBgColor())}>
+          <div className={cn("p-3 rounded-md", getBgColor())}>
             <IconComponent className="h-6 w-6" />
           </div>
         )}
@@ -87,7 +87,7 @@ export default function SummaryCard({
 
       <div className="flex-1 min-w-0 grid grid-rows-3 gap-0 items-center overflow-hidden">
         <p
-          className="text-xs sm:text-sm font-medium text-muted-foreground whitespace-normal break-words truncate"
+          className="text-sm sm:text-base font-medium text-muted-foreground whitespace-normal break-words truncate"
           title={tooltip}
         >
           {title}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { announce } from "@/components/LiveRegion";
 import { formatCurrency, formatMonthYear, getCurrentMonth, getMonthFromDate } from "@/lib/utils";
