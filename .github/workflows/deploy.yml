@@ -24,6 +24,14 @@ jobs:
           npm install
           cd functions && npm install
 
+      - name: Create environment file from secrets
+        run: |
+          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
+            echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY_PRODUCTION }}" >> .env.production
+          else
+            echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY_STAGING }}" >> .env.staging
+          fi
+
       - name: Build
         run: |
           if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
