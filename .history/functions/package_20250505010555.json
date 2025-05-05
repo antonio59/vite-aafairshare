@@ -1,7 +1,7 @@
 {
   "name": "functions",
   "scripts": {
-    "lint": "eslint --ext .js,.ts . --ignore-pattern 'src/shared/dist/**' --ignore-pattern 'src/shared/*.js'",
+    "lint": "eslint --ext .js,.ts .",
     "build": "rimraf lib/ && rimraf src/shared && cpy '../shared/**/*' src/shared --parents && tsc && tsc-alias && cpy src/shared lib/shared && cpy node_modules/pdfmake/build/vfs_fonts.js lib/ && echo 'Copied vfs_fonts.js to lib/'",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",

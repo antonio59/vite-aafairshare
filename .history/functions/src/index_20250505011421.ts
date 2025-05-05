@@ -360,10 +360,9 @@ export const onSettlementCreated = functionsV1.region("europe-west1").firestore.
               ],
             },
             layout: {
-              hLineWidth: function(i: number, node: unknown): number {
-                const typedNode = node as PDFTableNode;
-                return i === 0 || i === 1 || i === typedNode.table.body.length ? 1 : 0;
-              },
+              hLineWidth: (i: number, node: unknown) => (
+                i === 0 || i === 1 || i === (node as { table: { body: any[] } }).table.body.length ? 1 : 0
+              ),
               vLineWidth: () => 0,
               hLineColor: (i: number) => (i === 0 || i === 1 ? brandColor : "#E5E7EB"),
               paddingTop: () => 6,

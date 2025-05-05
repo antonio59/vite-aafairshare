@@ -1,0 +1,6 @@
+{
+  "ignorePatterns": [
+    "dist/",
+    "src/shared/dist/**"
+  ]
+} 

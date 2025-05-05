@@ -1,10 +1,10 @@
 import * as functions from "firebase-functions";
 import * as functionsV1 from "firebase-functions/v1";
-// import * as firestoreV1 from "firebase-functions/v1/firestore";
+import * as firestoreV1 from "firebase-functions/v1/firestore";
 import * as admin from "firebase-admin";
 import * as path from "path"; // <-- Add path import
 // import { DocumentSnapshot } from "firebase-functions"; // Removed, use firestore.DocumentSnapshot
-import type { EventContext } from "firebase-functions/v1";
+// import { EventContext } from "firebase-functions"; // Removed, use correct context typing
 import {Parser} from "@json2csv/plainjs";
 import PdfPrinter from "pdfmake";
 // If this import fails, fallback to importing types from 'pdfmake' directly.
@@ -90,7 +90,7 @@ const isFirestoreTimestamp = (value: unknown): value is { toDate: () => Date } =
 // Cloud Function triggered by the creation of a settlement document
 // Cloud Function triggered by the creation of a settlement document
 export const onSettlementCreated = functionsV1.region("europe-west1").firestore.document("settlements/{settlementId}")
-  .onCreate(async (snap: admin.firestore.DocumentSnapshot, context: EventContext<{ settlementId: string }>) => {
+  .onCreate(async (snap: admin.firestore.DocumentSnapshot, context: any) => {
     const settlement = snap.data() as Settlement;
     const {month, amount, fromUserId, toUserId} = settlement;
 
@@ -305,7 +305,7 @@ export const onSettlementCreated = functionsV1.region("europe-west1").firestore.
         const printer = new PdfPrinter(fonts);
 
         // Define PDF content
-        const pdfContent: object[] = [
+        const pdfContent: any[] = [
           {text: "AAFairShare", style: "logoHeader", color: brandColor},
           {text: `Settlement Report - ${month}`, style: "header"},
           {
@@ -360,22 +360,21 @@ export const onSettlementCreated = functionsV1.region("europe-west1").firestore.
               ],
             },
             layout: {
-              hLineWidth: function(i: number, node: unknown): number {
-                const typedNode = node as PDFTableNode;
-                return i === 0 || i === 1 || i === typedNode.table.body.length ? 1 : 0;
-              },
-              vLineWidth: () => 0,
-              hLineColor: (i: number) => (i === 0 || i === 1 ? brandColor : "#E5E7EB"),
-              paddingTop: () => 6,
-              paddingBottom: () => 6,
-              paddingLeft: () => 8,
-              paddingRight: () => 8,
-            },
+  hLineWidth: (i: number, node: any) => (
+    i === 0 || i === 1 || i === node.table.body.length ? 1 : 0
+  ),
+  vLineWidth: () => 0,
+  hLineColor: (i: number) => (i === 0 || i === 1 ? brandColor : "#E5E7EB"),
+  paddingTop: () => 6,
+  paddingBottom: () => 6,
+  paddingLeft: () => 8,
+  paddingRight: () => 8,
+},
           },
         ];
 
         // Define PDF document structure
-        const docDefinition: object = {
+        const docDefinition: any = {
           content: pdfContent,
           styles: {
             logoHeader: {fontSize: 20, bold: true, margin: [0, 0, 0, 5]},
@@ -567,7 +566,9 @@ body { font-family: sans-serif; line-height: 1.6; color: #333; }
       // for Trigger Email)
       await db.collection("mail").add(emailData);
       functions.logger.log(
-        `Email document created successfully for settlement ${context.params.settlementId}.`
+        `Email document created successfully for settlement ${
+          context.params.settlementId
+        }.`
       );
     } catch (error) {
       functions.logger.error(
@@ -621,15 +622,3 @@ export const onSettlementMarkedSettled = functionsV1.region("europe-west1").fire
       }
     }
   });
-
-interface PDFTableCell {
-  text: string;
-  alignment?: 'left' | 'right' | 'center';
-  fillColor?: string;
-}
-
-interface PDFTableNode {
-  table: {
-    body: PDFTableCell[][];
-  };
-}
