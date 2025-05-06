@@ -1,10 +1,10 @@
 # FairShare Expense Sharing App
 
-A modern expense sharing application designed for two users to track and split expenses, built with React, TypeScript, and Firebase.
+A modern expense sharing application designed for two users to track and split expenses, built with React, TypeScript, Supabase, and Netlify.
 
 ## Features
 
-- 🔐 Google Authentication
+- 🔐 Google Authentication (via Supabase)
 - 💰 Track and categorize expenses
 - 📊 Visualize spending patterns with charts
 - 🔄 Split expenses equally (50/50) or assign to one user (100%)
@@ -19,7 +19,8 @@ A modern expense sharing application designed for two users to track and split e
 - **State Management**: React Context + React Query for server state
 - **UI Components**: Tailwind CSS with shadcn/ui components
 - **Forms**: React Hook Form with Zod validation
-- **Backend**: Firebase (Firestore, Authentication)
+- **Backend**: Supabase (Postgres, Auth)
+- **Hosting**: Netlify
 - **Routing**: React Router v7
 
 ### Core Architecture Concepts
@@ -38,7 +39,7 @@ The application is designed specifically for two users to share expenses:
 #### Data Flow
 - **Context Providers**: Domain-specific contexts (User, Resources)
 - **Custom Hooks**: Abstracted data fetching and state management
-- **Service Layer**: Firebase operations abstracted through service modules
+- **Service Layer**: Supabase operations abstracted through service modules
 
 #### Type System
 - Centralized type definitions in shared directory
@@ -48,8 +49,9 @@ The application is designed specifically for two users to share expenses:
 ## Getting Started
 
 ### Prerequisites
-- Node.js 16+
-- Firebase account
+- Node.js 18+
+- Supabase account
+- Netlify account
 
 ### Installation
 
@@ -64,14 +66,10 @@ cd fairshare
 npm install
 ```
 
-3. Create a `.env` file in the root directory with your Firebase configuration:
+3. Create a `.env` file in the root directory with your Supabase configuration:
 ```
-VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=your-auth-domain
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_STORAGE_BUCKET=your-storage-bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
-VITE_FIREBASE_APP_ID=your-app-id
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_KEY=your-supabase-anon-key
 ```
 
 4. Start the development server
@@ -88,53 +86,54 @@ src/
 ├── hooks/           # Custom React hooks
 ├── lib/             # Utilities and configuration
 ├── pages/           # Page components
-├── services/        # API and Firebase services
+├── services/        # API and Supabase services
 └── shared/          # Shared types and utilities
 ```
 
 ## Scripts & Automation
 
-This project uses a unified GitHub Actions workflow for deploying to both staging and production environments using npm and Firebase Hosting.
+This project uses a unified GitHub Actions workflow for deploying to production using npm and Netlify.
 
 ### Deployment Workflow
 
 - **Unified Workflow:**
-  - The `.github/workflows/deploy.yml` workflow handles both staging and production deployments.
-  - **Push to `staging` branch:** Deploys to the staging Firebase project (`aafairshare---staging`).
-  - **Push to `main` branch:** Deploys to the production Firebase project (`aafairshare`).
-  - The workflow uses npm for dependency management and build, and conditionally deploys based on the branch.
+  - The `.github/workflows/deploy.yml` workflow handles production deployments.
+  - **Push to `main` branch:** Deploys to the production Netlify site and applies Supabase migrations if present.
+  - The workflow uses npm for dependency management and build, and deploys via Netlify CLI/API.
 
 #### How to Deploy
-- **To test in staging:**
-  1. Push or merge your changes to the `staging` branch.
-  2. The workflow will build and deploy to the staging Firebase environment.
 - **To deploy to production:**
-  1. Merge or cherry-pick your changes to the `main` branch.
-  2. The workflow will build and deploy to the production Firebase environment.
+  1. Merge or push your changes to the `main` branch.
+  2. The workflow will build and deploy to the production Netlify environment and apply any new Supabase migrations.
 
 #### Example Workflow File
 See `.github/workflows/deploy.yml` for the full configuration.
 
 ### Other Scripts
 
-- **sync-monthly-data.ts**
-  - **What it does:** Syncs Firestore data for a given month (categories, locations, expenses, settlements) from production to staging.
+- **Supabase Migrations**
+  - **What it does:** Manages schema changes for your database using SQL migration files in `/migrations`.
   - **How to run:**
     ```sh
-    npm tsx scripts/sync-monthly-data.ts --month YYYY-MM [--dry-run]
+    supabase db push
     ```
-    Add `--dry-run` to preview changes without writing.
+    See `/migrations/README.md` for details.
 
-- **migrate-firebase-data.js**
-  - **What it does:** Migrates all users and collections from production to staging, including backup to disk.
-  - **How to run:**
-    ```sh
-    node scripts/migrate-firebase-data.js
-    ```
+## Environment Variables
 
-- **fix-expense-dates.ts**
-  - **What it does:** Fixes expenses in Firestore where the `date` field was incorrectly migrated (e.g., from Timestamp to map object). Runs against STAGING.
-  - **How to run:**
-    ```sh
-    npm tsx scripts/fix-expense-dates.ts
-    ```
+- `VITE_SUPABASE_URL` - Your Supabase project URL
+- `VITE_SUPABASE_KEY` - Your Supabase anon/public key
+
+## Branching Strategy
+
+- All development and hotfixes are branched from `main`.
+- See `docs/BRANCHING_STRATEGY.md` for details.
+
+## Monitoring & Analytics
+
+- Supabase logs and analytics for user metrics and performance
+- Custom application logging for detailed debugging
+
+## License
+
+MIT

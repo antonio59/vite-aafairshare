@@ -5,32 +5,21 @@
  */
 import React from 'react';
 import { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  signInWithPopup,
-  User as FirebaseUser,
-  GoogleAuthProvider
-} from 'firebase/auth';
-import { auth } from '../lib/firebase';
 import { User, FirestoreTimestamp } from '@shared/types';
 import { Category, Location } from '@shared/types';
 import { db } from '../lib/firebase';
-import { collection, query, orderBy, onSnapshot, doc, getDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import { toUser, toUUID, toISODateString } from "@shared/utils/typeGuards";
+import { createClient, AuthChangeEvent, Session } from '@supabase/supabase-js';
 
-// Create a Google provider instance
-const googleProvider = new GoogleAuthProvider();
-googleProvider.addScope('https://www.googleapis.com/auth/userinfo._email');
-googleProvider.addScope('https://www.googleapis.com/auth/userinfo.profile');
+// Initialize Supabase client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  signup: (_email: string, _password: string) => Promise<void>;
-  login: (_email: string, _password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   allUsers?: User[];
@@ -41,7 +30,6 @@ interface AuthContextType {
   locationsLoading?: boolean;
 }
 
- 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function useAuth(): AuthContextType {
@@ -73,58 +61,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [usersLoading, setUsersLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [locationsLoading, setLocationsLoading] = useState(true);
-
-  async function signup(_email: string, _password: string) {
-    await createUserWithEmailAndPassword(auth, _email, _password);
-  }
-
-  async function login(_email: string, _password: string) {
-    await signInWithEmailAndPassword(auth, _email, _password);
-  }
   
-  async function signInWithGoogle() {
-    await signInWithPopup(auth, googleProvider);
+  async function signInWithGoogle(): Promise<void> {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent'
+        }
+      }
+    });
+    if (error) throw error;
+    // Redirect happens automatically
   }
 
   async function logout() {
-    await signOut(auth);
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user: FirebaseUser | null) => {
-      if (user) {
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
+    // Listen for auth state changes in Supabase
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event: AuthChangeEvent, session: Session | null) => {
+      if (session?.user) {
+        const user = session.user;
+        console.log('[AuthContext] User authenticated:', { 
+          id: user.id,
+          email: user.email,
+          username: user.user_metadata?.full_name || user.email?.split('@')[0]
+        });
         
-        if (userSnap.exists()) {
-          const userData = userSnap.data();
-          console.log('[AuthContext] User authenticated:', { 
-            id: userData.id, 
-            _email: userData._email,
-            username: userData.username
-          });
-          setCurrentUser(
-            toUser({
-              ...userData,
-              id: toUUID(userSnap.id),
-              createdAt: toISODateString(userData.createdAt),
-              updatedAt: toISODateString(new Date()),
-            })
-          );
-        } else {
-          // Create new user document if it doesn't exist
-          const newUser = toUser({
-            id: toUUID(user.uid),
-            uid: user.uid,
-            email: user.email || '',
-            username: user.email?.split('@')[0] || 'User',
-            photoURL: user.photoURL ?? null,
-            createdAt: toISODateString(new Date()),
-            updatedAt: toISODateString(new Date()),
-            isAnonymous: user.isAnonymous,
-          });
-          setCurrentUser(newUser);
-        }
+        // Convert Supabase user to our User type
+        setCurrentUser(toUser({
+          id: toUUID(user.id),
+          uid: user.id,
+          email: user.email || '',
+          username: user.user_metadata?.full_name || user.email?.split('@')[0] || 'User',
+          photoURL: user.user_metadata?.avatar_url ?? null,
+          createdAt: toISODateString(new Date(user.created_at)),
+          updatedAt: toISODateString(new Date()),
+          isAnonymous: false,
+        }));
       } else {
         console.log('[AuthContext] No authenticated user');
         setCurrentUser(null);
@@ -132,7 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -244,8 +224,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value: AuthContextType = {
     currentUser,
-    signup,
-    login,
     signInWithGoogle,
     logout,
     loading,

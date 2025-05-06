@@ -107,6 +107,7 @@ yarn-error.log*
 # Rules
 .cursorrules 
 .cursor/
+.cursor/rules/.cursorrules
 
 # History files
 .history/

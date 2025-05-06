@@ -1,11 +1,10 @@
 # test change
-name: Deploy to Firebase Hosting
+name: Deploy to Netlify Production
 
 on:
   push:
     branches:
-      - main      # For production
-      - staging   # For staging
+      - main
   workflow_dispatch:
 
 jobs:
@@ -20,66 +19,50 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: |
-          npm install
-          cd functions && npm install
+        run: npm install
 
       - name: Create environment file from secrets
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY_PRODUCTION }}" >> .env.production
-          else
-            echo "VITE_FIREBASE_API_KEY=${{ secrets.VITE_FIREBASE_API_KEY_STAGING }}" >> .env.staging
-          fi
+          echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
+          echo "VITE_SUPABASE_KEY=${{ secrets.VITE_SUPABASE_KEY }}" >> .env
 
       - name: Build
+        run: npm run build:production
+
+      - name: Check for migration changes
+        id: migration-check
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            npm run build:production
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '^migrations/.*\.sql$'; then
+            echo "migrations_changed=true" >> $GITHUB_OUTPUT
           else
-            npm run build:staging
+            echo "migrations_changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create Service Account Key File
+      - name: Install Supabase CLI
+        if: steps.migration-check.outputs.migrations_changed == 'true'
         run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_PRODUCTION }}' > serviceAccountKey.json
-          else
-            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_STAGING }}' > serviceAccountKey.staging.json
-          fi
+          brew install supabase/tap/supabase
 
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools@13.2.1
-
-      - name: Debug Firebase CLI
-        run: firebase --version
-
-      - name: Debug Firebase Projects
+      - name: Apply Supabase Migrations
+        if: steps.migration-check.outputs.migrations_changed == 'true'
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.ref_name == 'main' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: |
-          echo "Contents of .firebaserc:"
-          cat .firebaserc
-          echo "Listing Firebase projects:"
-          firebase projects:list
+          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+          supabase db push
 
-      - name: Deploy to Firebase
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
+
+      - name: Deploy to Netlify
+        run: netlify deploy --dir=dist --prod
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.ref_name == 'main' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}
-        run: |
-          if [[ "${GITHUB_REF_NAME}" == "main" ]]; then
-            echo '{ "projects": { "default": "aafairshare-37271" } }' > .firebaserc
-            firebase use aafairshare-37271
-            firebase deploy --only hosting,functions,firestore --project aafairshare-37271
-          else
-            echo '{ "projects": { "default": "aafairshare---staging" } }' > .firebaserc
-            firebase use aafairshare---staging
-            firebase deploy --only hosting:aafairshare---staging,functions,firestore --project aafairshare---staging
-          fi
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 
       - name: Deployment Status
         run: |
           echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
           echo "* Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "* Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "* Environment: ${{ github.ref_name == 'main' && 'Production' || 'Staging' }}" >> $GITHUB_STEP_SUMMARY 
+          echo "* Environment: Production" >> $GITHUB_STEP_SUMMARY 
