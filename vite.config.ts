@@ -49,6 +49,6 @@ export default defineConfig({
     sourcemap: true
   },
   optimizeDeps: {
-    include: ['firebase/app', 'firebase/firestore', 'firebase/auth', 'firebase/storage']
+    include: ['@supabase/supabase-js']
   }
 }) 

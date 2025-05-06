@@ -6,9 +6,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "dev": "vite",
-    "dev:staging": "vite --mode staging",
     "build": "tsc && vite build",
-    "build:staging": "tsc && vite build --mode staging",
     "build:production": "tsc && vite build --mode production",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -16,9 +14,7 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
-    "typecheck": "tsc --noEmit",
-    "deploy:production": "npm run build:production && firebase deploy --only hosting:aafairshare-online --project aafairshare-37271",
-    "deploy:staging": "npm run build:staging && firebase deploy --only hosting:aafairshare---staging --project aafairshare---staging"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@google-cloud/firestore": "^7.11.0",

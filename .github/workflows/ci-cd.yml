@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - staging
       - 'feature/**'
       - 'bugfix/**'
     paths-ignore:
@@ -14,7 +13,6 @@ on:
   pull_request:
     branches:
       - main
-      - staging
       - 'feature/**'
       - 'bugfix/**'
     paths-ignore:
@@ -22,17 +20,8 @@ on:
       - 'docs/**'
       - '.github/workflows/dependency-updates.yml'
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy to'
-        required: true
-        default: 'staging'
-        type: choice
-        options:
-          - staging
-          - production
 
-# Ensure we don't have concurrent deployments to the same environment
+# Ensure we don't have concurrent deployments
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -68,7 +57,7 @@ jobs:
     name: Build and Deploy
     needs: setup-and-test
     runs-on: ubuntu-latest
-    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.environment || github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+    environment: production
     
     steps:
       - name: Download Repo Snapshot
@@ -76,55 +65,39 @@ jobs:
         with:
           name: repo-snapshot
           path: .
-      
-      - name: Set Environment
-        id: set-env
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "environment=${{ github.event.inputs.environment }}" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "environment=production" >> "$GITHUB_OUTPUT"
-          else
-            echo "environment=staging" >> "$GITHUB_OUTPUT"
-          fi
 
-      - name: Copy Environment Files
-        run: |
-          if [[ "${{ steps.set-env.outputs.environment }}" == "production" ]]; then
-            cp .env.production .env
-            export GOOGLE_APPLICATION_CREDENTIALS=./serviceAccountKey.json
-            echo '{
-              "projects": {
-                "default": "aafairshare-37271"
-              }
-            }' > .firebaserc
-          else
-            cp .env.staging .env
-            export GOOGLE_APPLICATION_CREDENTIALS=./serviceAccountKey.staging.json
-            echo '{
-              "projects": {
-                "default": "aafairshare---staging"
-              }
-            }' > .firebaserc
-          fi
-      
-      - name: Debug Firebase Config
-        run: |
-          echo "Using .firebaserc:"
-          cat .firebaserc
-          echo "Using GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS"
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.18.0'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Install Netlify CLI
+        run: npm install -g netlify-cli
 
       - name: Build
-        run: npm run build:${{ steps.set-env.outputs.environment }}
+        run: npm run build
 
-      - name: Deploy to Firebase
+      - name: Deploy to Netlify
         env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.set-env.outputs.environment == 'production' && './serviceAccountKey.json' || './serviceAccountKey.staging.json' }}
-        run: npm exec firebase deploy --only hosting
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        run: netlify deploy --prod --dir=dist
+
+      - name: Run Supabase Migrations
+        if: contains(github.event.head_commit.modified, 'supabase/migrations/')
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+        run: |
+          npx supabase db push
 
       - name: Deployment Status
         run: |
           echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
-          echo "* Environment: ${{ steps.set-env.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
           echo "* Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "* Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY 
+          echo "* Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "* Environment: Production" >> $GITHUB_STEP_SUMMARY 
