@@ -1,1 +1,11 @@
-{"type":"module","dependencies":{"@supabase/supabase-js":"^2.49.4","dotenv":"^16.5.0","firebase-admin":"^13.3.0"}}
+{
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "dotenv": "^16.5.0",
+    "firebase-admin": "^13.3.0"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+  }
+}
