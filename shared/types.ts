@@ -20,7 +20,7 @@ export const CATEGORY_ICONS = {
   OTHER: 'other'
 } as const;
 
-// Category icon type - matches Firestore data exactly
+// Category icon type - matches database schema
 export type CategoryIconName = 
   | 'Subscriptions'
   | 'Utilities'

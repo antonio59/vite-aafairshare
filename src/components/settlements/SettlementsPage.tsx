@@ -29,13 +29,13 @@ export default function SettlementsPage() {
   const [summary, setSummary] = useState<MonthSummary | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  // Fetch settlements from Firestore
+  // Fetch settlements from database
   useEffect(() => {
     if (!currentUser) return;
     
     const fetchSettlements = async () => {
       try {
-        // In a real implementation, this would fetch settlements from Firestore
+        // In a real implementation, this would fetch settlements from Supabase
         // For now, we'll use mock data
         setSettlements([]);
         setLoading(false);

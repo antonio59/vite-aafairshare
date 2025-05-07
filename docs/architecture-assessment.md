@@ -4,7 +4,7 @@
 - **Frontend Framework**: React with TypeScript and Vite
 - **State Management**: React Context + React Query
 - **UI Components**: Tailwind CSS with shadcn/ui components
-- **Backend**: Firebase (Firestore, Authentication)
+- **Backend**: Supabase (PostgreSQL, Authentication)
 - **Form Handling**: React Hook Form with Zod validation
 - **Routing**: React Router v7
 
@@ -30,7 +30,7 @@
   - [x] Create shared type library
   - [x] Eliminate inline type definitions
   - [x] Standardize types across components
-  - [x] Align User types between Firebase model and application model
+  - [x] Align User types between Supabase model and application model
   - [x] Resolve split type inconsistencies (e.g., "Equal"/"50/50" vs "Owned"/"100%")
 
 ### 4. Error Handling
@@ -41,9 +41,9 @@
   - [x] Implement retry mechanisms for network operations
 
 ### 5. Code Duplication
-- **Issue**: Repetitive Firestore query logic across components
+- **Issue**: Repetitive database query logic across components
 - **Solution**: Abstract into reusable services
-  - [x] Create Firebase service layer
+  - [x] Create service modules for Supabase operations
   - [x] Implement repository pattern for data access
   - [x] Centralize query logic in custom hooks
 
@@ -75,17 +75,17 @@
   - [x] Standardize user profile data structure
   - [x] Add comprehensive session management
 
-### 10. Firebase Integration
-- **Issue**: Direct Firebase references throughout the codebase
+### 10. Supabase Integration
+- **Issue**: Direct Supabase references throughout the codebase
 - **Solution**: Proper abstraction layer
-  - [x] Create service modules for Firebase operations
-  - [x] Add data transformation layer between Firestore and application models
+  - [x] Create service modules for Supabase operations
+  - [x] Add data transformation layer between database and application models
   - [x] Implement caching strategies for frequently accessed data
   - [x] Add offline support capabilities
 
 ## Implementation Priority
 1. Component refactoring (reduce size, improve separation of concerns)
-2. Data management improvements (centralize Firebase operations)
+2. Data management improvements (centralize Supabase operations)
 3. Type system refinement
 4. Error handling standardization
 5. Performance optimizations
@@ -102,7 +102,7 @@
 
 ### Phase 2: Data Management
 - [x] Create ResourceContext
-- [x] Create Firebase service layer
+- [x] Create Supabase service layer
 - [x] Implement repository pattern hooks
 
 ### Phase 3: Type System
@@ -155,10 +155,10 @@ The application is designed as a two-user expense sharing platform, which simpli
 - Split types are limited to basic scenarios (50/50 and 100%)
 - Settlement calculations are straightforward between two parties
 
-### Firebase Integration
-Firebase provides a comprehensive solution for this application:
-- Firestore handles the document-based data model effectively
-- Google Authentication provides secure user management
+### Supabase Integration
+Supabase provides a comprehensive solution for this application:
+- PostgreSQL handles the relational data model effectively
+- Multiple authentication providers including Google Authentication
 - Real-time capabilities enable synchronization between users
 - Serverless architecture eliminates need for custom backend
 

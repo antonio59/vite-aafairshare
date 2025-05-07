@@ -25,20 +25,11 @@ export function formatCurrency(amount: number | undefined | null): string {
  * @returns Formatted date string
  */
 export function formatDate(date: Date | string | unknown): string {
-  // Handle Firestore Timestamp objects
-  if (date && typeof date === 'object' && 'toDate' in date && typeof (date as { toDate?: () => Date }).toDate === 'function') {
-    date = (date as { toDate: () => Date }).toDate();
+  if (date instanceof Date) {
+    return date.toLocaleDateString();
   }
-  
-  // Handle string dates
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
-  // Use locale date string for consistent formatting
-  return dateObj instanceof Date && !isNaN(dateObj.getTime())
-    ? dateObj.toLocaleDateString("en-GB", {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric'
-      })
-    : '';
+  if (typeof date === 'string') {
+    return new Date(date).toLocaleDateString();
+  }
+  return new Date().toLocaleDateString();
 } 

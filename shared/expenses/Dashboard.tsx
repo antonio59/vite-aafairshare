@@ -105,7 +105,7 @@ const Dashboard = () => {
             {/* TODO: Integrate filteredExpenses from your app's context or props */}
             {/* {filteredExpenses && filteredExpenses.length > 0 ? (
               filteredExpenses.map((expense: ExpenseWithDetails) => {
-                // Parse date from Firestore format
+                // Parse expense date
                 let expenseDate = new Date();
                 if (expense.date) {
                   // Handle if it's a regular date object or string

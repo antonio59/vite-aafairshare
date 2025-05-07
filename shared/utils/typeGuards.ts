@@ -6,17 +6,15 @@ export function toUUID(id: string): UUID {
 }
 
 /**
- * Converts a Date, Firestore Timestamp, string, or undefined/null to an ISODateString.
+ * Converts a Date, string, or undefined/null to an ISODateString.
  * If input is undefined or null, defaults to new Date().
  */
-export function toISODateString(date: Date | string | { toDate?: () => Date } | undefined | null): ISODateString {
+export function toISODateString(date: Date | string | undefined | null): ISODateString {
   if (!date) {
-    // Optionally log a warning here
     return new Date().toISOString() as ISODateString;
   }
   if (typeof date === "string") return date as ISODateString;
   if (date instanceof Date) return date.toISOString() as ISODateString;
-  if (typeof date === "object" && typeof date.toDate === "function") return date.toDate().toISOString() as ISODateString;
   throw new Error("Invalid date type for toISODateString");
 }
 

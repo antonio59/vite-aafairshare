@@ -29,21 +29,20 @@ We use GitHub Actions for continuous integration and deployment:
 ### Deployment Workflow
 - Triggered on pushes to `main` and `develop` branches
 - Runs validation steps (lint, test, build)
-- Deploys to appropriate Firebase environment:
+- Deploys to appropriate Supabase environment:
   - `main` → Production
-  - `develop` → Staging
 
 ## Environment Setup
 
 ### Environment Variables
 - Store sensitive environment variables in GitHub Repository Secrets
 - Required secrets:
-  - `FIREBASE_SERVICE_ACCOUNT`: Firebase service account JSON
-  - `FIREBASE_PROJECT_ID`: Firebase project ID
+  - `SUPABASE_URL`: Supabase project URL
+  - `SUPABASE_ANON_KEY`: Supabase anonymous key
+  - `SUPABASE_SERVICE_ROLE_KEY`: Supabase service role key
 
-### Firebase Projects
+### Supabase Projects
 - **Production**: Linked to `main` branch
-- **Staging**: Linked to `develop` branch
 
 ## Version Management
 

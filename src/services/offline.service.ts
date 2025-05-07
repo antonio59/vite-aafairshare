@@ -194,7 +194,7 @@ async function processPendingOperations(): Promise<void> {
  * Process a single operation
  */
 async function processOperation(operation: OfflineOperation): Promise<void> {
-  // This would connect to your Firestore service
+  // This would connect to your Supabase service
   // For example:
   
   switch (operation.type) {

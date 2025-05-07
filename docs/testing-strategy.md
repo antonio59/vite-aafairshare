@@ -39,13 +39,13 @@ Focus on testing pure logic such as:
 Example unit test structure:
 ```ts
 describe('authService', () => {
-  describe('convertFirebaseUserToUser', () => {
-    it('should correctly transform Firebase user to app user model', () => {
+  describe('convertSupabaseUserToUser', () => {
+    it('should correctly transform Supabase user to app user model', () => {
       // Arrange
-      const firebaseUser = { /* ... */ };
+      const supabaseUser = { /* ... */ };
       
       // Act
-      const result = convertFirebaseUserToUser(firebaseUser);
+      const result = convertSupabaseUserToUser(supabaseUser);
       
       // Assert
       expect(result).toEqual({ /* expected output */ });
@@ -152,7 +152,7 @@ cypress/
 
 ## Mocking Strategy
 
-- **Firebase Services**: Create test doubles for Firebase services
+- **Supabase Services**: Create test doubles for Supabase services
 - **API Requests**: Use MSW to intercept and mock network requests
 - **Authentication**: Provide test users for authentication flows
 
