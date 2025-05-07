@@ -27,11 +27,16 @@ jobs:
         with:
           ref: main
       
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18.18.0'
-          cache: 'npm'
+          cache: 'pnpm'
       
       - name: Configure Git
         run: |
@@ -65,13 +70,13 @@ jobs:
           fi
       
       - name: Install Updated Dependencies
-        run: npm install
+        run: pnpm install
       
       - name: Run Tests
-        run: npm test || true
+        run: pnpm test || true
 
       - name: Run Build
-        run: npm run build || true
+        run: pnpm run build || true
       
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
