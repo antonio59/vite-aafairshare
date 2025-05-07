@@ -16,13 +16,6 @@ dist-ssr
 .env.*
 !.env.example
 
-# Firebase
-.firebase/
-firebase-debug.log*
-ui-debug.log*
-database-debug.log*
-firestore-debug.log*
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -52,9 +45,6 @@ cypress/screenshots/
 build/
 .vercel
 .netlify
-
-# Firebase service account keys
-serviceAccountKey*.json
 
 # TypeScript
 *.tsbuildinfo

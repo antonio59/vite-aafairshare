@@ -82,34 +82,12 @@ export function validateExpense(expense: Omit<Expense, 'id'>): Omit<Expense, 'id
     categoryId: validateUUID(expense.categoryId as string, 'categoryId'),
     locationId: validateUUID(expense.locationId as string, 'locationId'),
     paidById: validateUUID(expense.paidById as string, 'paidById'),
-    splitBetweenIds: expense.splitBetweenIds.map(id => validateUUID(id as string, 'splitBetweenIds')),
     splitType: expense.splitType,
     month: expense.month,
     date: validateISODateString(expense.date as string, 'date'),
     createdAt: validateISODateString(expense.createdAt as string, 'createdAt'),
     updatedAt: validateISODateString(expense.updatedAt as string, 'updatedAt')
   };
-}
-
-// Firebase Auth User type with required Firebase properties
-export interface FirebaseAuthUser {
-  uid: string;
-  email: string | null;
-  username: string | null;
-  photoURL: string | null;
-  emailVerified: boolean;
-  isAnonymous: boolean;
-  metadata: {
-    creationTime?: string;
-    lastSignInTime?: string;
-  };
-  providerData: Array<{
-    providerId: string;
-    uid: string;
-    email: string | null;
-    phoneNumber: string | null;
-    photoURL: string | null;
-  }>;
 }
 
 // Core User type that is used throughout the application
@@ -147,12 +125,6 @@ export interface Category {
   color?: string;      // Optional color field
 }
 
-// Firestore timestamp format
-export interface FirestoreTimestamp {
-  _seconds: number;
-  _nanoseconds: number;
-}
-
 // Expense split type with proper typing
 export type ExpenseSplitType = "50/50" | "100%";
 
@@ -164,7 +136,6 @@ export interface Expense {
   categoryId: UUID;
   locationId: UUID;
   paidById: UUID;
-  splitBetweenIds: UUID[];
   splitType: ExpenseSplitType;
   month: string; // YYYY-MM
   date: ISODateString;
@@ -201,7 +172,9 @@ export function validateSettlement(settlement: Omit<Settlement, 'id'>): Omit<Set
     month: settlement.month,
     date: validateISODateString(settlement.date as string, 'date'),
     createdAt: validateISODateString(settlement.createdAt as string, 'createdAt'),
-    updatedAt: validateISODateString(settlement.updatedAt as string, 'updatedAt')
+    updatedAt: validateISODateString(settlement.updatedAt as string, 'updatedAt'),
+    notes: settlement.notes,
+    recordedBy: validateUUID(settlement.recordedBy as string, 'recordedBy')
   };
 }
 
@@ -216,6 +189,8 @@ export interface Settlement {
   date: ISODateString;
   createdAt: ISODateString;
   updatedAt: ISODateString;
+  notes: string;
+  recordedBy: UUID;
 }
 
 // Extended Settlement type with related data
@@ -275,21 +250,6 @@ export interface RecurringExpenseWithDetails extends RecurringExpense {
   category: Category;
   location: Location;
   paidByUser: User;
-}
-
-// Conversion functions
-export function convertFirebaseAuthToUser(firebaseUser: FirebaseAuthUser): User {
-  const now = new Date().toISOString() as ISODateString;
-  return {
-    id: firebaseUser.uid as UUID,
-    uid: firebaseUser.uid,
-    email: firebaseUser.email || '',
-    username: firebaseUser.username || firebaseUser.email?.split('@')[0] || 'User',
-    photoURL: firebaseUser.photoURL || null,
-    createdAt: now,
-    updatedAt: now,
-    isAnonymous: firebaseUser.isAnonymous,
-  };
 }
 
 // Convert app User to SchemaUser for shared schema compatibility

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { announce } from "@/components/LiveRegion";
@@ -7,39 +7,88 @@ import { formatCurrency, formatMonthYear, getCurrentMonth, getMonthFromDate } fr
 import { getUserColor, getCategoryColor, getLocationColor } from "@/lib/chartColors";
 import { DataChart, TrendChart } from "@/components/AnalyticsChart";
 import { useAuth } from "@/contexts/AuthContext";
-import { MonthSummary, User, TrendData, Expense, Settlement, Category, Location } from "@shared/types";
-import { db } from "@/lib/firebase";
-import { collection, query, where, orderBy, onSnapshot, Timestamp } from "firebase/firestore";
+import { MonthSummary, TrendData } from "@shared/types";
+import { SupabaseService } from "@/services/supabase.service";
 import { subMonths, startOfMonth } from "date-fns";
-import type { UUID, ISODateString } from '@shared/types';
-
-// Helper to safely format dates to ISO string
-function toISODateString(dateValue: unknown): ISODateString | undefined {
-  if (!dateValue) return undefined;
-  const date = new Date(dateValue as string | number | Date);
-  return isNaN(date.getTime()) ? undefined : (date.toISOString() as ISODateString);
-}
+import type { ISODateString } from '@shared/types';
+import {
+  transformUser,
+  transformCategory,
+  transformLocation,
+  transformExpense,
+  transformSettlement
+} from "@/services/supabase.service";
+import { supabase } from '../config/supabase';
 
 export default function Analytics() {
   const [currentMonth] = useState(getCurrentMonth());
   const { toast } = useToast();
-  const { currentUser, loading: authLoading } = useAuth();
+  const { user: currentUser, loading: authLoading } = useAuth();
 
-  // State for Firestore data
-  const [users, setUsers] = useState<User[]>([]);
-  const [usersLoading, setUsersLoading] = useState(true);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [locationsLoading, setLocationsLoading] = useState(true);
-  const [currentMonthExpenses, setCurrentMonthExpenses] = useState<Expense[]>([]);
-  const [currentMonthExpensesLoading, setCurrentMonthExpensesLoading] = useState(true);
-  const [currentMonthSettlements, setCurrentMonthSettlements] = useState<Settlement[]>([]);
-  const [currentMonthSettlementsLoading, setCurrentMonthSettlementsLoading] = useState(true);
-  const [trendExpenses, setTrendExpenses] = useState<Expense[]>([]);
-  const [trendExpensesLoading, setTrendExpensesLoading] = useState(true);
+  // Fetch data using React Query
+  const { data: users = [], isLoading: usersLoading, refetch: refetchUsers } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      const data = await SupabaseService.get('users');
+      return Array.isArray(data) ? data.filter(row => typeof row === 'object' && row !== null && !('error' in row)).map(transformUser) : [];
+    },
+    enabled: !!currentUser
+  });
 
-  // State for calculated data
+  const { data: categories = [], isLoading: categoriesLoading, refetch: refetchCategories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      const data = await SupabaseService.get('categories');
+      return Array.isArray(data) ? data.filter(row => typeof row === 'object' && row !== null && !('error' in row)).map(transformCategory) : [];
+    },
+    enabled: !!currentUser
+  });
+
+  const { data: locations = [], isLoading: locationsLoading, refetch: refetchLocations } = useQuery({
+    queryKey: ['locations'],
+    queryFn: async () => {
+      const data = await SupabaseService.get('locations');
+      return Array.isArray(data) ? data.filter(row => typeof row === 'object' && row !== null && !('error' in row)).map(transformLocation) : [];
+    }
+  });
+
+  const { data: currentMonthExpenses = [], isLoading: currentMonthExpensesLoading, refetch: refetchCurrentMonthExpenses } = useQuery({
+    queryKey: ['expenses', currentMonth],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      const data = await SupabaseService.get('expenses', { eq: { month: currentMonth }, order: { column: 'date', ascending: false } });
+      return Array.isArray(data) ? data.filter(row => typeof row === 'object' && row !== null && !('error' in row)).map(transformExpense) : [];
+    },
+    enabled: !!currentUser
+  });
+
+  const { data: currentMonthSettlements = [], isLoading: currentMonthSettlementsLoading, refetch: refetchCurrentMonthSettlements } = useQuery({
+    queryKey: ['settlements', currentMonth],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      const data = await SupabaseService.get('settlements', { eq: { month: currentMonth } });
+      return Array.isArray(data) ? data.filter(row => typeof row === 'object' && row !== null && !('error' in row)).map(transformSettlement) : [];
+    },
+    enabled: !!currentUser
+  });
+
+  const { data: trendExpenses = [], isLoading: trendExpensesLoading, refetch: refetchTrendExpenses } = useQuery({
+    queryKey: ['expenses', 'trend'],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5));
+      const data = await SupabaseService.get('expenses', {
+        eq: { date: { gte: sixMonthsAgo.toISOString() } },
+        order: { column: 'date', ascending: true }
+      });
+      return Array.isArray(data) ? data.filter(row => typeof row === 'object' && row !== null && !('error' in row)).map(transformExpense) : [];
+    },
+    enabled: !!currentUser
+  });
+
+  // Remove old state variables and useEffect hooks for data fetching
   const [summary, setSummary] = useState<MonthSummary | null>(null);
   const [summaryLoading, setSummaryLoading] = useState(true);
   const [trendData, setTrendData] = useState<TrendData | null>(null);
@@ -56,211 +105,52 @@ export default function Analytics() {
     }
   }, [authLoading, currentUser, toast]);
 
-  // Fetch Users
+  // Add real-time subscriptions
   useEffect(() => {
-    if (!currentUser) {
-        setUsersLoading(false);
-        setUsers([]);
-        return;
+    // Subscribe to all relevant tables
+    const subscriptions = [
+      supabase
+        .channel('expenses_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
+          refetchCurrentMonthExpenses();
+          refetchTrendExpenses();
+        })
+        .subscribe(),
+
+      supabase
+        .channel('settlements_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'settlements' }, () => {
+          refetchCurrentMonthSettlements();
+        })
+        .subscribe(),
+
+      supabase
+        .channel('categories_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'categories' }, () => {
+          refetchCategories();
+        })
+        .subscribe(),
+
+      supabase
+        .channel('locations_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'locations' }, () => {
+          refetchLocations();
+        })
+        .subscribe(),
+
+      supabase
+        .channel('users_changes')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, () => {
+          refetchUsers();
+        })
+        .subscribe()
+    ];
+
+    return () => {
+      // Cleanup all subscriptions
+      subscriptions.forEach(subscription => subscription.unsubscribe());
     };
-
-    setUsersLoading(true);
-    const usersCol = collection(db, "users");
-    const unsubscribe = onSnapshot(usersCol, (snapshot) => {
-      const fetchedUsers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as User));
-      setUsers(fetchedUsers);
-      setUsersLoading(false);
-    }, (error) => {
-      console.error("Error fetching users:", error);
-      toast({
-        title: "Error",
-        description: "Could not load user data. Please refresh the page.",
-        variant: "destructive"
-      });
-      setUsersLoading(false);
-    });
-    return () => unsubscribe();
-  }, [currentUser, toast]);
-
-  // Fetch Categories
-  useEffect(() => {
-     if (!currentUser) {
-        setCategoriesLoading(false);
-        setCategories([]);
-        return;
-    };
-
-    setCategoriesLoading(true);
-    const catCol = collection(db, "categories");
-    const q = query(catCol, orderBy("name"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
-      setCategories(fetchedCategories);
-      setCategoriesLoading(false);
-    }, (error) => {
-      console.error("Error fetching categories:", error);
-      toast({
-        title: "Error",
-        description: "Could not load categories. Please refresh the page.",
-        variant: "destructive"
-      });
-      setCategoriesLoading(false);
-    });
-    return () => unsubscribe();
-  }, [currentUser, toast]);
-
-  // Fetch Locations
-  useEffect(() => {
-    setLocationsLoading(true);
-    const locCol = collection(db, "locations");
-    const q = query(locCol, orderBy("name"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedLocations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Location));
-      setLocations(fetchedLocations);
-      setLocationsLoading(false);
-    }, (error) => {
-      console.error("Error fetching locations:", error);
-      setLocationsLoading(false);
-       toast({
-        title: "Error",
-        description: "Could not load locations.",
-        variant: "destructive"
-      });
-    });
-    return () => unsubscribe();
-  }, [toast]);
-
-  // Fetch Current Month Expenses
-  useEffect(() => {
-    if (!currentUser) {
-        setCurrentMonthExpensesLoading(false);
-        setCurrentMonthExpenses([]);
-        return;
-    };
-    setCurrentMonthExpensesLoading(true);
-    const expensesCol = collection(db, "expenses");
-    const q = query(expensesCol, where("month", "==", currentMonth), orderBy("date", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedExpenses = snapshot.docs.map(doc => {
-         const data = doc.data();
-         return {
-           id: doc.id as UUID,
-           amount: data.amount ?? 0,
-           description: data.description ?? '',
-           categoryId: data.categoryId ?? '',
-           locationId: data.locationId ?? '',
-           paidById: data.paidById ?? '',
-           splitBetweenIds: data.splitBetweenIds ?? [],
-           splitType: data.splitType ?? '50/50',
-           month: data.month ?? '',
-           date: toISODateString(data.date),
-           createdAt: toISODateString(data.createdAt),
-           updatedAt: toISODateString(data.updatedAt),
-         } as Expense;
-      });
-      setCurrentMonthExpenses(fetchedExpenses);
-      setCurrentMonthExpensesLoading(false);
-    }, (error) => {
-      console.error("Error fetching current month expenses:", error);
-      setCurrentMonthExpensesLoading(false);
-       toast({
-        title: "Error",
-        description: "Could not load current month expenses.",
-        variant: "destructive"
-      });
-    });
-    return () => unsubscribe();
-  }, [currentMonth, currentUser, toast]);
-
-  // Fetch Current Month Settlements
-   useEffect(() => {
-     if (!currentUser) {
-        setCurrentMonthSettlementsLoading(false);
-        setCurrentMonthSettlements([]);
-        return;
-     };
-     setCurrentMonthSettlementsLoading(true);
-     const settlementsCol = collection(db, "settlements");
-     const q = query(settlementsCol, where("month", "==", currentMonth));
-     const unsubscribe = onSnapshot(q, (snapshot) => {
-       const fetchedSettlements = snapshot.docs.map(doc => {
-         const data = doc.data();
-         return {
-           id: doc.id as UUID,
-           fromUserId: data.fromUserId ?? '',
-           toUserId: data.toUserId ?? '',
-           amount: data.amount ?? 0,
-           status: data.status ?? 'PENDING',
-           month: data.month ?? '',
-           date: toISODateString(data.date),
-           createdAt: toISODateString(data.createdAt),
-           updatedAt: toISODateString(data.updatedAt),
-         } as Settlement;
-       });
-       setCurrentMonthSettlements(fetchedSettlements);
-       setCurrentMonthSettlementsLoading(false);
-     }, (error) => {
-       console.error("Error fetching settlements:", error);
-       setCurrentMonthSettlementsLoading(false);
-        toast({
-            title: "Error",
-            description: "Could not load settlements.",
-            variant: "destructive"
-        });
-     });
-     return () => unsubscribe();
-   }, [currentMonth, currentUser, toast]);
-
-   // Fetch Expenses for Trend Calculation (e.g., last 6 months)
-   useEffect(() => {
-     if (!currentUser) {
-        setTrendExpensesLoading(false);
-        setTrendExpenses([]);
-        return;
-     };
-     setTrendExpensesLoading(true);
-     const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5)); // Start of month 6 months ago (inclusive)
-     const expensesCol = collection(db, "expenses");
-     const q = query(expensesCol, where("date", ">=", Timestamp.fromDate(sixMonthsAgo)), orderBy("date", "asc"));
-
-     const unsubscribe = onSnapshot(q, (snapshot) => {
-         const fetchedExpenses = snapshot.docs.map(doc => {
-             const data = doc.data();
-             // Helper to convert Firestore Timestamp or string to ISO date string (YYYY-MM-DD)
-             const toISO = (val: unknown): string => {
-               if (val instanceof Timestamp) return val.toDate().toISOString().slice(0, 10);
-               if (typeof val === 'string') return val.slice(0, 10);
-               return '';
-             };
-             return {
-                 id: doc.id as UUID,
-                 amount: data.amount ?? 0,
-                 description: data.description ?? '',
-                 categoryId: data.categoryId ?? '',
-                 locationId: data.locationId ?? '',
-                 paidById: data.paidById ?? '',
-                 splitBetweenIds: data.splitBetweenIds ?? [],
-                 splitType: data.splitType ?? '50/50',
-                 month: data.month ?? '',
-                 date: toISO(data.date),
-                 createdAt: toISO(data.createdAt),
-                 updatedAt: toISO(data.updatedAt),
-             } as Expense;
-         });
-         setTrendExpenses(fetchedExpenses);
-         setTrendExpensesLoading(false);
-     }, (error) => {
-         console.error("Error fetching trend expenses:", error);
-         setTrendExpensesLoading(false);
-          toast({
-            title: "Error",
-            description: "Could not load trend data.",
-            variant: "destructive"
-          });
-     });
-
-     return () => unsubscribe();
-   }, [currentUser, toast]);
+  }, [refetchCurrentMonthExpenses, refetchTrendExpenses, refetchCurrentMonthSettlements, refetchCategories, refetchLocations, refetchUsers]);
 
   // Calculate Summary for Current Month
   useEffect(() => {
@@ -500,8 +390,6 @@ export default function Analytics() {
       setTrendDataLoading(false);
     }
   }, [calculatedTrendData]);
-
-  
 
   // Helper function to get username by ID
   const getUsernameById = (userId: string): string => {

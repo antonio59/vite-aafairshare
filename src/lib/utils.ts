@@ -20,11 +20,6 @@ export function formatDate(date: Date | string | number | undefined | null): str
       return 'Invalid date';
     }
     
-    // Handle Firestore timestamp objects
-    if (date && typeof date === 'object' && 'toDate' in date && typeof date.toDate === 'function') {
-      date = date.toDate();
-    }
-    
     // Convert string to date if needed
     const dateObj = typeof date === 'string' ? new Date(date) : date;
     
@@ -208,27 +203,10 @@ export const getCategoryBackgroundColorClass = (categoryName?: string): string =
 
 /**
  * Robustly normalize any input to a Date object, or undefined if invalid.
- * Handles Date, string, Firestore Timestamp, object, undefined, null.
+ * Handles Date, string, object, undefined, null.
  */
 export function normalizeToDate(input: unknown): Date | undefined {
   if (!input) return undefined;
-  // Firestore Timestamp (has toDate method)
-  if (typeof input === 'object' && input !== null && typeof (input as { toDate?: unknown }).toDate === 'function') {
-    try {
-      const d = (input as { toDate: () => Date }).toDate();
-      return d instanceof Date && !isNaN(d.getTime()) ? d : undefined;
-    } catch {
-      return undefined;
-    }
-  }
-  // Firestore Timestamp-like object with seconds
-  if (typeof input === 'object' && input !== null && 'seconds' in input) {
-    const seconds = (input as { seconds: number }).seconds;
-    if (typeof seconds === 'number') {
-      const d = new Date(seconds * 1000);
-      return d instanceof Date && !isNaN(d.getTime()) ? d : undefined;
-    }
-  }
   // String
   if (typeof input === 'string') {
     const d = new Date(input);

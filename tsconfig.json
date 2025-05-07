@@ -32,10 +32,6 @@
     "shared/**/*.tsx",
     "shared/**/*.js",
     "shared/**/*.jsx",
-    "functions/**/*.ts",
-    "functions/**/*.tsx",
-    "functions/**/*.js",
-    "functions/**/*.jsx",
     "eslint.config.mjs",
     "vitest.config.ts"
   ],

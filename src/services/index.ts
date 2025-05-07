@@ -5,7 +5,7 @@
  * and API interactions from the UI components.
  */
 
-export * from './firestore.service';
-export * from './auth.service';
-export * from './resources.service';
-export * from './expenses.service'; 
+export { default as AuthService } from './auth.service';
+export { default as ExpensesService } from './expenses.service';
+export { default as SettlementsService } from './settlements.service';
+export { default as SupabaseService } from './supabase.service'; 

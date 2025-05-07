@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -19,108 +19,90 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { db } from "@/lib/firebase";
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc, updateDoc, addDoc } from "firebase/firestore";
 import { CATEGORY_ICONS } from "@/lib/constants";
 import type { CategoryIconName } from "@shared/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { VisuallyHidden } from "@/components/ui/visually-hidden";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SupabaseService } from '@/services/supabase.service';
+import type { Tables } from '@/services/supabase.service';
 
 export default function Settings() {
   const [editingLocation, setEditingLocation] = useState<Location | undefined>(undefined);
   const [activeTab, setActiveTab] = useState("categories");
   const [isLocationFormOpen, setLocationFormOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
-  
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ type: 'category' | 'location'; id: string } | null>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isCategoryFormOpen, setCategoryFormOpen] = useState(false);
 
-  // State for Firestore data
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [categoriesLoading, setCategoriesLoading] = useState(true);
-  const [locationsLoading, setLocationsLoading] = useState(true);
+  // Fetch Categories from Supabase
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery<Category[]>({
+    queryKey: ['categories'],
+    queryFn: async () => {
+      const cats = await SupabaseService.get('categories', { order: { column: 'name', ascending: true } });
+      if (!Array.isArray(cats) || cats.length === 0) return [];
+      if (typeof cats[0] === 'object' && 'error' in cats[0]) return [];
+      return (cats as unknown as Tables['categories']['Row'][]).map(cat => ({
+        id: cat.id,
+        name: cat.name,
+        color: cat.color ?? '#000000',
+        icon: cat.icon ?? 'default',
+        createdAt: ''
+      }));
+    }
+  });
 
-  // Fetch Categories from Firestore
-  useEffect(() => {
-    setCategoriesLoading(true);
-    const catCol = collection(db, "categories");
-    const q = query(catCol, orderBy("name"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedCategories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Category));
-      setCategories(fetchedCategories);
-      setCategoriesLoading(false);
-    }, (error) => {
-      console.error("Error fetching categories:", error);
-      toast({ title: "Error", description: "Could not load categories.", variant: "destructive" });
-      setCategoriesLoading(false);
-    });
-    return () => unsubscribe();
-  }, [toast]);
-
-  // Fetch Locations from Firestore
-  useEffect(() => {
-    setLocationsLoading(true);
-    const locCol = collection(db, "locations");
-    const q = query(locCol, orderBy("name"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedLocations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Location));
-      setLocations(fetchedLocations);
-      setLocationsLoading(false);
-    }, (error) => {
-      console.error("Error fetching locations:", error);
-      toast({ title: "Error", description: "Could not load locations.", variant: "destructive" });
-      setLocationsLoading(false);
-    });
-    return () => unsubscribe();
-  }, [toast]);
-
+  // Fetch Locations from Supabase
+  const { data: locations = [], isLoading: locationsLoading } = useQuery<Location[]>({
+    queryKey: ['locations'],
+    queryFn: async () => {
+      const locs = await SupabaseService.get('locations', { order: { column: 'name', ascending: true } });
+      if (!Array.isArray(locs) || locs.length === 0) return [];
+      if (typeof locs[0] === 'object' && 'error' in locs[0]) return [];
+      return (locs as unknown as Tables['locations']['Row'][]).map(loc => ({
+        id: loc.id,
+        name: loc.name
+      }));
+    }
+  });
 
   const openDeleteDialog = (type: 'category' | 'location', id: string) => {
     setEditingLocation(undefined); // reset editing on delete
-
     setItemToDelete({ type, id });
     setDeleteDialogOpen(true);
   };
 
-  // Updated handleDelete using Firestore
+  // Delete handler using Supabase
   const handleDelete = async () => {
     if (!itemToDelete) return;
-
     const { type, id } = itemToDelete;
-    const collectionName = type === 'category' ? 'categories' : 'locations'; // Correct pluralization
-    const itemRef = doc(db, collectionName, id);
-
     try {
-      await deleteDoc(itemRef);
+      await SupabaseService.delete(type === 'category' ? 'categories' : 'locations', id);
       toast({
         title: "Success",
         description: `${type.charAt(0).toUpperCase() + type.slice(1)} deleted successfully.`,
       });
-      // No need to invalidate queries, listener handles updates
-    } catch (error: unknown) { // Changed 'any' to 'unknown'
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
+      // Invalidate queries to refetch
+      queryClient.invalidateQueries({ queryKey: [type === 'category' ? 'categories' : 'locations'] });
+    } catch (error: unknown) {
       console.error(`Error deleting ${type}:`, error);
-      // Type check before accessing properties
       const errorMessage = error instanceof Error ? error.message : `Failed to delete ${type}. It might be in use or there was a server error.`;
-      // Check for specific Firestore error codes if needed, e.g., if deletion fails due to rules
       toast({
         title: "Error",
         description: errorMessage,
         variant: "destructive",
       });
-    } finally {
-        setDeleteDialogOpen(false);
-        setItemToDelete(null);
     }
   };
 
   const handleCategorySuccess = () => {
-    // Handle successful category addition
     setSelectedCategory(undefined);
+    queryClient.invalidateQueries({ queryKey: ['categories'] });
   };
-
-  const [isCategoryFormOpen, setCategoryFormOpen] = useState(false);
 
   return (
     <div className="container py-4 px-2 sm:py-6 sm:px-0">
@@ -214,23 +196,13 @@ export default function Settings() {
         </TabsContent>
       </Tabs>
 
-      {/* Category Form Modal */}
+      {/* Category Form Dialog */}
       <Dialog open={isCategoryFormOpen} onOpenChange={setCategoryFormOpen}>
-        <DialogContent
-          className="max-w-md w-full p-0"
-          aria-labelledby="category-dialog-title"
-          aria-describedby="category-dialog-description"
-        >
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle id="category-dialog-title">
-              <VisuallyHidden>{selectedCategory ? "Edit Category" : "Add Category"}</VisuallyHidden>
-            </DialogTitle>
-            <DialogDescription id="category-dialog-description">
-              <VisuallyHidden>
-                {selectedCategory
-                  ? "Edit the details of the selected category."
-                  : "Fill in the details to add a new category."}
-              </VisuallyHidden>
+            <DialogTitle>{selectedCategory ? "Edit Category" : "Add Category"}</DialogTitle>
+            <DialogDescription>
+              {selectedCategory ? "Update the category details below." : "Enter the details for the new category."}
             </DialogDescription>
           </DialogHeader>
           <CategoryForm
@@ -241,59 +213,37 @@ export default function Settings() {
         </DialogContent>
       </Dialog>
 
-      {/* Location Form Modal */}
+      {/* Location Form Dialog */}
       <Dialog open={isLocationFormOpen} onOpenChange={setLocationFormOpen}>
-        <DialogContent
-          className="max-w-md w-full p-0"
-          aria-labelledby="location-dialog-title"
-          aria-describedby="location-dialog-description"
-        >
+        <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle id="location-dialog-title">
-              <VisuallyHidden>{editingLocation ? "Edit Location" : "Add Location"}</VisuallyHidden>
-            </DialogTitle>
-            <DialogDescription id="location-dialog-description">
-              <VisuallyHidden>
-                {editingLocation
-                  ? "Edit the details of the selected location."
-                  : "Fill in the details to add a new location."}
-              </VisuallyHidden>
+            <DialogTitle>{editingLocation ? "Edit Location" : "Add Location"}</DialogTitle>
+            <DialogDescription>
+              {editingLocation ? "Update the location details below." : "Enter the details for the new location."}
             </DialogDescription>
           </DialogHeader>
           <LocationForm
             _location={editingLocation}
-            onSuccess={async (locationData) => {
-              if (editingLocation) {
-                // Update existing location in Firestore
-                const locationRef = doc(db, 'locations', locationData.id);
-                await updateDoc(locationRef, { name: locationData.name });
-                setEditingLocation(undefined);
-              } else {
-                // Add new location to Firestore
-                await addDoc(collection(db, 'locations'), { name: locationData.name });
-              }
-              setLocationFormOpen(false);
-            }}
-            onCancel={() => {
-              setLocationFormOpen(false);
-              setEditingLocation(undefined);
-            }}
+            onSuccess={() => queryClient.invalidateQueries({ queryKey: ['locations'] })}
+            onCancel={() => setLocationFormOpen(false)}
           />
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog using AlertDialog */}
+      {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>Delete {itemToDelete?.type === 'category' ? 'Category' : 'Location'}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete this {itemToDelete?.type}. This action cannot be undone.
+              Are you sure you want to delete this {itemToDelete?.type}? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">Delete</AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

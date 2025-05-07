@@ -7,8 +7,8 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Category, Location } from '@shared/types';
-import { getCategories, getLocations } from '@/services/resources.service';
-import { useAuth } from './AuthContext';
+import { ResourcesService } from '/Users/antoniosmith/Projects/vite-aafairshare/src/services/resources.service';
+import { useAuth } from './NewAuthContext';
 
 interface ResourceContextType {
   categories: Category[];
@@ -50,7 +50,7 @@ export function ResourceProvider({ children }: { children: React.ReactNode }) {
     // Load categories
     setCategoriesLoading(true);
     try {
-      const fetchedCategories = await getCategories();
+      const fetchedCategories = await ResourcesService.getCategories();
       console.log(`[ResourceContext] Loaded ${fetchedCategories.length} categories`);
       setCategories(fetchedCategories);
     } catch (error) {
@@ -62,7 +62,7 @@ export function ResourceProvider({ children }: { children: React.ReactNode }) {
     // Load locations
     setLocationsLoading(true);
     try {
-      const fetchedLocations = await getLocations();
+      const fetchedLocations = await ResourcesService.getLocations();
       console.log(`[ResourceContext] Loaded ${fetchedLocations.length} locations`);
       setLocations(fetchedLocations);
     } catch (error) {

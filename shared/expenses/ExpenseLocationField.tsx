@@ -9,7 +9,7 @@ import { Control } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combobox';
 import { Location, Expense } from '@shared/types';
-import { createLocation } from '@/services/resources.service';
+import { ResourcesService } from '/Users/antoniosmith/Projects/vite-aafairshare/src/services/resources.service';
 import { useToast } from '@/hooks/use-toast';
 
 interface ExpenseLocationFieldProps {
@@ -42,8 +42,8 @@ const ExpenseLocationField: React.FC<ExpenseLocationFieldProps> = ({
       // Capitalize first letter of the name
       const capitalizedName = trimmedName.charAt(0).toUpperCase() + trimmedName.slice(1);
       
-      // Create the location
-      await createLocation({ name: capitalizedName });
+      // Create the location using Supabase-based ResourcesService
+      await ResourcesService.createLocation(capitalizedName);
       
       // Show success toast
       toast({

@@ -12,17 +12,11 @@ import {
   User, 
   UUID, 
   ISODateString,
-  validatePositiveNumber
 } from "@shared/types";
-import { formatCurrency, getCurrentMonth, normalizeToDate } from "@/lib/utils";
-// Using LazyMonthSelector instead of MonthSelector
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { useResources } from "@/contexts/ResourceContext";
-import { useUsers } from "@/contexts/UserContext";
-import { deleteExpense } from "@/services/expenses.service";
-import { db } from "@/lib/firebase";
-import { collection, query, where, getDocs, limit } from "firebase/firestore";
+import { SupabaseService, transformSettlement, transformExpense } from '@/services/supabase.service';
+import type { Tables } from '@/services/supabase.service';
 import {
   Dialog,
   DialogContent,
@@ -31,13 +25,29 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
-import { FirebaseError } from 'firebase/app';
+import { supabase } from '../config/supabase';
 
 type ExportFormat = 'csv' | 'pdf';
 
 // Helper to normalize splitType
 function getSplitType(expense: ExpenseWithDetails) {
   return expense.splitType || '50/50';
+}
+
+// Helper to get current month in YYYY-MM format
+function getCurrentMonth(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  return `${year}-${month}`;
+}
+
+// Helper to format currency
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP'
+  }).format(amount);
 }
 
 export default function Dashboard() {
@@ -67,12 +77,17 @@ export default function Dashboard() {
   const { toast } = useToast();
   // Get global data and loading states from AuthContext
   const {
-    currentUser,
+    user,
     allUsers,
     loading: authLoading
   } = useAuth();
-  const { categories: resourceCategories, locations: resourceLocations, categoriesLoading, locationsLoading } = useResources();
-  const { allUsers: userAllUsers, usersLoading: userUsersLoading } = useUsers();
+  // TODO: Replace with Supabase data fetching for categories, locations, and users
+  const resourceCategories: any[] = [];
+  const resourceLocations: any[] = [];
+  const categoriesLoading = false;
+  const locationsLoading = false;
+  const userAllUsers: any[] = allUsers || [];
+  const userUsersLoading = false;
 
   // Check data loading status but don't block rendering
   const dataIsLoading = Boolean(authLoading) || Boolean(userUsersLoading) || Boolean(categoriesLoading) || Boolean(locationsLoading);
@@ -88,26 +103,26 @@ export default function Dashboard() {
     console.log('[Dashboard] Initial users from allUsers:', users.map(u => ({ id: u.id, email: u.email })));
     
     // Add current user if missing
-    if (currentUser && !users.some(u => u.id === currentUser.uid)) {
+    if (user && !users.some(u => u.id === user.uid)) {
       console.log('[Dashboard] Adding current user to safeUsers array - was missing');
       const now = new Date().toISOString() as ISODateString;
       users.push({
-        id: currentUser.uid as UUID,
-        uid: currentUser.uid,
-        email: currentUser.email || '',
-        username: currentUser.username || currentUser.email?.split('@')[0] || 'Current User',
-        photoURL: currentUser.photoURL || null,
+        id: user.uid as UUID,
+        uid: user.uid,
+        email: user.email || '',
+        username: user.username || user.email?.split('@')[0] || 'Current User',
+        photoURL: user.photoURL || null,
         createdAt: now,
         updatedAt: now,
-        isAnonymous: currentUser.isAnonymous,
+        isAnonymous: user.isAnonymous,
       });
-    } else if (currentUser) {
+    } else if (user) {
       console.log('[Dashboard] Current user already exists in allUsers');
     }
     
     console.log('[Dashboard] Final safeUsers array:', users.map(u => ({ id: u.id, email: u.email })));
     return users as User[];
-  }, [userAllUsers, currentUser]);
+  }, [userAllUsers, user]);
   
   const safeCategories = useMemo(() => {
     const result = Array.isArray(resourceCategories) ? resourceCategories : [];
@@ -140,153 +155,54 @@ export default function Dashboard() {
 
   // --- Fetch Expenses using React Query - IMPROVED ---
   const fetchExpenses = useCallback(async (month: string): Promise<ExpenseWithDetails[]> => {
-    console.log("🔥 Dashboard: Fetching expenses for month:", month);
-    
-    // Check if user is authenticated first
-    if (!currentUser) {
+    if (!user) {
       console.warn("No authenticated user, returning empty expenses");
       return [];
     }
-    
     try {
-      // Fetch data from Firestore directly if auth is good but users might not be loaded yet
-      const expensesCol = collection(db, "expenses");
-      const expensesQuery = query(expensesCol, where("month", "==", month));
-      const snapshot = await getDocs(expensesQuery);
-      console.log(`📊 Dashboard: Retrieved ${snapshot.docs.length} expenses for month: ${month}`);
-      
-      if (snapshot.empty) {
+      // Fetch expenses from Supabase
+      const expenses = await SupabaseService.get('expenses', { eq: { month }, order: { column: 'date', ascending: false } });
+      // If error, return empty array
+      if (!Array.isArray(expenses) || expenses.length === 0) return [];
+      if (typeof expenses[0] === 'object' && 'error' in expenses[0]) {
+        console.error('SupabaseService.get returned error:', expenses[0]);
         return [];
       }
-
-      // Check if we have enough user data
-      const expenseUserIds = new Set(snapshot.docs.map(doc => doc.data().paidById));
-      console.log(`Dashboard: Found ${expenseUserIds.size} unique user IDs in expenses`);
-      
-      // Create maps for efficient lookups with better error handling
-      let categoryMap = new Map();
-      let locationMap = new Map();
-      let userMap = new Map();
-      
-      // Only create maps if data is available
-      if (Array.isArray(safeCategories) && safeCategories.length > 0) {
-        categoryMap = new Map(safeCategories.map(c => [c.id, c]));
-        console.log(`[Dashboard] Created categoryMap with ${categoryMap.size} categories`);
-        if (categoryMap.size > 0) {
-          // Log a sample category from the map to confirm structure
-          const sampleCatId = safeCategories[0].id;
-          console.log(`[Dashboard] Sample category (${sampleCatId}):`, categoryMap.get(sampleCatId));
-        }
-      } else {
-        console.warn(`[Dashboard] No categories available to map - safeCategories length: ${safeCategories?.length}`);
-      }
-      
-      if (Array.isArray(safeLocations) && safeLocations.length > 0) {
-        locationMap = new Map(safeLocations.map(l => [l.id, l]));
-        console.log(`[Dashboard] Created locationMap with ${locationMap.size} locations`);
-        if (locationMap.size > 0) {
-          // Log a sample location from the map to confirm structure
-          const sampleLocId = safeLocations[0].id;
-          console.log(`[Dashboard] Sample location (${sampleLocId}):`, locationMap.get(sampleLocId));
-        }
-      } else {
-        console.warn(`[Dashboard] No locations available to map - safeLocations length: ${safeLocations?.length}`);
-      }
-      
-      // Check if we need to fetch users directly 
-      if (Array.isArray(safeUsers) && safeUsers.length > 0) {
-        userMap = new Map(safeUsers.map(u => [u.id, u]));
-        console.log(`Dashboard: Using ${userMap.size} users from safeUsers`);
-        
-        // Check if we're missing any users
-        const missingUserIds = Array.from(expenseUserIds).filter(id => !userMap.has(id as string));
-        if (missingUserIds.length > 0) {
-          console.warn(`Dashboard: Missing ${missingUserIds.length} users in safeUsers:`, missingUserIds);
-        }
-      } else {
-        console.warn("Dashboard: No users available in safeUsers");
-      }
-
-      // Continue with processing expenses
-      const resolvedExpenses = snapshot.docs.map((expenseDoc): ExpenseWithDetails => {
-        const expenseData = expenseDoc.data();
-        const category = categoryMap.get(expenseData.categoryId) || 
-                         { id: expenseData.categoryId, name: 'Unknown Category', color: '#888888' };
-        const location = locationMap.get(expenseData.locationId) || 
-                         { id: expenseData.locationId, name: 'Unknown Location' };
-        
-        // Get user data from userMap
-        let user = userMap.get(expenseData.paidById);
-        
-        // Handle missing user more robustly
-        if (!user) {
-          console.warn(`Dashboard: User not found for expense ${expenseDoc.id}, paidById:`, expenseData.paidById);
-          const now = new Date().toISOString() as ISODateString;
-          user = {
-            id: expenseData.paidById,
-            uid: expenseData.paidById,
-            email: 'unknown@example.com',
-            username: 'Unknown User',
-            photoURL: null,
-            createdAt: now,
-            updatedAt: now,
-            isAnonymous: false,
+      // Only map if the first element has an 'id' property (expense row)
+      if (typeof expenses[0] === 'object' && 'id' in expenses[0]) {
+        return (expenses as unknown as Tables['expenses']['Row'][]).map(exp => {
+          const baseExpense = transformExpense(exp);
+          return {
+            ...baseExpense,
+            category: { 
+              id: exp.category_id ?? '', 
+              name: 'Unknown Category', 
+              icon: 'other', 
+              createdAt: exp.created_at 
+            },
+            location: { 
+              id: exp.location_id ?? '', 
+              name: 'Unknown Location' 
+            },
+            paidBy: {
+              id: exp.paid_by_id ?? '',
+              uid: exp.paid_by_id ?? '',
+              email: '',
+              username: '',
+              photoURL: null,
+              createdAt: exp.created_at,
+              updatedAt: exp.updated_at ?? exp.created_at,
+              isAnonymous: false
+            }
           };
-        }
-        
-        // Ensure we have a valid paidBy with username field
-        const paidBy = {
-          id: user.id,
-          uid: user.uid,
-          email: user.email || '',
-          username: user.username || 'Unknown User',
-          photoURL: user.photoURL,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
-          isAnonymous: user.isAnonymous,
-        };
-
-        // Process the expense data...
-        const dateObj = normalizeToDate(expenseData.date);
-        if (!dateObj) {
-          console.warn(`normalizeToDate: Invalid or missing date for expense ${expenseDoc.id}:`, expenseData.date);
-        }
-        const date = dateObj ? dateObj.toISOString() : '';
-        
-        // Ensure amount is a number
-        const amount = Number(expenseData.amount) || 0;
-
-        const expenseBase = {
-          id: expenseDoc.id as UUID,
-          amount: validatePositiveNumber(amount, 'amount'),
-          description: expenseData.description || "",
-          date,
-          paidById: expenseData.paidById,
-          splitType: expenseData.splitType || "50/50",
-          categoryId: expenseData.categoryId,
-          locationId: expenseData.locationId,
-          month: expenseData.month,
-          createdAt: expenseData.createdAt?.toDate() || new Date(),
-          updatedAt: expenseData.updatedAt?.toDate(),
-          splitBetweenIds: expenseData.splitBetweenIds || []
-        };
-        return { ...expenseBase, category, location, paidBy };
-      });
-
-      resolvedExpenses.sort((a, b) => {
-        const isDate = (d: unknown): d is Date => d instanceof Date;
-        const aTime = isDate(a.date) && !isNaN(a.date.getTime()) ? a.date.getTime() : 0;
-        const bTime = isDate(b.date) && !isNaN(b.date.getTime()) ? b.date.getTime() : 0;
-        return bTime - aTime;
-      });
-      console.log("✅ Dashboard: Resolved expenses:", resolvedExpenses.length);
-      
-      return resolvedExpenses;
+        });
+      }
+      return [];
     } catch (error) {
       console.error("Error in fetchExpenses:", error);
-      throw error; // Let React Query handle the error
+      return [];
     }
-  }, [currentUser, safeCategories, safeLocations, safeUsers]);
+  }, [user]);
 
   const {
     data: expensesData, // Rename data to avoid conflict
@@ -297,7 +213,7 @@ export default function Dashboard() {
     queryKey: ['expenses', currentMonth], // Query key includes the month
     queryFn: () => fetchExpenses(currentMonth),
     // Simplified dependency - only require user authentication
-    enabled: !!currentUser,
+    enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes of inactivity
     retry: 3, // Add retry logic
@@ -326,7 +242,7 @@ export default function Dashboard() {
   // --- Calculate Summary - OPTIMIZED ---
   // Basic user information first
   const { user1, user1Id, user1Name, user2Data, user2Id, user2Name } = useMemo(() => {
-    if (!currentUser || !safeUsers.length) {
+    if (!user || !safeUsers.length) {
       return { 
         user1: null, 
         user1Id: undefined, 
@@ -338,8 +254,8 @@ export default function Dashboard() {
     }
     
     // Line 319-320: Add type annotation to parameter 'u'
-    const u1 = safeUsers.find((u: User) => u.id === currentUser.uid) || null;
-    const u2 = safeUsers.find((u: User) => u.id !== currentUser.uid) || null;
+    const u1 = safeUsers.find((u: User) => u.id === user.uid) || null;
+    const u2 = safeUsers.find((u: User) => u.id !== user.uid) || null;
     
     return {
       user1: u1,
@@ -349,7 +265,7 @@ export default function Dashboard() {
       user2Id: u2?.id, 
       user2Name: u2?.username
     };
-  }, [currentUser, safeUsers]);
+  }, [user, safeUsers]);
 
   // Then calculate summary based on expenses
   const calculatedSummary = useMemo(() => {
@@ -428,65 +344,27 @@ export default function Dashboard() {
     } as MonthSummary;
   }, [expenses, user1Id, user2Id, currentMonth]);
 
-  // --- Fetch Settlement Status - IMPROVED ASYNC HANDLING ---
+  // --- Fetch Settlement Status - SUPABASE VERSION ---
   useEffect(() => {
-    if (!currentUser) return;
-    
     setSettlementLoading(true);
-    
-    let isMounted = true;
-    
-    const fetchSettlementStatus = async () => {
+    async function fetchSettlementStatus() {
       try {
-        const settlementsCol = collection(db, "settlements");
-        const q = query(settlementsCol, where("month", "==", currentMonth), limit(1));
-        
-        const snapshot = await getDocs(q);
-        
-        if (isMounted) {
-          const isSettled = !snapshot.empty;
-          console.log(`Settlement status for ${currentMonth}: ${isSettled ? 'Settled' : 'Not Settled'}`);
-          setIsCurrentMonthSettled(isSettled);
-          setSettlementLoading(false);
-        }
-      } catch (error: unknown) {
-        console.error("Error fetching settlement status:", error);
-        
-        if (isMounted) {
-          if (error instanceof FirebaseError) {
-            const errorCode = error.code;
-            const errorMessage = errorCode === 'permission-denied' 
-              ? "Permission denied fetching settlement status (expected during development)" 
-              : "Could not check settlement status";
-            if (errorCode !== 'permission-denied') {
-              toast({ 
-                title: "Error", 
-                description: errorMessage,
-                variant: "destructive" 
-              });
-            }
-          } else {
-            toast({
-              title: "Error",
-              description: "An unknown error occurred while checking settlement status.",
-              variant: "destructive"
-            });
-          }
-          setIsCurrentMonthSettled(false);
-          setSettlementLoading(false);
-        }
+        const settlements = await SupabaseService.get('settlements', { eq: { month: currentMonth, status: 'COMPLETED' } });
+        const completedSettlements = Array.isArray(settlements)
+          ? settlements.filter(row => typeof row === 'object' && row !== null && !('error' in row)).map(transformSettlement)
+          : [];
+        const isSettled = completedSettlements.length > 0;
+        setIsCurrentMonthSettled(isSettled);
+        setSettlementLoading(false);
+      } catch (error) {
+        console.error('Error fetching settlement status:', error);
+        setIsCurrentMonthSettled(false);
+        setSettlementLoading(false);
       }
-    };
-    
+    }
     fetchSettlementStatus();
-    
-    return () => {
-      isMounted = false;
-    };
-  }, [currentMonth, currentUser, toast]);
+  }, [currentMonth]);
 
-
-  
   const handleEditExpense = useCallback((expense: ExpenseWithDetails) => { 
     setSelectedExpense(expense); 
     setIsExpenseFormOpen(true); 
@@ -524,7 +402,7 @@ export default function Dashboard() {
   }, [isExportMenuOpen]);
   
   const handleExport = useCallback(async (format: ExportFormat) => {
-    if (!calculatedSummary || expensesLoading || !currentUser) { 
+    if (!calculatedSummary || expensesLoading || !user) { 
       toast({ title: "Data Not Ready", description: "Please wait for data to load." }); 
       return; 
     }
@@ -550,11 +428,11 @@ export default function Dashboard() {
         variant: "destructive" 
       }); 
     }
-  }, [calculatedSummary, expensesLoading, currentMonth, expensesData, allUsers, toast, currentUser]);
+  }, [calculatedSummary, expensesLoading, currentMonth, expensesData, allUsers, toast, user]);
   
   const handleDeleteExpense = useCallback(async (expense: ExpenseWithDetails) => {
     try {
-      await deleteExpense(expense.id);
+      await SupabaseService.delete('expenses', expense.id);
       toast({ title: "Expense deleted", description: "The expense has been removed successfully." });
       refetchExpenses();
     } catch (error) {
@@ -604,18 +482,18 @@ export default function Dashboard() {
 
   // Add debug logs for currentUser and users when they change
   useEffect(() => {
-    if (currentUser) {
+    if (user) {
       console.log('[Dashboard] currentUser:', { 
-        id: currentUser.id, 
-        uid: currentUser.uid,
-        email: currentUser.email 
+        id: user.id, 
+        uid: user.uid,
+        email: user.email 
       });
     } else {
       console.log('[Dashboard] currentUser is null');
     }
     
     console.log('[Dashboard] allUsers:', allUsers ? `${allUsers.length} users found` : 'none');
-  }, [currentUser, allUsers]);
+  }, [user, allUsers]);
   
   // Add debug for expenses and user relationships
   useEffect(() => {
@@ -635,6 +513,20 @@ export default function Dashboard() {
       }
     }
   }, [expenses, safeUsers]);
+
+  useEffect(() => {
+    const subscription = supabase
+      .channel('expenses_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'expenses' }, () => {
+        // Refetch expenses on any change
+        refetchExpenses();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [refetchExpenses]);
 
   return (
     <>
@@ -768,6 +660,3 @@ export default function Dashboard() {
     </>
   );
 }
-
-// Remove the commented-out code at the end of the file that references non-existent variables
-// Delete lines 738-760 that contain the commented-out code with fetchExpenses and currentMonth references

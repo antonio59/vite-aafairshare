@@ -16,7 +16,9 @@ export interface Database {
           username: string | null
           photo_url: string | null
           created_at: string
-          provider: string | null
+          uid: string | null
+          is_anonymous: boolean | null
+          updated_at: string | null
         }
         Insert: {
           id?: string
@@ -24,7 +26,9 @@ export interface Database {
           username?: string | null
           photo_url?: string | null
           created_at?: string
-          provider?: string | null
+          uid?: string | null
+          is_anonymous?: boolean | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
@@ -32,7 +36,9 @@ export interface Database {
           username?: string | null
           photo_url?: string | null
           created_at?: string
-          provider?: string | null
+          uid?: string | null
+          is_anonymous?: boolean | null
+          updated_at?: string | null
         }
       }
       categories: {
@@ -41,117 +47,108 @@ export interface Database {
           name: string
           color: string | null
           icon: string | null
-          created_at: string
         }
         Insert: {
           id?: string
           name: string
           color?: string | null
           icon?: string | null
-          created_at?: string
         }
         Update: {
           id?: string
           name?: string
           color?: string | null
           icon?: string | null
-          created_at?: string
         }
       }
       locations: {
         Row: {
           id: string
           name: string
-          address: string | null
-          created_at: string
         }
         Insert: {
           id?: string
           name: string
-          address?: string | null
-          created_at?: string
         }
         Update: {
           id?: string
           name?: string
-          address?: string | null
-          created_at?: string
         }
       }
       expenses: {
         Row: {
           id: string
           amount: number
-          description: string | null
-          date: string
-          paid_by: string
           category_id: string | null
-          location_id: string | null
           created_at: string
-          updated_at: string
-          participants: Json | null
-          notes: string | null
-          month: string // YYYY-MM format
+          date: string
+          description: string | null
+          location_id: string | null
+          month: string
+          paid_by_id: string | null
+          split_type: string | null
+          updated_at: string | null
         }
         Insert: {
           id?: string
           amount: number
-          description?: string | null
-          date: string
-          paid_by: string
           category_id?: string | null
-          location_id?: string | null
           created_at?: string
-          updated_at?: string
-          participants?: Json | null
-          notes?: string | null
-          month: string // YYYY-MM format
+          date: string
+          description?: string | null
+          location_id?: string | null
+          month: string
+          paid_by_id?: string | null
+          split_type?: string | null
+          updated_at?: string | null
         }
         Update: {
           id?: string
           amount?: number
-          description?: string | null
-          date?: string
-          paid_by?: string
           category_id?: string | null
-          location_id?: string | null
           created_at?: string
-          updated_at?: string
-          participants?: Json | null
-          notes?: string | null
-          month?: string // YYYY-MM format
+          date?: string
+          description?: string | null
+          location_id?: string | null
+          month?: string
+          paid_by_id?: string | null
+          split_type?: string | null
+          updated_at?: string | null
         }
       }
       settlements: {
         Row: {
           id: string
-          from_user_id: string
-          to_user_id: string
           amount: number
+          created_at: string | null
           date: string
-          status: string
-          created_at: string
-          month: string // YYYY-MM format
+          from_user_id: string | null
+          month: string
+          notes: string | null
+          recorded_by: string | null
+          to_user_id: string | null
         }
         Insert: {
           id?: string
-          from_user_id: string
-          to_user_id: string
           amount: number
+          created_at?: string | null
           date: string
-          status: string
-          created_at?: string
-          month: string // YYYY-MM format
+          from_user_id?: string | null
+          month: string
+          notes?: string | null
+          recorded_by?: string | null
+          to_user_id?: string | null
         }
         Update: {
           id?: string
-          from_user_id?: string
-          to_user_id?: string
           amount?: number
+          created_at?: string | null
           date?: string
-          status?: string
-          created_at?: string
-          month?: string // YYYY-MM format
+          from_user_id?: string | null
+          month?: string
+          notes?: string | null
+          recorded_by?: string | null
+          to_user_id?: string | null
         }
       }
       recurring: {
@@ -190,5 +187,8 @@ export interface Database {
         }
       }
     }
+    Views: unknown,
+    Functions: unknown,
+    Enums: unknown
   }
 } 

@@ -8,12 +8,12 @@ import {
   ISODateString, 
   Expense, 
   Settlement,
-  ExpenseSplitType,
   ExpenseWithDetails,
   SettlementWithUsers
 } from '@shared/types';
 
-type Tables = Database['public']['Tables'];
+export type Tables = Database['public']['Tables'];
+export type Enums = Database['public']['Enums'];
 
 // Users
 export async function getUsers(): Promise<User[]> {
@@ -161,8 +161,8 @@ export async function createExpense(expense: Omit<Expense, 'id' | 'createdAt' | 
       paid_by: expense.paidById,
       category_id: expense.categoryId,
       location_id: expense.locationId,
-      participants: expense.splitBetweenIds,
       month: expense.month,
+      split_type: expense.splitType,
       created_at: now,
       updated_at: now
     })
@@ -183,8 +183,8 @@ export async function updateExpense(id: string, expense: Partial<Expense>): Prom
       paid_by: expense.paidById,
       category_id: expense.categoryId,
       location_id: expense.locationId,
-      participants: expense.splitBetweenIds,
       month: expense.month,
+      split_type: expense.splitType,
       updated_at: new Date().toISOString()
     })
     .eq('id', id);
@@ -309,50 +309,151 @@ function transformLocation(row: Tables['locations']['Row']): Location {
   };
 }
 
+// Expense transformer for Supabase schema (maps to camelCase for app use)
 function transformExpense(row: Tables['expenses']['Row']): Expense {
   return {
-    id: row.id as UUID,
+    id: row.id,
     amount: row.amount,
-    description: row.description || '',
-    categoryId: row.category_id as UUID,
-    locationId: row.location_id as UUID,
-    paidById: row.paid_by as UUID,
-    splitBetweenIds: (row.participants as UUID[]) || [],
-    splitType: '50/50' as ExpenseSplitType, // Default to 50/50 split
+    categoryId: row.category_id ?? '',
+    createdAt: row.created_at,
+    date: row.date,
+    description: row.description ?? '',
+    locationId: row.location_id ?? '',
     month: row.month,
-    date: row.date as ISODateString,
-    createdAt: row.created_at as ISODateString,
-    updatedAt: row.updated_at as ISODateString
+    paidById: row.paid_by_id ?? '',
+    splitType: (row.split_type === '50/50' || row.split_type === '100%') ? row.split_type : '50/50',
+    updatedAt: row.updated_at ?? ''
   };
 }
 
 function transformExpenseWithDetails(row: any): ExpenseWithDetails {
   return {
     ...transformExpense(row),
-    category: transformCategory(row.category),
-    location: transformLocation(row.location),
-    paidBy: transformUser(row.paidBy)
+    // You may want to join and map category/location/paidBy details here if needed
+    category: row.category ?? undefined,
+    location: row.location ?? undefined,
+    paidBy: row.paid_by ?? undefined
   };
 }
 
+// Settlement transformer for Supabase schema (maps to camelCase for app use)
 function transformSettlement(row: Tables['settlements']['Row']): Settlement {
   return {
-    id: row.id as UUID,
-    fromUserId: row.from_user_id as UUID,
-    toUserId: row.to_user_id as UUID,
+    id: row.id,
     amount: row.amount,
-    status: row.status as 'PENDING' | 'COMPLETED' | 'CANCELLED',
+    createdAt: row.created_at ?? '',
+    date: row.date,
+    fromUserId: row.from_user_id ?? '',
     month: row.month,
-    date: row.date as ISODateString,
-    createdAt: row.created_at as ISODateString,
-    updatedAt: row.created_at as ISODateString // Use created_at as updated_at since we don't track updates
+    notes: row.notes ?? '',
+    recordedBy: row.recorded_by ?? '',
+    toUserId: row.to_user_id ?? '',
+    status: (row as any).status ?? 'PENDING',
+    updatedAt: (row as any).updated_at ?? ''
   };
 }
 
 function transformSettlementWithUsers(row: any): SettlementWithUsers {
   return {
     ...transformSettlement(row),
-    fromUser: transformUser(row.fromUser),
-    toUser: transformUser(row.toUser)
+    fromUser: row.from_user ?? undefined,
+    toUser: row.to_user ?? undefined
   };
-} 
+}
+
+export class SupabaseService {
+  static async get<T extends keyof Tables>(
+    table: T,
+    query?: {
+      select?: string
+      eq?: { [key: string]: any }
+      order?: { column: string; ascending?: boolean }
+      limit?: number
+    }
+  ) {
+    let queryBuilder = supabase.from(table).select(query?.select || '*')
+
+    if (query?.eq) {
+      Object.entries(query.eq).forEach(([key, value]) => {
+        queryBuilder = queryBuilder.eq(key, value)
+      })
+    }
+
+    if (query?.order) {
+      queryBuilder = queryBuilder.order(query.order.column, {
+        ascending: query.order.ascending ?? true
+      })
+    }
+
+    if (query?.limit) {
+      queryBuilder = queryBuilder.limit(query.limit)
+    }
+
+    const { data, error } = await queryBuilder
+
+    if (error) throw error
+    return data
+  }
+
+  static async create<T extends keyof Tables>(
+    table: T,
+    data: Tables[T]['Insert']
+  ) {
+    const { data: result, error } = await supabase
+      .from(table)
+      .insert(data)
+      .select()
+      .single()
+
+    if (error) throw error
+    return result
+  }
+
+  static async update<T extends keyof Tables>(
+    table: T,
+    id: string,
+    data: Partial<Tables[T]['Update']>
+  ) {
+    const { data: result, error } = await supabase
+      .from(table)
+      .update(data)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error) throw error
+    return result
+  }
+
+  static async delete<T extends keyof Tables>(table: T, id: string) {
+    const { error } = await supabase.from(table).delete().eq('id', id)
+
+    if (error) throw error
+  }
+
+  static async subscribe<T extends keyof Tables>(
+    table: T,
+    callback: (_payload: {
+      new: Tables[T]['Row'] | null
+      old: Tables[T]['Row'] | null
+      eventType: 'INSERT' | 'UPDATE' | 'DELETE'
+    }) => void
+  ) {
+    return supabase
+      .channel(`${table}-changes`)
+      .on(
+        'postgres_changes' as any, // Type workaround for Supabase client
+        {
+          event: '*',
+          schema: 'public',
+          table: table as string
+        },
+        callback
+      )
+      .subscribe()
+  }
+}
+
+export default SupabaseService
+
+export { transformUser, transformCategory, transformLocation, transformExpense, transformSettlement }; 

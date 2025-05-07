@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Category, Location, ExpenseWithDetails, User } from "@shared/types";
+import { Category, Location, ExpenseWithDetails, User, ExpenseSplitType } from "@shared/types";
 import { z } from "zod";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { db } from "@/lib/firebase";
-import { collection, addDoc, updateDoc, doc, serverTimestamp, getDocs } from "firebase/firestore";
+import { ExpensesService } from "@/services/expenses.service";
+import { ResourcesService } from "@/services/resources.service";
 import { queryClient } from "@/lib/queryClient";
 import { CATEGORY_ICONS } from "@/lib/constants";
 import type { CategoryIconName } from "@shared/types";
@@ -17,8 +17,13 @@ import { DatePicker } from "@/components/ui/react-datepicker";
 import { Combobox } from "@/components/ui/combobox";
 import type { ComboboxItem } from "@/components/ui/combobox";
 import { getMonthFromDate, cn, normalizeToDate } from "@/lib/utils";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/NewAuthContext";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+
+// Extended ExpenseWithDetails type to include splitBetweenIds
+interface ExtendedExpenseWithDetails extends ExpenseWithDetails {
+  splitBetweenIds?: string[];
+}
 
 // --- Zod Schema (Adjust if needed based on new inputs) ---
 const formSchema = z.object({
@@ -35,7 +40,7 @@ export type ExpenseFormData = z.infer<typeof formSchema>;
 
 // --- Component Props ---
 export interface ExpenseFormProps {
-  expense?: ExpenseWithDetails;
+  expense?: ExtendedExpenseWithDetails;
   onClose: (_needsRefetch?: boolean) => void;
   categories?: Category[];  // Now optional since we'll fetch directly
   locations?: Location[];   // Now optional since we'll fetch directly
@@ -56,29 +61,21 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
   const formRef = useRef<HTMLFormElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Fetch data directly from Firestore if not provided via props
+  // Fetch data directly if not provided via props
   useEffect(() => {
     const fetchData = async () => {
       if ((propCategories?.length === 0 || propLocations?.length === 0) && !propsLoading) {
         setLoading(true);
         try {
           // Fetch categories directly
-          console.log("📥 ExpenseForm: Directly fetching categories from Firestore");
-          const categoriesSnapshot = await getDocs(collection(db, "categories"));
-          const categoriesData = categoriesSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as Category[];
+          console.log("📥 ExpenseForm: Directly fetching categories");
+          const categoriesData = await ResourcesService.getCategories();
           console.log(`✅ ExpenseForm: Directly fetched ${categoriesData.length} categories`);
           setCategories(categoriesData);
           
           // Fetch locations directly
-          console.log("📥 ExpenseForm: Directly fetching locations from Firestore");
-          const locationsSnapshot = await getDocs(collection(db, "locations"));
-          const locationsData = locationsSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-          })) as Location[];
+          console.log("📥 ExpenseForm: Directly fetching locations");
+          const locationsData = await ResourcesService.getLocations();
           console.log(`✅ ExpenseForm: Directly fetched ${locationsData.length} locations`);
           setLocations(locationsData);
           
@@ -187,18 +184,14 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
   // --- Start: Add Location Creation Logic ---
   const fetchLocations = async () => {
     try {
-      const locationsSnapshot = await getDocs(collection(db, "locations"));
-      const locationsData = locationsSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Location[];
+      const locationsData = await ResourcesService.getLocations();
       setLocations(locationsData);
       return locationsData;
     } catch (error) {
       console.error("Error fetching locations:", error);
       toast({
         title: "Error",
-        description: "Failed to load locations. Please try again.",
+        description: "Failed to refresh locations list. Please try again.",
         variant: "destructive"
       });
       return [];
@@ -206,86 +199,89 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
   };
 
   const handleCreateLocation = async (locationName: string) => {
-    const trimmedName = locationName.trim();
-    if (!trimmedName || isCreatingLocation) return;
-
-    // Capitalize first letter
-    const capitalizedName = trimmedName.charAt(0).toUpperCase() + trimmedName.slice(1);
-
+    if (!locationName.trim()) return;
+    
     setIsCreatingLocation(true);
     try {
-      const locationData = {
-        name: capitalizedName, // Use capitalized name
-        createdAt: serverTimestamp()
-      };
-
-      // Add to Firestore
-      const docRef = await addDoc(collection(db, "locations"), locationData);
-
-      toast({
-        title: "Location created",
-        description: `"${capitalizedName}" added.`
-      });
-
-      // Refetch locations and set the new one as selected
+      const newLocation = await ResourcesService.createLocation(locationName.trim());
+      
+      // Refresh locations list
       const updatedLocations = await fetchLocations();
-      form.setValue("locationId", docRef.id, { shouldValidate: true });
-      setLocations(updatedLocations);
-    } catch (error: unknown) {
-      console.error("Error creating location:", error);
-      const errorMessage = error instanceof Error ? error.message : "Could not add the new location.";
+      
+      // Set the new location as selected
+      form.setValue('locationId', newLocation.id);
+      
       toast({
-        title: "Error creating location",
-        description: errorMessage,
-        variant: "destructive",
+        title: "Success",
+        description: `Created new location: ${newLocation.name}`,
       });
+      
+      return updatedLocations;
+    } catch (error) {
+      console.error("Error creating location:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create new location. Please try again.",
+        variant: "destructive"
+      });
+      return null;
     } finally {
       setIsCreatingLocation(false);
     }
   };
-  // --- End: Add Location Creation Logic ---
 
-  // --- Submission Handler ---
   const onSubmit = async (data: ExpenseFormData) => {
     if (!currentUser) {
-      toast({ title: "Authentication Error", description: "User not logged in", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "You must be logged in to create expenses",
+        variant: "destructive"
+      });
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Map form data to domain model
       const expenseData = {
         amount: data.amount,
+        description: data.description || "",
         categoryId: data.categoryId,
         locationId: data.locationId,
-        splitType: data.splitType === "Owned" ? "100%" : "50/50", // Map to domain value
-        date: data.date.toISOString(), // Store as ISO string
-        description: data.description,
-        paidById: currentUser.uid,
+        paidById: currentUser.id,
+        splitType: data.splitType === "Owned" ? "100%" : "50/50" as ExpenseSplitType,
         month: getMonthFromDate(data.date),
-        splitBetweenIds: data.splitBetweenIds || [],
-        ...(expense?.id ? { updatedAt: serverTimestamp() } : { createdAt: serverTimestamp() }),
+        date: data.date.toISOString(),
+        splitBetweenIds: data.splitBetweenIds || []
       };
 
-      if (expense?.id) {
-        await updateDoc(doc(db, "expenses", expense.id), expenseData);
-        toast({ title: "Expense updated" });
+      if (expense) {
+        // Update existing expense
+        await ExpensesService.updateExpense(expense.id, expenseData);
+        toast({
+          title: "Success",
+          description: "Expense updated successfully",
+        });
       } else {
-        await addDoc(collection(db, "expenses"), expenseData);
-        toast({ title: "Expense added" });
+        // Create new expense
+        await ExpensesService.createExpense(expenseData);
+        toast({
+          title: "Success",
+          description: "Expense created successfully",
+        });
       }
 
-      // Invalidate queries
-      queryClient.invalidateQueries({ queryKey: [`expenses`, expenseData.month] });
-      queryClient.invalidateQueries({ queryKey: [`summary`, expenseData.month] });
-
-      onClose(true); // Close and indicate refetch needed
-
-    } catch (error: unknown) {
-      console.error("Error saving expense:", error);
-      const errorMessage = error instanceof Error ? error.message : "Please try again";
-      toast({ title: "Error saving expense", description: errorMessage, variant: "destructive" });
+      // Invalidate and refetch queries
+      await queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      
+      // Close the form
+      onClose(true);
+    } catch (error) {
+      console.error("Error submitting expense:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save expense. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }

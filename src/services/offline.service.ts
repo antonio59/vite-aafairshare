@@ -5,7 +5,7 @@
  * by tracking network status and managing offline operations.
  */
 
-import { queryClient } from './cache.service';
+import { queryClient } from '@/lib/queryClient';
 
 // Offline queue for pending operations
 interface OfflineOperation {

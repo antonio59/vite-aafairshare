@@ -1,9 +1,8 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, Users, BarChart2, Settings, LogOut } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/NewAuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
 
 import { SkipLink } from "@/components/SkipLink";
@@ -34,8 +33,8 @@ const navItems = [
 export default function MainLayout({ children }: MainLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { currentUser, loading } = useAuth();
   const { toast } = useToast();
+  const { currentUser, logout } = useAuth();
   const [isMobile] = useState(false);
 
   useEffect(() => {
@@ -52,15 +51,10 @@ export default function MainLayout({ children }: MainLayoutProps) {
   }, [isMobile]);
 
   useEffect(() => {
-    if (loading) return;
     if (!currentUser) {
       navigate('/login');
     }
-  }, [currentUser, loading, navigate]);
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  }, [currentUser, navigate]);
 
   if (!currentUser) {
     return null;
@@ -74,9 +68,8 @@ export default function MainLayout({ children }: MainLayoutProps) {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut();
+      await logout();
       toast({ title: "Logged Out", description: "You have been successfully logged out." });
-      // Navigate to login after logout
       navigate("/login");
     } catch (error: unknown) {
       console.error("Logout Error:", error);
@@ -85,7 +78,6 @@ export default function MainLayout({ children }: MainLayoutProps) {
   };
 
   const getInitials = (name?: string | null, email?: string | null): string => {
-    // ... (Keep existing getInitials function) ...
     if (name) {
       const names = name.split(' ');
       if (names.length > 1) return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();

@@ -4,9 +4,8 @@ import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-route
 import { QueryClientProvider as QueryCli } from "@tanstack/react-query";
 import { queryClient } from "./lib/queryClient";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthProvider, useAuth } from "./contexts/NewAuthContext";
 import { ResourceProvider } from "./contexts/ResourceContext";
-import { UserProvider } from "./contexts/UserContext";
 
 import MainLayout from "@/components/layouts/MainLayout";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -72,79 +71,77 @@ function App() {
 
         <AuthProvider>
           <ResourceProvider>
-            <UserProvider>
-              <MobileToastProvider>
-                <ErrorBoundary>
-                  <BrowserRouter>
-                    <Suspense fallback={<LoadingFallback />}>
-                      <Routes>
-                        {/* Public route */}
-                        <Route path="/login" element={<Login />} />
+            <MobileToastProvider>
+              <ErrorBoundary>
+                <BrowserRouter>
+                  <Suspense fallback={<LoadingFallback />}>
+                    <Routes>
+                      {/* Public route */}
+                      <Route path="/login" element={<Login />} />
 
-                        {/* Explicit redirect from root to dashboard */}
-                        <Route index element={<Navigate to="/dashboard" replace />} />
-                        
-                        {/* Protected Routes */}
-                        <Route
-                          path="/dashboard"
-                          element={
-                            <ProtectedRoute>
-                              <MainLayout>
-                                <Dashboard />
-                              </MainLayout>
-                            </ProtectedRoute>
-                          }
-                        />
-                        <Route
-                          path="/analytics"
-                          element={
-                            <ProtectedRoute>
-                              <MainLayout>
-                                <Analytics />
-                              </MainLayout>
-                            </ProtectedRoute>
-                          }
-                        />
-                        <Route
-                          path="/settlement"
-                          element={
-                            <ProtectedRoute>
-                              <MainLayout>
-                                <Settlement />
-                              </MainLayout>
-                            </ProtectedRoute>
-                          }
-                        />
-                        <Route
-                          path="/settings"
-                          element={
-                            <ProtectedRoute>
-                              <MainLayout>
-                                <Settings />
-                              </MainLayout>
-                            </ProtectedRoute>
-                          }
-                        />
+                      {/* Explicit redirect from root to dashboard */}
+                      <Route index element={<Navigate to="/dashboard" replace />} />
+                      
+                      {/* Protected Routes */}
+                      <Route
+                        path="/dashboard"
+                        element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <Dashboard />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/analytics"
+                        element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <Analytics />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/settlement"
+                        element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <Settlement />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/settings"
+                        element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <Settings />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        }
+                      />
 
-                        {/* Catch-all for 404 */}
-                        <Route
-                          path="*"
-                          element={
-                            <ProtectedRoute>
-                              <MainLayout>
-                                <NotFound />
-                              </MainLayout>
-                            </ProtectedRoute>
-                          }
-                        />
-                      </Routes>
-                    </Suspense>
-                    <SonnerToaster richColors closeButton />
-                    <LiveRegionAnnouncer />
-                  </BrowserRouter>
-                </ErrorBoundary>
-              </MobileToastProvider>
-            </UserProvider>
+                      {/* Catch-all for 404 */}
+                      <Route
+                        path="*"
+                        element={
+                          <ProtectedRoute>
+                            <MainLayout>
+                              <NotFound />
+                            </MainLayout>
+                          </ProtectedRoute>
+                        }
+                      />
+                    </Routes>
+                  </Suspense>
+                  <SonnerToaster richColors closeButton />
+                  <LiveRegionAnnouncer />
+                </BrowserRouter>
+              </ErrorBoundary>
+            </MobileToastProvider>
           </ResourceProvider>
         </AuthProvider>
 

@@ -9,14 +9,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/NewAuthContext";
 
 export default function Login() {
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const { toast } = useToast();
-  const { currentUser } = useAuth();
+  const { currentUser, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if already logged in
@@ -30,20 +28,8 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
     try {
-      const provider = new GoogleAuthProvider();
-      provider.addScope('email');
-      provider.addScope('profile');
-      provider.setCustomParameters({
-        prompt: 'select_account'
-      });
-
-      console.log("Starting Google popup authentication...");
-      const result = await signInWithPopup(auth, provider);
-      console.log("Popup authentication successful:", result.user.uid);
+      await signInWithGoogle();
       toast({ title: "Login Successful", description: "Welcome back!" });
-      
-      // Navigate to home page
-      navigate("/", { replace: true });
     } catch (error) {
       console.error("Google Authentication Error:", error);
       toast({

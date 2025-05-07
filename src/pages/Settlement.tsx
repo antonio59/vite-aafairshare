@@ -1,34 +1,21 @@
 import { useState, useEffect } from "react";
 import MonthSelector from "@/components/MonthSelector";
-// Removed unused SummaryCard import
-// import SummaryCard from "@/components/SummaryCard";
 import SettlementHistory from "@/components/SettlementHistory";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Import Avatar components
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Check, CalendarClock, X } from "lucide-react";
-import { Settlement as SettlementType, User, Expense, PositiveNumber } from "@shared/types"; // Import correct types
-import { getCurrentMonth, formatCurrency, getPreviousMonth, formatDate } from "@/lib/utils"; // Added formatDate
-// Removed format import from date-fns
+import { Settlement as SettlementType, User, Expense } from "@shared/types";
+import { getCurrentMonth, formatCurrency, getPreviousMonth, formatDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ResponsiveDialog } from "@/components/ui/responsive-dialog"; // Import ResponsiveDialog
-import { DialogFooter, DialogClose } from "@/components/ui/dialog"; // Import DialogFooter & DialogClose from base dialog
-// Removed unused AlertDialog imports
-import { useAuth } from "@/contexts/AuthContext"; // Fix import path
-import { db } from "@/lib/firebase"; // Import Firestore instance
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  deleteDoc,
-  doc,
-  Timestamp
-} from "firebase/firestore";
-import { toUUID, toISODateString } from "@shared/utils/typeGuards";
+import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
+import { DialogFooter, DialogClose } from "@/components/ui/dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { SupabaseService } from '@/services/supabase.service';
+import type { Tables } from '@/services/supabase.service';
+import { supabase } from '../config/supabase';
 
 // Define a specific type for the summary data needed on this page
 interface SettlementPageSummary {
@@ -37,207 +24,139 @@ interface SettlementPageSummary {
   userExpenses: Record<string, number>; // { userId: amount }
 }
 
-// Helper to coerce string | null | undefined to string | undefined
-const toOptionalString = (value: string | null | undefined): string | undefined => typeof value === 'string' ? value : undefined;
-
 export default function Settlement() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
-
-  // Always ensure currentMonth is valid
-  useEffect(() => {
-    if (!/^\d{4}-\d{2}$/.test(currentMonth)) {
-      setCurrentMonth(getCurrentMonth());
-    }
-  }, []);
   const setIsDialogOpen = useState(false)[1];
   const { toast } = useToast();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
 
-  // State for Firestore data
-  const [users, setUsers] = useState<User[]>([]);
-  const [usersLoading, setUsersLoading] = useState(true);
-  const [expenses, setExpenses] = useState<Expense[]>([]); // Need expenses for summary
-  const [expensesLoading, setExpensesLoading] = useState(true);
-  const [settlements, setSettlements] = useState<SettlementType[]>([]);
-  const [settlementsLoading, setSettlementsLoading] = useState(true);
-  // Use the new specific type for summary state
-  const [summary, setSummary] = useState<SettlementPageSummary | null>(null);
-  // Removed summaryLoading state, will derive from expensesLoading and usersLoading
-  const [previousMonthSettlements, setPreviousMonthSettlements] = useState<SettlementType[]>([]);
-  const [previousMonthSettlementsLoading, setPreviousMonthSettlementsLoading] = useState(true);
-  const [previousMonthExpenses, setPreviousMonthExpenses] = useState<Expense[]>([]);
-  const [previousMonthExpensesLoading, setPreviousMonthExpensesLoading] = useState(true);
-  const [isSettling, setIsSettling] = useState(false); // State for settlement in progress
+  // Fetch users from Supabase
+  const { data: users = [], isLoading: usersLoading } = useQuery<User[]>({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const data = await SupabaseService.get('users', { order: { column: 'username', ascending: true } });
+      if (!Array.isArray(data) || data.length === 0) return [];
+      if (typeof data[0] === 'object' && 'error' in data[0]) return [];
+      return (data as unknown as Tables['users']['Row'][]).map(row => ({
+        id: row.id,
+        email: row.email,
+        username: row.username ?? '',
+        photoURL: row.photo_url ?? null,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at ?? row.created_at,
+        isAnonymous: row.is_anonymous ?? false,
+        uid: row.id,
+      }));
+    }
+  });
 
+  // Fetch expenses for current month from Supabase
+  const { data: expenses = [], isLoading: expensesLoading } = useQuery<Expense[]>({
+    queryKey: ['expenses', currentMonth],
+    queryFn: async () => {
+      const data = await SupabaseService.get('expenses', { eq: { month: currentMonth }, order: { column: 'date', ascending: false } });
+      if (!Array.isArray(data) || data.length === 0) return [];
+      if (typeof data[0] === 'object' && 'error' in data[0]) return [];
+      return (data as unknown as Tables['expenses']['Row'][]).map(row => ({
+        id: row.id,
+        amount: row.amount,
+        description: row.description ?? '',
+        categoryId: row.category_id ?? '',
+        locationId: row.location_id ?? '',
+        paidById: row.paid_by_id ?? '',
+        splitType: row.split_type === '50/50' || row.split_type === '100%' ? row.split_type : '50/50',
+        month: row.month,
+        date: row.date,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at ?? row.created_at,
+      }));
+    }
+  });
 
-  // --- Firestore Listener for Users ---
-  useEffect(() => {
-    setUsersLoading(true);
-    const usersCol = collection(db, "users");
-    const unsubscribe = onSnapshot(usersCol, (snapshot) => {
-      const fetchedUsers = snapshot.docs.map(doc => ({
-        id: toUUID(doc.id), // Ensure UUID branded type
-        email: toOptionalString(doc.data().email),
-        username: toOptionalString(doc.data().username),
-        photoURL: toOptionalString(doc.data().photoURL), // Fetch photoURL
-      } as User));
-      setUsers(fetchedUsers);
-      setUsersLoading(false);
-    }, (error) => {
-      console.error("Error fetching users:", error);
-      toast({ title: "Error", description: "Could not load user data.", variant: "destructive" });
-      setUsersLoading(false);
-    });
-    return () => unsubscribe();
-  }, [toast]);
+  // Fetch settlements for current month from Supabase
+  const { data: settlements = [], isLoading: settlementsLoading, refetch: refetchSettlements } = useQuery<SettlementType[]>({
+    queryKey: ['settlements', currentMonth],
+    queryFn: async () => {
+      const data = await SupabaseService.get('settlements', { eq: { month: currentMonth }, order: { column: 'date', ascending: false } });
+      if (!Array.isArray(data) || data.length === 0) return [];
+      if (typeof data[0] === 'object' && 'error' in data[0]) return [];
+      return (data as unknown as Tables['settlements']['Row'][]).map(row => ({
+        id: row.id,
+        amount: row.amount,
+        date: row.date,
+        fromUserId: row.from_user_id ?? '',
+        toUserId: row.to_user_id ?? '',
+        notes: row.notes ?? '',
+        recordedBy: row.recorded_by ?? '',
+        status: (row as any).status ?? 'PENDING',
+        month: row.month,
+        createdAt: row.created_at ?? '',
+        updatedAt: (row as any).updated_at ?? row.created_at ?? '',
+        username: '',
+      }));
+    }
+  });
 
-  // --- Firestore Listener for Expenses (Current Month) ---
-  useEffect(() => {
-    if (!currentUser) return;
-    setExpensesLoading(true);
-    const expensesCol = collection(db, "expenses");
-    const q = query(expensesCol, where("month", "==", currentMonth), orderBy("date", "desc"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedExpenses = snapshot.docs.map(doc => {
-         const data = doc.data();
-         return {
-           id: toUUID(doc.id),
-           amount: data.amount as PositiveNumber, // Ensure PositiveNumber
-           description: data.description ?? '',
-           categoryId: toUUID(data.categoryId),
-           locationId: toUUID(data.locationId),
-           paidById: toUUID(data.paidById),
-           splitBetweenIds: Array.isArray(data.splitBetweenIds) ? data.splitBetweenIds.map(toUUID) : [],
-           splitType: data.splitType ?? '50/50',
-           month: data.month ?? '',
-           date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
-           createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
-           updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
-         } as Expense;
-      });
-      setExpenses(fetchedExpenses);
-      setExpensesLoading(false);
-    }, (error) => {
-      console.error("Error fetching current month expenses:", error);
-      toast({ title: "Error", description: "Could not load expenses.", variant: "destructive" });
-      setExpensesLoading(false);
-    });
-    return () => unsubscribe();
-  }, [currentMonth, currentUser, toast]);
-
-  // --- Firestore Listener for Settlements (Current Month) ---
-   useEffect(() => {
-     if (!currentUser) return;
-     setSettlementsLoading(true);
-     const settlementsCol = collection(db, "settlements");
-     const q = query(settlementsCol, where("month", "==", currentMonth));
-     const unsubscribe = onSnapshot(q, (snapshot) => {
-       const fetchedSettlements = snapshot.docs.map(doc => {
-         const data = doc.data();
-         return {
-           id: toUUID(doc.id),
-           amount: data.amount as PositiveNumber,
-           date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
-           fromUserId: toUUID(data.fromUserId),
-           toUserId: toUUID(data.toUserId),
-           notes: data.notes ?? '',
-           recordedBy: data.recordedBy ?? '',
-           status: toOptionalString(data.status),
-           month: data.month ?? '',
-           createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
-           updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
-           username: toOptionalString(data.username != null && typeof data.username === 'string' ? data.username : undefined),
-         } as SettlementType;
-       });
-       setSettlements(fetchedSettlements);
-       setSettlementsLoading(false);
-     }, (error) => {
-       console.error("Error fetching settlements:", error);
-       toast({ title: "Error", description: "Could not load settlements.", variant: "destructive" });
-       setSettlementsLoading(false);
-     });
-     return () => unsubscribe();
-   }, [currentMonth, currentUser, toast]);
-
-   // --- Firestore Listener for Previous Month Data ---
-   const previousMonth = getPreviousMonth(currentMonth);
-   useEffect(() => {
-     if (!currentUser || !previousMonth) return;
-
-     // Previous Month Settlements
-     setPreviousMonthSettlementsLoading(true);
-     const prevSettlementsCol = collection(db, "settlements");
-     const prevSettlementsQ = query(prevSettlementsCol, where("month", "==", previousMonth));
-     const unsubPrevSettlements = onSnapshot(prevSettlementsQ, (snapshot) => {
-       const fetched = snapshot.docs.map(doc => {
-         const data = doc.data();
-         return {
-           id: toUUID(doc.id),
-           amount: data.amount as PositiveNumber,
-           date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
-           fromUserId: toUUID(data.fromUserId),
-           toUserId: toUUID(data.toUserId),
-           notes: data.notes ?? '',
-           recordedBy: data.recordedBy ?? '',
-           status: toOptionalString(data.status),
-           month: data.month ?? '',
-           createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
-           updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
-           username: toOptionalString(data.username != null && typeof data.username === 'string' ? data.username : undefined),
-         } as SettlementType;
-       });
-       setPreviousMonthSettlements(fetched);
-       setPreviousMonthSettlementsLoading(false);
-     }, (error) => {
-       console.error("Error fetching previous month settlements:", error);
-       setPreviousMonthSettlementsLoading(false);
-     });
-
-     // Previous Month Expenses
-     setPreviousMonthExpensesLoading(true);
-     const prevExpensesCol = collection(db, "expenses");
-     const prevExpensesQ = query(prevExpensesCol, where("month", "==", previousMonth));
-     const unsubPrevExpenses = onSnapshot(prevExpensesQ, (snapshot) => {
-         const fetched = snapshot.docs.map(doc => {
-           const data = doc.data();
-           return {
-             id: toUUID(doc.id),
-             amount: data.amount as PositiveNumber,
-             description: data.description ?? '',
-             categoryId: toUUID(data.categoryId),
-             locationId: toUUID(data.locationId),
-             paidById: toUUID(data.paidById),
-             splitBetweenIds: Array.isArray(data.splitBetweenIds) ? data.splitBetweenIds.map(toUUID) : [],
-             splitType: data.splitType ?? '50/50',
-             month: data.month ?? '',
-             date: toISODateString((data.date as Timestamp)?.toDate ? (data.date as Timestamp).toDate().toISOString() : new Date().toISOString()),
-             createdAt: toISODateString(data.createdAt ? (data.createdAt as Timestamp)?.toDate?.() ? (data.createdAt as Timestamp).toDate().toISOString() : data.createdAt : new Date().toISOString()),
-             updatedAt: toISODateString(data.updatedAt ? (data.updatedAt as Timestamp)?.toDate?.() ? (data.updatedAt as Timestamp).toDate().toISOString() : data.updatedAt : new Date().toISOString()),
-           } as Expense;
-         });
-         setPreviousMonthExpenses(fetched);
-         setPreviousMonthExpensesLoading(false);
-     }, (error) => {
-         console.error("Error fetching previous month expenses:", error);
-         setPreviousMonthExpensesLoading(false);
-     });
-
-
-     return () => {
-       unsubPrevSettlements();
-       unsubPrevExpenses();
-     };
-   }, [previousMonth, currentUser, toast]);
-
+  // Fetch previous month settlements and expenses
+  const previousMonth = getPreviousMonth(currentMonth);
+  const { data: previousMonthSettlements = [], isLoading: previousMonthSettlementsLoading } = useQuery<SettlementType[]>({
+    queryKey: ['settlements', previousMonth],
+    queryFn: async () => {
+      if (!previousMonth) return [];
+      const data = await SupabaseService.get('settlements', { eq: { month: previousMonth }, order: { column: 'date', ascending: false } });
+      if (!Array.isArray(data) || data.length === 0) return [];
+      if (typeof data[0] === 'object' && 'error' in data[0]) return [];
+      return (data as unknown as Tables['settlements']['Row'][]).map(row => ({
+        id: row.id,
+        amount: row.amount,
+        date: row.date,
+        fromUserId: row.from_user_id ?? '',
+        toUserId: row.to_user_id ?? '',
+        notes: row.notes ?? '',
+        recordedBy: row.recorded_by ?? '',
+        status: (row as any).status ?? 'PENDING',
+        month: row.month,
+        createdAt: row.created_at ?? '',
+        updatedAt: (row as any).updated_at ?? row.created_at ?? '',
+        username: '',
+      }));
+    }
+  });
+  const { data: previousMonthExpenses = [], isLoading: previousMonthExpensesLoading } = useQuery<Expense[]>({
+    queryKey: ['expenses', previousMonth],
+    queryFn: async () => {
+      if (!previousMonth) return [];
+      const data = await SupabaseService.get('expenses', { eq: { month: previousMonth }, order: { column: 'date', ascending: false } });
+      if (!Array.isArray(data) || data.length === 0) return [];
+      if (typeof data[0] === 'object' && 'error' in data[0]) return [];
+      return (data as unknown as Tables['expenses']['Row'][]).map(row => ({
+        id: row.id,
+        amount: row.amount,
+        description: row.description ?? '',
+        categoryId: row.category_id ?? '',
+        locationId: row.location_id ?? '',
+        paidById: row.paid_by_id ?? '',
+        splitType: row.split_type === '50/50' || row.split_type === '100%' ? row.split_type : '50/50',
+        month: row.month,
+        date: row.date,
+        createdAt: row.created_at,
+        updatedAt: row.updated_at ?? row.created_at,
+      }));
+    }
+  });
 
   // --- Calculate Summary ---
   // Define state for calculated settlement details
   const [settlementAmount, setSettlementAmount] = useState(0);
   const [settlementDirection, setSettlementDirection] = useState<{ fromUserId: string; toUserId: string } | null>(null);
 
+  // Use the new specific type for summary state
+  const [summary, setSummary] = useState<SettlementPageSummary | null>(null);
+
+  // --- Calculate Summary ---
   useEffect(() => {
     // Check if essential data is loading or missing, but don't exit early
-    if (expensesLoading || usersLoading || !currentUser || users.length < 2) {
+    if (expensesLoading || usersLoading || !user || users.length < 2) {
       // Set default/empty values but don't exit early
       setSummary({
         month: currentMonth,
@@ -250,8 +169,8 @@ export default function Settlement() {
     }
     
     // Match current user by document ID
-    const user1 = users.find(u => u.id === currentUser.uid);
-    const user2 = users.find(u => u.id !== currentUser.uid);
+    const user1 = users.find(u => u.id === user.uid);
+    const user2 = users.find(u => u.id !== user.uid);
 
     if (!user1 || !user2) {
         console.error("Could not find both users. User1:", user1, "User2:", user2);
@@ -343,36 +262,34 @@ export default function Settlement() {
     setSettlementDirection(calculatedSettlementDirection);
 
     // Added currentMonth to dependency array
-  }, [expenses, users, currentUser, expensesLoading, usersLoading, currentMonth]); // Dependencies remain the same
-
+  }, [expenses, users, user, expensesLoading, usersLoading, currentMonth]); // Dependencies remain the same
 
   const handleMonthChange = (month: string) => {
     setCurrentMonth(month);
   };
 
-  // Updated handleUnsettlement using Firestore
+  // Updated handleUnsettlement using Supabase
   const handleUnsettlement = async (settlementId: string) => { // ID is now string
     try {
-      const settlementRef = doc(db, "settlements", settlementId);
-      await deleteDoc(settlementRef);
+      await SupabaseService.delete('settlements', settlementId);
       toast({
         title: "Settlement removed",
         description: "The settlement has been removed successfully."
       });
-      // No need to manually refetch/invalidate, listener handles it
+      // No need to manually refetch/invalidate, React Query handles it
     } catch (error) {
       console.error("Error removing settlement:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to remove settlement",
+        description: "Failed to remove settlement. Please try again.",
         variant: "destructive"
       });
     }
   };
 
-  // Updated handleSettlement using Firestore
+  // Updated handleSettlement using Supabase
   const handleSettlement = async () => {
-    const isSettled = !settlementsLoading && settlements && settlements.length > 0; // Recalculate inside handler
+    const isSettled = !settlementsLoading && (settlements?.length ?? 0) > 0; // Recalculate inside handler
     if (isSettled) {
       toast({ title: "Already settled", variant: "destructive" }); return;
     }
@@ -380,32 +297,29 @@ export default function Settlement() {
     if (!settlementDirection || settlementAmount <= 0) {
       toast({ title: "Nothing to settle", description: "The balance is zero.", variant: "default" }); return;
     }
-    if (!currentUser) {
+    if (!user) {
        toast({ title: "Error", description: "User not logged in.", variant: "destructive" }); return;
     }
 
-    setIsSettling(true); // Start settling process
     setIsDialogOpen(false); // Close dialog immediately
 
     try {
-      const settlementData = {
+      await SupabaseService.create('settlements', {
         month: currentMonth,
         amount: settlementAmount, // Use state variable
-        date: Timestamp.now(), // Use Firestore Timestamp
-        fromUserId: settlementDirection.fromUserId, // Use state variable
-        toUserId: settlementDirection.toUserId, // Use state variable
+        date: new Date().toISOString().slice(0, 10), // YYYY-MM-DD
+        from_user_id: settlementDirection.fromUserId, // Use snake_case for Supabase
+        to_user_id: settlementDirection.toUserId, // Use snake_case for Supabase
         notes: `Settlement for ${currentMonth}`,
-        recordedBy: currentUser.uid, // Optional: track who recorded
-        createdAt: Timestamp.fromDate(new Date()), // Use server timestamp
-      };
-
-      await addDoc(collection(db, "settlements"), settlementData);
+        recorded_by: user.uid, // Use snake_case for Supabase
+        created_at: new Date().toISOString(),
+      });
 
       toast({
         title: "Settlement recorded",
         description: "The settlement has been recorded successfully."
       });
-      // No need to manually refetch/invalidate, listener handles it
+      // No need to manually refetch/invalidate, React Query handles it
     } catch (error) {
       console.error('Settlement error:', error);
       toast({
@@ -413,14 +327,12 @@ export default function Settlement() {
         description: error instanceof Error ? error.message : "Failed to record settlement.",
         variant: "destructive"
       });
-    } finally {
-      setIsSettling(false); // End settling process
     }
   };
 
   // Fix getUserName function to handle undefined users array
   const getUserName = (userId: string): string => {
-    // Use Firestore document ID for matching and handle undefined users
+    // Use Supabase document ID for matching and handle undefined users
     if (!users || users.length === 0) return 'User...';
     const user = users.find(u => u.id === userId);
     return user?.username || user?.email?.split('@')[0] || `User...`; // Fallback logic
@@ -442,6 +354,21 @@ const isSettled = !settlementsLoading && settlements && settlements.length > 0;
   const previousMonthIsSettled = !previousMonthSettlementsLoading && previousMonthSettlements && previousMonthSettlements.length > 0;
   const hasPreviousMonthExpenses = !previousMonthExpensesLoading && previousMonthExpenses && previousMonthExpenses.length > 0;
   const showUnsettledWarning = (!previousMonthIsSettled && hasPreviousMonthExpenses);
+
+  useEffect(() => {
+    const subscription = supabase
+      .channel('settlements_changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'settlements' }, () => {
+        // Refetch settlements on any change
+        refetchSettlements();
+      })
+      .subscribe();
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [refetchSettlements]);
+
 return (
     <div className="space-y-6 px-2 sm:px-4 pb-24">
       <div className="flex items-center justify-between mb-4">
@@ -492,7 +419,7 @@ return (
                       const name = receivingUser ? getUserName(receivingUserId) : 'User';
                       return (
                         <Avatar className="h-12 w-12 mb-2">
-                          <AvatarImage src={toOptionalString(receivingUser?.photoURL)} alt={name} />
+                          <AvatarImage src={receivingUser?.photoURL ?? undefined} alt={name} />
                           <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
                         </Avatar>
                       );
@@ -518,7 +445,7 @@ return (
                         return (
                           <Avatar className="h-12 w-12 mb-2">
                             {/* Add null check for photoURL */}
-                            <AvatarImage src={toOptionalString(foundUser.photoURL)} alt={name} />
+                            <AvatarImage src={foundUser.photoURL ?? undefined} alt={name} />
                             <AvatarFallback>{name.charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
                         );
@@ -544,7 +471,6 @@ return (
                   variant="default"
                   className="w-full"
                   onClick={() => setIsDialogOpen(true)}
-                  disabled={isSettling} // Disable if already settling
                 >
                   <Check className="mr-2 h-4 w-4" /> Mark as Settled
                 </Button>
@@ -577,7 +503,7 @@ return (
             <Card key={user.id} className="border-gray-200 h-fit shadow-sm">
               <CardContent className="p-2 sm:p-3 flex items-center">
                 <Avatar className="h-10 w-10 sm:h-11 sm:w-11 mr-2 flex-shrink-0 min-h-[44px] min-w-[44px]">
-                  <AvatarImage src={toOptionalString(user.photoURL)} alt={userName} />
+                  <AvatarImage src={user.photoURL ?? undefined} alt={userName} />
                   <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col flex-1 min-w-0 leading-tight">
@@ -610,8 +536,8 @@ return (
              <Button variant="outline">Cancel</Button>
           </DialogClose>
           {/* Remove AlertDialogAction wrapper, keep the Button */}
-          <Button type="button" onClick={handleSettlement} disabled={isSettling}>
-            {isSettling ? "Settling..." : "Confirm Settlement"}
+          <Button type="button" onClick={handleSettlement}>
+            Mark as Settled
           </Button>
         </DialogFooter>
       </ResponsiveDialog>

@@ -7,13 +7,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { User } from '@shared/types';
-import { 
-  onAuthStateChange, 
-  signInWithGoogle, 
-  logout as signOutUser, 
-  getCurrentUser 
-} from '@/services/auth.service';
+import { AuthService } from '@/services/auth.service';
 import { onNetworkStatusChange, isNetworkOnline } from '@/services/offline.service';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
 // Session timeout in milliseconds (30 minutes)
 const SESSION_TIMEOUT = 30 * 60 * 1000;
@@ -32,20 +28,13 @@ interface SessionState {
   lastActive: number | null;
 }
 
-export interface SessionActions {
+interface SessionActions {
   login: () => Promise<void>;
   logout: () => Promise<void>;
   refreshSession: () => void;
-  updateLastActive: () => void;
 }
 
-/**
- * Hook for comprehensive session management
- * 
- * @returns Session state and actions
- */
 export function useSession(): [SessionState, SessionActions] {
-  // Session state
   const [state, setState] = useState<SessionState>({
     user: null,
     isLoading: true,
@@ -53,11 +42,27 @@ export function useSession(): [SessionState, SessionActions] {
     isSessionExpired: false,
     isOffline: !isNetworkOnline(),
     error: null,
-    lastActive: getLastActiveTime()
+    lastActive: null
   });
 
-  // Save session token to storage
-  const setSessionToken = useCallback((token: string | null): void => {
+  // Update last active timestamp
+  const updateLastActive = useCallback(() => {
+    const now = Date.now();
+    sessionStorage.setItem(SESSION_LAST_ACTIVE_KEY, now.toString());
+    setState(prev => ({ ...prev, lastActive: now }));
+  }, []);
+
+  // Check if session has expired
+  const checkSessionExpiry = useCallback(() => {
+    const lastActive = sessionStorage.getItem(SESSION_LAST_ACTIVE_KEY);
+    if (!lastActive) return true;
+    
+    const timeSinceLastActive = Date.now() - parseInt(lastActive, 10);
+    return timeSinceLastActive > SESSION_TIMEOUT;
+  }, []);
+
+  // Set session token
+  const setSessionToken = useCallback((token: string | null) => {
     if (token) {
       sessionStorage.setItem(SESSION_TOKEN_KEY, token);
     } else {
@@ -65,53 +70,12 @@ export function useSession(): [SessionState, SessionActions] {
     }
   }, []);
 
-  // Update last active timestamp
-  const updateLastActive = useCallback((): void => {
-    const now = Date.now();
-    sessionStorage.setItem(SESSION_LAST_ACTIVE_KEY, now.toString());
-    setState(prev => ({ ...prev, lastActive: now, isSessionExpired: false }));
-  }, []);
-
-  // Get last active time from storage
-  function getLastActiveTime(): number | null {
-    const time = sessionStorage.getItem(SESSION_LAST_ACTIVE_KEY);
-    return time ? parseInt(time, 10) : null;
-  }
-
-  // Check if session is expired
-  const checkSessionExpiry = useCallback((): boolean => {
-    const lastActive = getLastActiveTime();
-    if (!lastActive) return false;
-    
-    const now = Date.now();
-    const timeSinceLastActive = now - lastActive;
-    
-    return timeSinceLastActive > SESSION_TIMEOUT;
-  }, []);
-
-  // Refresh the session
-  const refreshSession = useCallback(async (): Promise<void> => {
-    // Reset session expiry
-    updateLastActive();
-    // Check if user is authenticated
-    const user = await getCurrentUser();
-    if (user) {
-      setState(prev => ({
-        ...prev,
-        user,
-        isAuthenticated: true,
-        isSessionExpired: false,
-        error: null
-      }));
-    }
-  }, [updateLastActive]);
-
   // Login with Google
   const login = useCallback(async (): Promise<void> => {
     try {
       setState(prev => ({ ...prev, isLoading: true, error: null }));
       
-      await signInWithGoogle();
+      await AuthService.signInWithGoogle();
       
       // Session is now active
       updateLastActive();
@@ -131,7 +95,7 @@ export function useSession(): [SessionState, SessionActions] {
     try {
       setState(prev => ({ ...prev, isLoading: true }));
       
-      await signOutUser();
+      await AuthService.signOut();
       
       // Clear session data
       setSessionToken(null);
@@ -161,9 +125,21 @@ export function useSession(): [SessionState, SessionActions] {
     const isExpired = checkSessionExpiry();
     
     // Listen for auth state changes
-    const unsubscribe = onAuthStateChange((user) => {
-      if (user) {
-        // Generate a simple session token (in a real app, you'd use Firebase's getIdToken)
+    const { data: authListener } = AuthService.onAuthStateChange((supabaseUser: SupabaseUser | null) => {
+      if (supabaseUser) {
+        // Transform the Supabase user into our User type
+        const user: User = {
+          id: supabaseUser.id,
+          uid: supabaseUser.id,
+          email: supabaseUser.email || '',
+          username: supabaseUser.email?.split('@')[0] || '',
+          photoURL: null,
+          createdAt: supabaseUser.created_at,
+          updatedAt: supabaseUser.updated_at || supabaseUser.created_at,
+          isAnonymous: false
+        };
+
+        // Generate a simple session token
         const mockToken = `session_${Date.now()}`;
         setSessionToken(mockToken);
         
@@ -189,14 +165,14 @@ export function useSession(): [SessionState, SessionActions] {
     
     // If user is already authenticated when component mounts
     (async () => {
-      const currentUser = await getCurrentUser();
+      const currentUser = await AuthService.getCurrentUser();
       if (currentUser && !isExpired) {
         updateLastActive();
       }
     })();
     
     return () => {
-      unsubscribe();
+      authListener.subscription.unsubscribe();
     };
   }, [checkSessionExpiry, setSessionToken, updateLastActive]);
 
@@ -217,32 +193,10 @@ export function useSession(): [SessionState, SessionActions] {
     };
   }, [state.isAuthenticated, checkSessionExpiry]);
 
-  // Setup activity tracking
-  useEffect(() => {
-    if (!state.isAuthenticated) return;
-    
-    // Update last active time on user interaction
-    const events = ['mousedown', 'keydown', 'touchstart', 'scroll'];
-    
-    const handleUserActivity = () => {
-      updateLastActive();
-    };
-    
-    events.forEach(event => {
-      window.addEventListener(event, handleUserActivity);
-    });
-    
-    return () => {
-      events.forEach(event => {
-        window.removeEventListener(event, handleUserActivity);
-      });
-    };
-  }, [state.isAuthenticated, updateLastActive]);
-
   // Setup network status listener
   useEffect(() => {
-    const unsubscribe = onNetworkStatusChange((online) => {
-      setState(prev => ({ ...prev, isOffline: !online }));
+    const unsubscribe = onNetworkStatusChange((isOnline) => {
+      setState(prev => ({ ...prev, isOffline: !isOnline }));
     });
     
     return () => {
@@ -250,13 +204,5 @@ export function useSession(): [SessionState, SessionActions] {
     };
   }, []);
 
-  // Exposed actions
-  const actions: SessionActions = {
-    login,
-    logout,
-    refreshSession,
-    updateLastActive
-  };
-
-  return [state, actions];
+  return [state, { login, logout, refreshSession: updateLastActive }];
 } 

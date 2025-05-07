@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, getDocs, doc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { useAuth } from '@/contexts/AuthContext';
+// import { collection, query, orderBy, getDocs, doc, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+// import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/NewAuthContext';
 import './SettingsPage.css';
 import CategoryForm from '@/components/settings/CategoryForm';
 import LocationForm from '@/components/settings/LocationForm';
 import { Category, Location } from "@shared/types";
+import { ResourcesService } from '@/services/resources.service';
 
 interface ItemToDelete {
   id: string;
@@ -37,18 +38,10 @@ export default function SettingsPage() {
   useEffect(() => {
     if (!currentUser) return;
     
-    // Fetch categories from Firestore
     const fetchCategories = async () => {
       setCategoriesLoading(true);
       try {
-        // Fetch from Firestore
-        const categoriesCollection = collection(db, 'categories');
-        const categoriesQuery = query(categoriesCollection, orderBy('name'));
-        const categoriesSnapshot = await getDocs(categoriesQuery);
-        const categoriesData = categoriesSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Category[];
+        const categoriesData = await ResourcesService.getCategories();
         setCategories(categoriesData);
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -57,18 +50,10 @@ export default function SettingsPage() {
       }
     };
     
-    // Fetch locations from Firestore
     const fetchLocations = async () => {
       setLocationsLoading(true);
       try {
-        // Fetch from Firestore
-        const locationsCollection = collection(db, 'locations');
-        const locationsQuery = query(locationsCollection, orderBy('name'));
-        const locationsSnapshot = await getDocs(locationsQuery);
-        const locationsData = locationsSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        })) as Location[];
+        const locationsData = await ResourcesService.getLocations();
         setLocations(locationsData);
       } catch (error) {
         console.error('Error fetching locations:', error);
@@ -111,26 +96,20 @@ export default function SettingsPage() {
   const handleCategorySuccess = async (categoryData: Category) => {
     try {
       if (selectedCategory) {
-        // Update existing category in Firestore
-        const categoryRef = doc(db, 'categories', categoryData.id);
-        await updateDoc(categoryRef, {
+        // Update existing category
+        await ResourcesService.updateCategory(categoryData.id, {
           name: categoryData.name,
           icon: categoryData.icon
         });
-        
-        // Update local state
         setCategories(categories.map(cat =>
           cat.id === categoryData.id ? categoryData : cat
         ));
       } else {
-        // Add new category to Firestore
-        const docRef = await addDoc(
-          collection(db, 'categories'),
-          (({ id: _id, ...rest }) => rest)(categoryData)
-        );
-        
-        // Update local state with the new ID from Firestore
-        const newCategory = { ...categoryData, id: docRef.id };
+        // Add new category
+        const newCategory = await ResourcesService.createCategory({
+          name: categoryData.name,
+          icon: categoryData.icon
+        });
         setCategories([...categories, newCategory]);
       }
       setIsCategoryDialogOpen(false);
@@ -152,25 +131,16 @@ export default function SettingsPage() {
   const handleLocationSuccess = async (locationData: Location) => {
     try {
       if (selectedLocation) {
-        // Update existing location in Firestore
-        const locationRef = doc(db, 'locations', locationData.id);
-        await updateDoc(locationRef, {
+        // Update existing location
+        await ResourcesService.updateLocation(locationData.id, {
           name: locationData.name
         });
-        
-        // Update local state
         setLocations(locations.map(loc =>
           loc.id === locationData.id ? locationData : loc
         ));
       } else {
-        // Add new location to Firestore
-        const docRef = await addDoc(
-          collection(db, 'locations'),
-          (({ id: _id, ...rest }) => rest)(locationData)
-        );
-        
-        // Update local state with the new ID from Firestore
-        const newLocation = { ...locationData, id: docRef.id };
+        // Add new location
+        const newLocation = await ResourcesService.createLocation(locationData.name);
         setLocations([...locations, newLocation]);
       }
       setIsLocationDialogOpen(false);
@@ -189,26 +159,17 @@ export default function SettingsPage() {
     
     try {
       if (itemToDelete.type === 'category') {
-        // Delete from Firestore
-        const categoryRef = doc(db, 'categories', itemToDelete.id);
-        await deleteDoc(categoryRef);
-        
-        // Update local state
+        await ResourcesService.deleteCategory(itemToDelete.id);
         setCategories(categories.filter(cat => cat.id !== itemToDelete.id));
       } else if (itemToDelete.type === 'location') {
-        // Delete from Firestore
-        const locationRef = doc(db, 'locations', itemToDelete.id);
-        await deleteDoc(locationRef);
-        
-        // Update local state
+        await ResourcesService.deleteLocation(itemToDelete.id);
         setLocations(locations.filter(loc => loc.id !== itemToDelete.id));
       }
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
     } catch (error) {
-      console.error(`Error deleting ${itemToDelete.type}:`, error);
+      console.error('Error deleting item:', error);
     }
-    
-    setDeleteDialogOpen(false);
-    setItemToDelete(null);
   };
   
   const cancelDelete = () => {
