@@ -121,7 +121,7 @@ export interface Category {
   id: UUID;
   name: string;
   icon: string;
-  createdAt: ISODateString | Date;
+  createdAt?: ISODateString | Date;
   color?: string;      // Optional color field
 }
 

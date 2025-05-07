@@ -297,8 +297,7 @@ function transformCategory(row: Tables['categories']['Row']): Category {
     id: row.id as UUID,
     name: row.name,
     color: row.color || '#000000',
-    icon: row.icon || 'default',
-    createdAt: row.created_at as ISODateString
+    icon: row.icon || 'default'
   };
 }
 

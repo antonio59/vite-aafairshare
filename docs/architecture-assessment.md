@@ -181,3 +181,8 @@ The application now uses a centralized type system:
 - Common conversion functions for transforming between different type systems
 - Consistent enums for values like SplitType
 - Proper JSDoc comments for improved developer experience 
+
+## Installation Commands
+- pnpm install
+- pnpm run build
+- pnpm run test 

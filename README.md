@@ -4,7 +4,7 @@ A modern expense sharing application designed for two users to track and split e
 
 ## Features
 
-- 🔐 Google Authentication (via Supabase)
+- 🔐 Google Authentication only (via Supabase) — no email/password login
 - 💰 Track and categorize expenses
 - 📊 Visualize spending patterns with charts
 - 🔄 Split expenses equally (50/50) or assign to one user (100%)
@@ -63,7 +63,7 @@ cd fairshare
 
 2. Install dependencies
 ```bash
-npm install
+pnpm install
 ```
 
 3. Create a `.env` file in the root directory with your Supabase configuration:
@@ -74,7 +74,7 @@ VITE_SUPABASE_KEY=your-supabase-anon-key
 
 4. Start the development server
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ## Project Structure
@@ -137,3 +137,6 @@ See `.github/workflows/deploy.yml` for the full configuration.
 ## License
 
 MIT
+
+### Authentication
+- The only way to access the app is via Google Sign-In. There is no email/password login or registration. Only two users are supported, and both must be pre-created in the database (pending migration from Firebase).

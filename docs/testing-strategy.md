@@ -193,4 +193,10 @@ All tests will be run:
 - [Vitest Documentation](https://vitest.dev/)
 - [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
 - [Mock Service Worker](https://mswjs.io/)
-- [Cypress Documentation](https://docs.cypress.io/) 
+- [Cypress Documentation](https://docs.cypress.io/)
+
+## Installation Commands
+
+- pnpm install
+- pnpm run test
+- pnpm run build 

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "4i9GOXv4CqmLziZhNc7C",
+    "name": "Shopping",
+    "icon": "Shopping",
+    "color": "#EC4899"
+  },
+  {
+    "id": "7FIe4Kk3v7velUgiLcrE",
+    "name": "Dining",
+    "icon": "Dining",
+    "color": "#F97316",
+    "updatedAt": {
+      "_seconds": 1744393582,
+      "_nanoseconds": 834000000
+    }
+  },
+  {
+    "id": "7tjCIbpYQ0gEokzw8YfM",
+    "name": "Entertainment",
+    "color": "#9C27B0",
+    "icon": "Entertainment"
+  },
+  {
+    "id": "F1ZueElhd5ciayN2RqQZ",
+    "icon": "Health",
+    "name": "Health",
+    "color": "#A3E635"
+  },
+  {
+    "id": "MwfKkinWb0jdGmPPNSWw",
+    "name": "Transport",
+    "color": "#06B6D4",
+    "icon": "Transport"
+  },
+  {
+    "id": "fG69FIQZ28Oh6GK05B5r",
+    "name": "Groceries",
+    "color": "#4CAF50",
+    "icon": "Groceries"
+  },
+  {
+    "id": "mDaWeyEv4ThLtChrFRhn",
+    "name": "Holidays",
+    "color": "#8B5CF6",
+    "icon": "Holidays"
+  },
+  {
+    "id": "mEsuXO7iuGFntx4y6wOa",
+    "color": "#607D8B",
+    "name": "Gifts",
+    "icon": "Gifts"
+  },
+  {
+    "id": "s2Sib3yjwjMce2mA3Sra",
+    "name": "Utilities",
+    "color": "#FFC107",
+    "icon": "Utilities"
+  },
+  {
+    "id": "tIAsrznfPG6c8v9LqlqR",
+    "name": "Subscriptions",
+    "color": "#6B7280",
+    "icon": "Subscriptions"
+  }
+]

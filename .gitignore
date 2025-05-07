@@ -101,3 +101,6 @@ yarn-error.log*
 
 # History files
 .history/
+
+# Firebase service account key
+scripts/firebase-service-account.json

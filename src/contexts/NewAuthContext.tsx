@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User, AuthContextType } from '@shared/types';
+import { User } from '@shared/types';
 import { AuthService } from '../services';
+
+interface AuthContextType {
+  user: User | null;
+  loading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
+}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -13,18 +20,13 @@ export function useAuth(): AuthContextType {
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const { data: authListener } = AuthService.onAuthStateChange((user: User | null) => {
-      if (user) {
-        setCurrentUser(user);
-        setLoading(false);
-      } else {
-        setCurrentUser(null);
-        setLoading(false);
-      }
+      setUser(user);
+      setLoading(false);
     });
 
     return () => {
@@ -37,16 +39,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (error) throw error;
   };
 
-  const logout = async () => {
+  const signOut = async () => {
     const { error } = await AuthService.signOut();
     if (error) throw error;
   };
 
   const value: AuthContextType = {
-    currentUser,
+    user,
     loading,
     signInWithGoogle,
-    logout
+    signOut
   };
 
   return (

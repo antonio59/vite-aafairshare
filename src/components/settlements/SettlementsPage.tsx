@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '@/contexts/NewAuthContext';
 import { ExpenseWithDetails } from '@shared/types';
-import { useExpenses } from '../../contexts/ExpenseContext';
+import { useExpenses } from '@/contexts/ExpenseContext';
 import './SettlementsPage.css';
 
 // Add types for settlements and summary

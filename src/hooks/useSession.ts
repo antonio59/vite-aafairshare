@@ -9,7 +9,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { User } from '@shared/types';
 import { AuthService } from '@/services/auth.service';
 import { onNetworkStatusChange, isNetworkOnline } from '@/services/offline.service';
-import { User as SupabaseUser } from '@supabase/supabase-js';
 
 // Session timeout in milliseconds (30 minutes)
 const SESSION_TIMEOUT = 30 * 60 * 1000;
@@ -125,24 +124,11 @@ export function useSession(): [SessionState, SessionActions] {
     const isExpired = checkSessionExpiry();
     
     // Listen for auth state changes
-    const { data: authListener } = AuthService.onAuthStateChange((supabaseUser: SupabaseUser | null) => {
-      if (supabaseUser) {
-        // Transform the Supabase user into our User type
-        const user: User = {
-          id: supabaseUser.id,
-          uid: supabaseUser.id,
-          email: supabaseUser.email || '',
-          username: supabaseUser.email?.split('@')[0] || '',
-          photoURL: null,
-          createdAt: supabaseUser.created_at,
-          updatedAt: supabaseUser.updated_at || supabaseUser.created_at,
-          isAnonymous: false
-        };
-
+    const { data: authListener } = AuthService.onAuthStateChange((user: User | null) => {
+      if (user) {
         // Generate a simple session token
         const mockToken = `session_${Date.now()}`;
         setSessionToken(mockToken);
-        
         setState(prev => ({
           ...prev,
           user,
@@ -152,7 +138,6 @@ export function useSession(): [SessionState, SessionActions] {
         }));
       } else {
         setSessionToken(null);
-        
         setState(prev => ({
           ...prev,
           user: null,

@@ -63,3 +63,8 @@ We follow semantic versioning (MAJOR.MINOR.PATCH):
 3. Create a release PR from `develop` to `main`
 4. After approval, merge to trigger production deployment
 5. Tag the release with appropriate version 
+
+- npm install
+- npm run build
++ pnpm install
++ pnpm run build 
