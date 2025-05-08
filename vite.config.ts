@@ -21,9 +21,7 @@ export default defineConfig({
         // manualChunks removed for clean, error-free build
       },
       external: (id) => {
-        // Externalize all @radix-ui/* packages and their subpaths
-        if (id.startsWith('@radix-ui/')) return true;
-        // Externalize other known problematic packages
+        // Only externalize packages you truly want to provide via CDN or similar
         return [
           'recharts',
           'react-hook-form',
