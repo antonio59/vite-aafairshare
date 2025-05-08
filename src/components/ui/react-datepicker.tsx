@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 
 interface DatePickerProps {
   value?: Date;
-  onChange: (date: Date | null) => void;
+  onChange: (_date: Date | null) => void;
   label?: string;
   placeholder?: string;
   className?: string;
