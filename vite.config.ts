@@ -25,7 +25,6 @@ export default defineConfig({
         if (id.startsWith('@radix-ui/')) return true;
         // Externalize other known problematic packages
         return [
-          'sonner',
           'recharts',
           'react-hook-form',
           'react-datepicker',
