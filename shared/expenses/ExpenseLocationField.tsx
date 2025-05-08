@@ -9,7 +9,7 @@ import { Control } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Combobox } from '@/components/ui/combobox';
 import { Location, Expense } from '@shared/types';
-import { ResourcesService } from '/Users/antoniosmith/Projects/vite-aafairshare/src/services/resources.service';
+import { ResourcesService } from "@/services/resources.service";
 import { useToast } from '@/hooks/use-toast';
 
 interface ExpenseLocationFieldProps {

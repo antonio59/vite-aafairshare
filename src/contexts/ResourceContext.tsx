@@ -7,7 +7,7 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Category, Location } from '@shared/types';
-import { ResourcesService } from '/Users/antoniosmith/Projects/vite-aafairshare/src/services/resources.service';
+import { ResourcesService } from "@/services/resources.service";
 import { useAuth } from './NewAuthContext';
 
 interface ResourceContextType {

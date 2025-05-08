@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 // TODO: Update the import path for useExpenses to the correct location in your project
 // import { useExpenses } from '@/contexts/ExpenseContext';
 import { useAuth } from '@/contexts/NewAuthContext';
-import { ResourcesService } from '/Users/antoniosmith/Projects/vite-aafairshare/src/services/resources.service';
+import { ResourcesService } from "@/services/resources.service";
 import { ExpenseWithDetails, Category, Location, User } from '@shared/types';
 import './ExpenseForm.css';
 
