@@ -1,3 +1,4 @@
+console.log("Main entry loaded");
 // Ensure React is imported first
 import React from 'react';
 import { createRoot } from "react-dom/client";
@@ -33,6 +34,7 @@ const renderApp = () => {
 
   // Create root and render app
   const root = createRoot(container);
+  console.log("About to render React app");
   root.render(
     <React.StrictMode>
 

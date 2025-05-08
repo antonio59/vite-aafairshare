@@ -64,87 +64,84 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 // App component using react-router-dom
 function App() {
-  console.log("App: Rendering App component");
-  
+  console.log("App component loaded");
   return (
     <QueryCli client={queryClient}>
+      <AuthProvider>
+        <ResourceProvider>
+          <MobileToastProvider>
+            <ErrorBoundary>
+              <BrowserRouter>
+                <Suspense fallback={<LoadingFallback />}>
+                  <Routes>
+                    {/* Public route */}
+                    <Route path="/login" element={<Login />} />
 
-        <AuthProvider>
-          <ResourceProvider>
-            <MobileToastProvider>
-              <ErrorBoundary>
-                <BrowserRouter>
-                  <Suspense fallback={<LoadingFallback />}>
-                    <Routes>
-                      {/* Public route */}
-                      <Route path="/login" element={<Login />} />
+                    {/* Explicit redirect from root to dashboard */}
+                    <Route index element={<Navigate to="/dashboard" replace />} />
+                    
+                    {/* Protected Routes */}
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <Dashboard />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/analytics"
+                      element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <Analytics />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/settlement"
+                      element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <Settlement />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/settings"
+                      element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <Settings />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                    />
 
-                      {/* Explicit redirect from root to dashboard */}
-                      <Route index element={<Navigate to="/dashboard" replace />} />
-                      
-                      {/* Protected Routes */}
-                      <Route
-                        path="/dashboard"
-                        element={
-                          <ProtectedRoute>
-                            <MainLayout>
-                              <Dashboard />
-                            </MainLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/analytics"
-                        element={
-                          <ProtectedRoute>
-                            <MainLayout>
-                              <Analytics />
-                            </MainLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/settlement"
-                        element={
-                          <ProtectedRoute>
-                            <MainLayout>
-                              <Settlement />
-                            </MainLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                      <Route
-                        path="/settings"
-                        element={
-                          <ProtectedRoute>
-                            <MainLayout>
-                              <Settings />
-                            </MainLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-
-                      {/* Catch-all for 404 */}
-                      <Route
-                        path="*"
-                        element={
-                          <ProtectedRoute>
-                            <MainLayout>
-                              <NotFound />
-                            </MainLayout>
-                          </ProtectedRoute>
-                        }
-                      />
-                    </Routes>
-                  </Suspense>
-                  <SonnerToaster richColors closeButton />
-                  <LiveRegionAnnouncer />
-                </BrowserRouter>
-              </ErrorBoundary>
-            </MobileToastProvider>
-          </ResourceProvider>
-        </AuthProvider>
-
+                    {/* Catch-all for 404 */}
+                    <Route
+                      path="*"
+                      element={
+                        <ProtectedRoute>
+                          <MainLayout>
+                            <NotFound />
+                          </MainLayout>
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Routes>
+                </Suspense>
+                <SonnerToaster richColors closeButton />
+                <LiveRegionAnnouncer />
+              </BrowserRouter>
+            </ErrorBoundary>
+          </MobileToastProvider>
+        </ResourceProvider>
+      </AuthProvider>
     </QueryCli>
   );
 }
