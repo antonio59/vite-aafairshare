@@ -37,9 +37,9 @@ export class AuthService {
   }
 
   static async getCurrentUser() {
-    const { data: { user }, error } = await supabase.auth.getUser()
+    const { data: { user: _user }, error } = await supabase.auth.getUser()
     if (error) throw error
-    return user
+    return _user
   }
 
   static async updateUserProfile(userId: string, updates: {
@@ -68,7 +68,7 @@ export class AuthService {
     return data
   }
 
-  static onAuthStateChange(callback: (user: User | null) => void) {
+  static onAuthStateChange(callback: (_user: User | null) => void) {
     return supabase.auth.onAuthStateChange((_event, session) => {
       if (_event === 'SIGNED_IN' && session?.user) {
         const now = new Date().toISOString();

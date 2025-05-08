@@ -399,7 +399,6 @@ export default function ExpenseForm({ expense, onClose, categories: propCategori
                           onChange={field.onChange}
                           className="border-0 shadow-none h-[40px] text-base w-full"
                           id={field.name}
-                          name={field.name}
                         />
                       </FormControl>
                       <FormMessage className="text-xs text-destructive" />

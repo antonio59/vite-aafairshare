@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /*
   NOTE: This file uses `as any` for refs passed to ResizablePrimitive.PanelGroup, Panel, and PanelResizeHandle.
   This is required due to incomplete or incompatible type definitions in the `react-resizable-panels` library,

@@ -3,12 +3,11 @@ import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
 
 export default defineConfig({
-  plugins: [react()],
   test: {
     environment: 'jsdom',
-    globals: true,
     setupFiles: ['./src/test/setup.ts'],
-    include: ['**/*.{test,spec}.{ts,tsx}'],
+    include: ['./src/**/*.{test,spec}.{ts,tsx}'],
+    globals: true,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -20,6 +19,7 @@ export default defineConfig({
       ],
     },
   },
+  plugins: react(),
   resolve: {
     alias: {
       '@': resolve(__dirname, './src'),

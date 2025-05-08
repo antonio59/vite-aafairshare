@@ -77,7 +77,7 @@ const DrawerContent = React.forwardRef<
   }, [children]);
 
   return (
-    <DrawerPortal>
+    <>
       <DrawerOverlay />
       <DrawerPrimitive.Content
         ref={ref}
@@ -97,7 +97,7 @@ const DrawerContent = React.forwardRef<
         )}
         {children}
       </DrawerPrimitive.Content>
-    </DrawerPortal>
+    </>
   );
 })
 DrawerContent.displayName = "DrawerContent"

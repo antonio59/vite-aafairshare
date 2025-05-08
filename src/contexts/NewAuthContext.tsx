@@ -4,9 +4,12 @@ import { AuthService } from '../services';
 
 interface AuthContextType {
   user: User | null;
+  currentUser: User | null;
+  allUsers: User[];
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -46,9 +49,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value: AuthContextType = {
     user,
+    currentUser: user,
+    allUsers: user ? [user] : [],
     loading,
     signInWithGoogle,
-    signOut
+    signOut,
+    logout: signOut
   };
 
   return (

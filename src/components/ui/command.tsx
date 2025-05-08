@@ -27,7 +27,7 @@ Command.displayName = CommandPrimitive.displayName
 // Replaced empty interface with type alias
 type CommandDialogProps = DialogProps;
 
-const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
+const CommandDialog = ({ children, ...props }: CommandDialogProps & { children: React.ReactNode }) => {
   // Use a stable, hardcoded ID
   const descriptionId = "command-dialog-description";
 
@@ -42,7 +42,7 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
         <DialogTitle className="sr-only">Command Menu</DialogTitle>
         <DialogDescription id={descriptionId} className="sr-only">Select a command or search.</DialogDescription>
         <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
-          {children}
+          {children as any}
         </Command>
       </DialogContent>
     </Dialog>
@@ -77,7 +77,11 @@ const CommandList = React.forwardRef<
   const listRef = React.useRef<HTMLDivElement>(null);
 
   // Combine the forwarded ref and the local ref
-  React.useImperativeHandle(ref, () => listRef.current!, []);
+  React.useImperativeHandle<HTMLDivElement | null, HTMLDivElement | null>(
+    ref,
+    () => listRef.current,
+    []
+  );
 
   React.useEffect(() => {
     const listElement = listRef.current;

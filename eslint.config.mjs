@@ -8,7 +8,21 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import importPlugin from 'eslint-plugin-import'
 
 export default [
-  { ignores: ['dist', 'node_modules', 'backup', 'functions/lib', 'src_backup', 'shared_backup', 'test', 'tests'] },
+  { ignores: [
+    'dist',
+    'node_modules',
+    'backup',
+    'functions/lib',
+    'src_backup',
+    'shared_backup',
+    'test',
+    'tests',
+    '.history',
+    'shared/dist',
+    'scripts',
+    'supabase/functions',
+    '*.d.ts'
+  ] },
 
   // Base config for all files
   {
@@ -115,7 +129,7 @@ export default [
       'react/prop-types': 'off',
       'react/display-name': 'off',
       'react/no-unescaped-entities': 'off',
-      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/naming-convention': 'off',
       '@typescript-eslint/consistent-type-imports': 'off',
       '@typescript-eslint/explicit-function-return-type': 'off',

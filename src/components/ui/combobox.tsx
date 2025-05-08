@@ -79,7 +79,7 @@ const ComboboxContent: React.FC<ComboboxContentProps> = ({
   inputClassName,
 }) => {
   // Enhanced blur handler: close dropdown if input loses focus and no selection is made
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
   const enhancedHandleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     // If focus moves outside the popover, close it
@@ -92,7 +92,7 @@ const ComboboxContent: React.FC<ComboboxContentProps> = ({
   return (
     <Command shouldFilter={false} className="w-full">
       <CommandInput
-        ref={inputRef}
+        ref={inputRef as unknown as React.Ref<never>}
         placeholder={`Search ${placeholder.toLowerCase()}...`}
         value={_searchQuery}
         onValueChange={_setSearchQuery}

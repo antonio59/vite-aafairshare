@@ -40,10 +40,10 @@ const createEmptySummary = (month: string): MonthSummary => ({
 export default function Expenses() {
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
   useEffect(() => {
-    if (!/^d{4}-\d{2}$/.test(currentMonth)) {
+    if (!/^\d{4}-\d{2}$/.test(currentMonth)) {
       setCurrentMonth(getCurrentMonth());
     }
-  }, []);
+  }, [currentMonth]);
   const [isExpenseFormOpen, setIsExpenseFormOpen] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<ExpenseWithDetails | undefined>(undefined);
   const [expenseToDelete, setExpenseToDelete] = useState<ExpenseWithDetails | null>(null);

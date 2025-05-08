@@ -497,22 +497,22 @@ return (
       {/* User summaries - moved below settlement card */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         {users.map((user) => {
-          const amountPaid = summary?.userExpenses?.[user.id] ?? 0;
+            const amountPaid = summary?.userExpenses?.[user.id] ?? 0;
           const userName = getUserName(user.id);
           return (
             <Card key={user.id} className="border-gray-200 h-fit shadow-sm">
               <CardContent className="p-2 sm:p-3 flex items-center">
                 <Avatar className="h-10 w-10 sm:h-11 sm:w-11 mr-2 flex-shrink-0 min-h-[44px] min-w-[44px]">
                   <AvatarImage src={user.photoURL ?? undefined} alt={userName} />
-                  <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="flex flex-col flex-1 min-w-0 leading-tight">
+                    <AvatarFallback>{userName.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex flex-col flex-1 min-w-0 leading-tight">
                   <p className="text-xs font-medium text-gray-500 truncate">{userName} Paid</p>
-                  <p className="text-base font-semibold text-gray-900 truncate">{formatCurrency(amountPaid)}</p>
-                </div>
-              </CardContent>
-            </Card>
-          );
+                    <p className="text-base font-semibold text-gray-900 truncate">{formatCurrency(amountPaid)}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            );
         })}
       </div>
 

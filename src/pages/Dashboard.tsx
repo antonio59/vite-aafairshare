@@ -14,7 +14,7 @@ import {
   ISODateString,
 } from "@shared/types";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/NewAuthContext";
 import { SupabaseService, transformSettlement, transformExpense } from '@/services/supabase.service';
 import type { Tables } from '@/services/supabase.service';
 import {
@@ -58,7 +58,7 @@ export default function Dashboard() {
     if (!/^\d{4}-\d{2}$/.test(currentMonth)) {
       setCurrentMonth(getCurrentMonth());
     }
-  }, []);
+  }, [currentMonth]);
 
   const queryClient = useQueryClient();
   const handleMonthChange = useCallback((newMonth: string) => {
@@ -82,11 +82,11 @@ export default function Dashboard() {
     loading: authLoading
   } = useAuth();
   // TODO: Replace with Supabase data fetching for categories, locations, and users
-  const resourceCategories: any[] = [];
-  const resourceLocations: any[] = [];
+  const resourceCategories: any[] = useMemo(() => [], []);
+  const resourceLocations: any[] = useMemo(() => [], []);
   const categoriesLoading = false;
   const locationsLoading = false;
-  const userAllUsers: any[] = allUsers || [];
+  const userAllUsers: any[] = useMemo(() => allUsers || [], [allUsers]);
   const userUsersLoading = false;
 
   // Check data loading status but don't block rendering

@@ -18,31 +18,21 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Vendor chunks
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-ui': [
-            '@radix-ui/react-alert-dialog',
-            '@radix-ui/react-avatar',
-            '@radix-ui/react-dialog',
-            '@radix-ui/react-dropdown-menu',
-            '@radix-ui/react-icons',
-            '@radix-ui/react-label',
-            '@radix-ui/react-navigation-menu',
-            '@radix-ui/react-popover',
-            '@radix-ui/react-select',
-            '@radix-ui/react-slot',
-            '@radix-ui/react-switch',
-            '@radix-ui/react-tabs',
-            '@radix-ui/react-toast',
-            '@radix-ui/react-toggle',
-            '@radix-ui/react-toggle-group'
-          ],
-          'vendor-utils': ['date-fns', 'zod', 'class-variance-authority', 'clsx', 'tailwind-merge'],
-          'vendor-charts': ['recharts'],
-          'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas', 'canvg'],
-          'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'react-datepicker', 'react-day-picker']
-        }
+        // manualChunks removed for clean, error-free build
+      },
+      external: (id) => {
+        // Externalize all @radix-ui/* packages and their subpaths
+        if (id.startsWith('@radix-ui/')) return true;
+        // Externalize other known problematic packages
+        return [
+          'sonner',
+          'recharts',
+          'react-hook-form',
+          'react-datepicker',
+          'react-datepicker/dist/react-datepicker.css',
+          'cmdk',
+          'vaul'
+        ].includes(id);
       }
     },
     chunkSizeWarningLimit: 1000, // Increase the warning limit to 1000KB
