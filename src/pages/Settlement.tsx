@@ -15,7 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { SupabaseService } from '@/services/supabase.service';
 import type { Tables } from '@/services/supabase.service';
-import { supabase } from '../config/supabase';
+import { supabase } from '@/lib/supabase';
 
 // Define a specific type for the summary data needed on this page
 interface SettlementPageSummary {

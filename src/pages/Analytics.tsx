@@ -18,7 +18,7 @@ import {
   transformExpense,
   transformSettlement
 } from "@/services/supabase.service";
-import { supabase } from '../config/supabase';
+import { supabase } from '@/lib/supabase';
 
 export default function Analytics() {
   const [currentMonth] = useState(getCurrentMonth());

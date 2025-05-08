@@ -4,7 +4,7 @@
  * This service provides methods for managing expenses in the application.
  */
 
-import supabase from '@/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { Expense, ExpenseWithDetails, Category, Location, User } from '@shared/types';
 
 export class ExpensesService {

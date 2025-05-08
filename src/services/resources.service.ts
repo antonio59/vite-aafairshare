@@ -1,4 +1,4 @@
-import supabase from '@/config/supabase';
+import { supabase } from '@/lib/supabase';
 import { Category, Location } from '@shared/types';
 
 export class ResourcesService {

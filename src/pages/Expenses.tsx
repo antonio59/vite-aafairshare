@@ -20,7 +20,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { SupabaseService, transformExpense } from '@/services/supabase.service';
 import type { Tables } from '@/services/supabase.service';
-import { supabase } from '../config/supabase';
+import { supabase } from '@/lib/supabase';
 
 const createEmptySummary = (month: string): MonthSummary => ({
   month: month,

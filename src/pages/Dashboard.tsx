@@ -25,7 +25,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
-import { supabase } from '../config/supabase';
+import { supabase } from '@/lib/supabase';
 
 type ExportFormat = 'csv' | 'pdf';
 
