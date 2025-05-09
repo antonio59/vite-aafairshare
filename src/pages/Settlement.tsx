@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ResponsiveDialog } from "@/components/ui/responsive-dialog";
 import { DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/NewAuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { SupabaseService } from '@/services/supabase.service';
 import type { Tables } from '@/services/supabase.service';

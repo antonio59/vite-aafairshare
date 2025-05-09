@@ -22,12 +22,16 @@ export default function Login() {
   const { user, signInWithGoogle, signOut } = useAuth();
   const navigate = useNavigate();
 
+  console.log('[Login] Render: user =', user);
+
   useEffect(() => {
     if (user) {
       if (ALLOWED_EMAILS.includes(user.email)) {
+        console.log('[Login] Redirecting to /');
         navigate("/", { replace: true });
       } else {
         // Not allowed, sign out and show error
+        console.log('[Login] User not allowed, signing out.');
         signOut();
         toast({
           title: "Access Denied",
@@ -40,11 +44,13 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
+    console.log('[Login] handleGoogleLogin: Starting Google sign-in');
     try {
       await signInWithGoogle();
+      console.log('[Login] handleGoogleLogin: signInWithGoogle resolved');
       toast({ title: "Login Successful", description: "Welcome back!" });
     } catch (error) {
-      console.error("Google Authentication Error:", error);
+      console.error("[Login] Google Authentication Error:", error);
       toast({
         title: "Login Failed",
         description: error instanceof Error ? error.message : "Could not complete Google sign in.",
@@ -52,11 +58,13 @@ export default function Login() {
       });
     } finally {
       setLoadingGoogle(false);
+      console.log('[Login] handleGoogleLogin: setLoadingGoogle(false)');
     }
   };
 
   // If already logged in, show nothing (will redirect)
   if (user) {
+    console.log('[Login] User exists, returning null.');
     return null;
   }
 

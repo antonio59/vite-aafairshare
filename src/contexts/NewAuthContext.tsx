@@ -27,10 +27,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('[AuthProvider] Calling AuthService.onAuthStateChange');
     const { data: authListener } = AuthService.onAuthStateChange((user: User | null) => {
+      console.log('[AuthProvider] Auth state changed:', user);
       setUser(user);
       setLoading(false);
+      console.log('[AuthProvider] loading set to false');
     });
+    console.log('[AuthProvider] AuthService.onAuthStateChange subscription set:', authListener);
 
     return () => {
       authListener.subscription.unsubscribe();
@@ -57,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     logout: signOut
   };
 
+  console.log('[AuthProvider] Render: user =', user, 'loading =', loading);
   return (
     <AuthContext.Provider value={value}>
       {children}

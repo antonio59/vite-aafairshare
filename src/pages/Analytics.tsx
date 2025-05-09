@@ -6,7 +6,7 @@ import { announce } from "@/components/LiveRegion";
 import { formatCurrency, formatMonthYear, getCurrentMonth, getMonthFromDate } from "@/lib/utils";
 import { getUserColor, getCategoryColor, getLocationColor } from "@/lib/chartColors";
 import { DataChart, TrendChart } from "@/components/AnalyticsChart";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/NewAuthContext";
 import { MonthSummary, TrendData } from "@shared/types";
 import { SupabaseService } from "@/services/supabase.service";
 import { subMonths, startOfMonth } from "date-fns";

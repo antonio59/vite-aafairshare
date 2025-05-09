@@ -69,7 +69,9 @@ export class AuthService {
   }
 
   static onAuthStateChange(callback: (_user: User | null) => void) {
+    console.log('[AuthService] onAuthStateChange called');
     return supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('[AuthService] Supabase event:', _event, 'session:', session);
       if (_event === 'SIGNED_IN' && session?.user) {
         const now = new Date().toISOString();
         const _user: User = {
@@ -82,9 +84,13 @@ export class AuthService {
           updatedAt: session.user.updated_at || now,
           isAnonymous: false
         };
+        console.log('[AuthService] Invoking callback with user:', _user);
         callback(_user);
-      } else if (_event === 'SIGNED_OUT') {
+      } else if (_event === 'SIGNED_OUT' || (_event === 'INITIAL_SESSION' && !session)) {
+        console.log('[AuthService] Invoking callback with null (signed out or initial session null)');
         callback(null);
+      } else {
+        console.log('[AuthService] Event ignored:', _event);
       }
     });
   }

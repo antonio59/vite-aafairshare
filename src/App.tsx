@@ -36,30 +36,15 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { currentUser, loading } = useAuth();
   const navigate = useNavigate();
 
-  // Only show loading indicator during initial authentication check
-  // (but limit this to a brief period to ensure UI renders)
   useEffect(() => {
     if (!loading && !currentUser) {
-      console.warn("ProtectedRoute: Not authenticated. Redirecting to login.");
       navigate("/login", { replace: true });
     }
   }, [currentUser, loading, navigate]);
 
-  // Always return content if we're on a protected route to prevent blank screens
-  return (
-    <>
-      {loading && (
-        <div className="flex items-center justify-center min-h-screen bg-background">
-          <div className="text-center space-y-4">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            <h2 className="text-lg font-medium text-foreground">Loading...</h2>
-            <p className="text-sm text-muted-foreground">Checking authentication...</p>
-          </div>
-        </div>
-      )}
-      {!loading && children}
-    </>
-  );
+  if (loading) return null; // Render nothing while checking
+  if (!currentUser) return null; // Redirect will happen via useEffect
+  return <>{children}</>;
 }
 
 // App component using react-router-dom
